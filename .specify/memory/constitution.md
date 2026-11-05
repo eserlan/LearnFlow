@@ -9,8 +9,8 @@ Sync Impact Report
   IV. Audio and Visual in Concert; V. Accessible, Inclusive and Respectful; VI. Honest, Visible AI;
   VII. Small, Verifiable Slices
 - Sections: Child Safety, Legal and Content Constraints; Quality Gates and Development Workflow; Governance
-- Templates requiring updates: ⚠ pending. Spec Kit templates (.specify/templates/) are not yet initialised in
-  this repository; the Constitution Check in plan-template.md should reference principles I–VII once they are.
+- Templates requiring updates: ✅ .specify/templates/ initialised (Spec Kit 1.1.0). plan-template.md derives
+  its Constitution Check gates from this file, so it needs no edits.
 - Follow-up TODOs: none
 -->
 

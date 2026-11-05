@@ -5,12 +5,16 @@ A mobile-first, audio-visual learning companion for independent use with school 
 ## Structure
 - `.specify/memory/constitution.md` — non-negotiable product principles
 - `specs/001-*` through `specs/007-*` — feature specifications with user stories and acceptance scenarios
+- `.specify/templates/`, `.specify/scripts/`, `.specify/workflows/` — Spec Kit templates and scripts (Spec Kit 1.1.0)
+- `.claude/skills/speckit-*` — Spec Kit commands for Claude Code
 
 ## Recommended Spec Kit workflow
-1. Initialise a GitHub Spec Kit repository using the official tooling, or copy this package into an existing Spec Kit-enabled repository.
-2. Review the constitution with `/speckit.constitution`.
-3. Refine each draft with `/speckit.clarify` and `/speckit.specify` as needed.
-4. For each feature, use `/speckit.plan`, `/speckit.tasks`, then `/speckit.implement`.
+Spec Kit is initialised with the Claude integration (`specify init --here --integration claude`).
+
+1. Review the constitution with `/speckit-constitution`.
+2. Refine each draft with `/speckit-clarify` (and `/speckit-specify` for new features). Resolve the `[NEEDS CLARIFICATION]` markers in 002, 003 and 006 first.
+3. For each feature, use `/speckit-plan`, `/speckit-tasks`, then `/speckit-implement`.
+4. Optionally, use `/speckit-checklist` after planning and `/speckit-analyze` before implementing.
 5. Implement 007 as cross-cutting design constraints alongside 001–004.
 
 ## Suggested vertical slice
