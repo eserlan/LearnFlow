@@ -4,8 +4,9 @@ split: dev
 subject: engelsk
 gradeBand: vg
 language: en
-contentType: expository
+contentType: exercises
 features:
+  - exercises
   - lists
 source:
   type: ndla
@@ -18,10 +19,45 @@ source:
     - Sonja Nygaard-Joki (writer)
   notes: NDLA article 22942, revision 16. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: The task is to watch a 5-minute NASA video from the series "Science for a Hungry World".
+      sourceQuote: Watch this video (5:12 min.) from American space agency NASA's series called "Science for a Hungry World".
+    - id: f2
+      statement: The video has difficult words, so turn on English subtitles and write down new words to look up later.
+      sourceQuote: It uses a number of difficult words, so remember to activate the English subtitles and take note of any new words to look up in a dictionary afterwards.
+    - id: f3
+      statement: The video is about farming around the world when the climate changes.
+      sourceQuote: This short video provides a global perspective on agriculture in a changing climate.
+    - id: f4
+      statement: Question 1 asks for two or three concrete examples of how climate can affect farming.
+      sourceQuote: Give 2-3 specific examples of how the climate can affect agriculture.
+    - id: f5
+      statement: Question 2 asks the pupil to explain a quotation from the video.
+      sourceQuote: '"Vulnerability to climate is uneven across the world." Can you explain what this quotation from the video means?'
+    - id: f6
+      statement: Question 3 asks how population growth affects farming; question 4 asks what the pupil would do if they could change the world's response.
+      sourceQuote: How does population growth affect agriculture?
+  keyTerms:
+    - term: agriculture
+    - term: climate
+    - term: population growth
+    - term: subtitles
+  mustPreserve:
+    - { value: "5:12", kind: number }
+    - { value: NASA, kind: name }
+    - { value: Science for a Hungry World, kind: name }
+    - { value: 2-3, kind: number }
+    - { value: Vulnerability to climate is uneven across the world., kind: term }
+  qualifiers:
+    - quote: specific examples
+      note: The task wants concrete examples, not a general statement.
+  expectations:
+    - "Each of the four questions is explained, never answered. In particular, no examples of climate effects on farming are given."
+    - "The quotation in question 2 is kept word for word in English, in quotation marks. It may be explained only as far as needed to understand the task, not interpreted."
+    - "Nothing is said about what the video contains beyond what the text says; the video itself is not available to the model."
+    - "\"Dig deeper\" refers to a playlist link that is not in the pasted text; it may be left out or kept, but no link is invented."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Video-based task page; the text alone is thin. Tests that the model does not invent video content or answer the questions.

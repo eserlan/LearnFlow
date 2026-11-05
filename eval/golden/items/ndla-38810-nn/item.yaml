@@ -8,6 +8,7 @@ contentType: expository
 features:
   - notation
   - lists
+  - qualifiers
 source:
   type: ndla
   url: https://ndla.no/article/38810
@@ -19,10 +20,84 @@ source:
     - Anne Langerud (writer)
   notes: NDLA article 38810, revision 94. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: Plantene tek opp karbondioksid og vatn og lagar sukker (glukose) og oksygen.
+      sourceQuote: Plantene tek opp karbondioksid (CO₂) og vatn (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og oksygen (O₂).
+    - id: f2
+      statement: Energien som driv fotosyntesen, kjem frå lys.
+      sourceQuote: Plantene bruker energien frå lyset til å drive fotosyntesen.
+    - id: f3
+      statement: Alt liv på jorda er direkte eller indirekte avhengig av stoffa fotosyntesen lagar.
+      sourceQuote: Alle levande organismar på jorda er direkte eller indirekte avhengige av dei organiske stoffa som blir produserte i fotosyntesen.
+    - id: f4
+      statement: Plantene bruker sukkeret som byggemateriale for å vekse.
+      sourceQuote: Litt forenkla kan vi seie at sukkeret er byggemateriale som plantene bruker for å vekse og bli større.
+    - id: f5
+      statement: Sukkeret er òg ei energikjelde; energien blir frigjord i respirasjonen.
+      sourceQuote: Sukkeret blir òg brukt som energikjelde, og denne energien blir frigjord i det vi kallar respirasjonen.
+    - id: f6
+      statement: Plantene kan lagre sukker som stivelse, til dømes i poteta og kålrota.
+      sourceQuote: I poteta eller kålrota er sukkeret danna om til stivelse som fungerer som opplagsnæring.
+    - id: f7
+      statement: Fotosyntesen skjer i kloroplastar i dei grøne plantedelane, og klorofyllet i dei gir den grøne fargen.
+      sourceQuote: Det er klorofyllet som gir den grøne fargen på blada.
+    - id: f8
+      statement: Klorofyllet fangar energien i lyset (lysreaksjonen); energien blir brukt til å binde karbondioksid til sukker (calvinsyklus).
+      sourceQuote: Energien blir send vidare til andre delar i kloroplasten og brukt til å drive prosessen der karbondioksid blir bunden og blir til sukker (calvinsyklus).
+    - id: f9
+      statement: "Viktige faktorar for effektiv fotosyntese er lys, vatn, næring, temperatur og CO₂."
+      sourceQuote: "Det følgande er viktige faktorar i dette arbeidet:"
+    - id: f10
+      statement: I områda våre er fotosyntesen mest effektiv rundt 20–25 °C.
+      sourceQuote: mest effektiv rundt 20–25 °C.
+    - id: f11
+      statement: Utan lys eller utan CO₂ stoppar fotosyntesen.
+      sourceQuote: Utan CO₂ stoppar fotosyntesen.
+  keyTerms:
+    - term: fotosyntese
+    - term: respirasjonen
+      sourceDefinition: denne energien blir frigjord i det vi kallar respirasjonen
+    - term: stivelse
+    - term: opplagsnæring
+    - term: kloroplastar
+      sourceDefinition: kloroplastar, som er små korn inne i cellene
+    - term: klorofyll
+      sourceDefinition: Det er klorofyllet som fangar energien i lyset
+    - term: lysreaksjonen
+      sourceDefinition: "Det er klorofyllet som fangar energien i lyset, og membranane fungerer nesten som solcellepanel. Denne prosessen blir kalla lysreaksjonen."
+    - term: calvinsyklus
+      sourceDefinition: prosessen der karbondioksid blir bunden og blir til sukker (calvinsyklus)
+    - term: spalteopningane
+  mustPreserve:
+    - { value: CO₂, kind: formula }
+    - { value: H₂O, kind: formula }
+    - { value: C₆H₁₂O₆, kind: formula }
+    - { value: O₂, kind: formula }
+    - { value: 20–25 °C, kind: unit }
+    - { value: karbondioksid, kind: term }
+    - { value: glukose, kind: term }
+  qualifiers:
+    - quote: direkte eller indirekte
+      note: Not every organism eats plants; dropping this overstates the claim.
+    - quote: Litt forenkla
+      note: The source flags its own simplification; keep the hedge or an equivalent.
+    - quote: I områda våre
+      note: The 20–25 °C range is regional, not universal.
+    - quote: nesten som solcellepanel
+      note: An analogy, not a literal claim.
+    - quote: Sjølve fotosyntesen krev lite vatn.
+      note: Easy to invert into "plants need a lot of water for photosynthesis".
+    - quote: Utandørs er ikkje mangel på CO₂ noko problem
+      note: Keep the outdoor/greenhouse contrast.
+  expectations:
+    - "The chemical formulas stay exactly as written, with subscripts: CO₂, H₂O, C₆H₁₂O₆, O₂."
+    - "The term \"glukose\" is kept (it can be explained as a kind of sugar), not replaced by \"sukker\" alone."
+    - "The five factors stay a list of five; none is dropped or merged."
+    - "No extra facts are added, e.g. the balanced equation (6CO₂ + 6H₂O), which the source does not give."
+    - "Written in Nynorsk throughout; no Bokmål forms (e.g. \"vatn\", not \"vann\"; \"kloroplastar\", not \"kloroplaster\")."
+    - "Its facts should match the Bokmål twin ndla-38810-nb; a difference between the two outputs points to a language-variant problem."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Nynorsk twin of the worked example ndla-38810-nb. Annotations mirror it.

@@ -7,6 +7,7 @@ language: nn
 contentType: expository
 features:
   - dates-sequence
+  - qualifiers
 source:
   type: ndla
   url: https://ndla.no/article/27137
@@ -18,10 +19,111 @@ source:
     - Eivind Sehested Zakariassen (writer)
   notes: NDLA article 27137, revision 87. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: Under reformasjonen braut fleire statar med paven og laga sine eigne statskyrkjer.
+      sourceQuote: Fleire statar bryt med paven og dannar sine eigne statskyrkjer.
+    - id: f2
+      statement: Martin Luther, ein tysk munk og teologiprofessor, starta protesten i 1517. Han ville først reformere den katolske kyrkja, men blei bannlyst av paven.
+      sourceQuote: Han ønskte i utgangspunktet å reformere den katolske kyrkja, men blei i staden bannlyst av paven.
+    - id: f3
+      statement: Kyrkja var alt svekt av pavesetet i Avignon, periodar med fleire pavar samtidig, og svartedauden.
+      sourceQuote: Fleire hendingar på 1300- og 1400-talet hadde svekt stillinga til kyrkja i Europa.
+    - id: f4
+      statement: Luther var inspirert av humanismen. For han var Bibelen den einaste kjelda til rett tru, og han ville ha Bibelen omsett til lokale språk.
+      sourceQuote: For Luther var Bibelen den einaste kjelda til rett tru.
+    - id: f5
+      statement: Boktrykkjarkunsten, som Gutenberg fann opp på midten av 1400-talet, hjelpte reformatorane å spreie bodskapen og omsette biblar.
+      sourceQuote: Denne teknologien blei flittig brukt av Luther og andre reformatorar for å spreie bodskapen sin
+    - id: f6
+      statement: Avlatshandelen, der kyrkja selde avlatsbrev for å sleppe straff i skjærselden, var ein viktig del av Luthers protest.
+      sourceQuote: Ein viktig del av Luthers protest var avlatshandelen.
+    - id: f7
+      statement: Mange tyske fyrstar støtta Luther. Dei fekk meir makt og rikdom når kyrkja blei statskyrkje og staten tok over eigedommane.
+      sourceQuote: Eigedommane til kyrkja blei overtekne av staten, og kongen blei overhovudet til den nye statskyrkja.
+    - id: f8
+      statement: Luther meinte menneska blir frelste gjennom trua åleine, og at tilgiving er ei sak mellom den enkelte og Gud.
+      sourceQuote: Luther meinte dette var ei sak mellom den enkelte angrande synder og Gud.
+    - id: f9
+      statement: I protestantiske land blei synd straffa etter statlege lover, og hekseprosessane var verst på 1600-talet.
+      sourceQuote: Det er på denne tida hekseprosessane er på sitt verste, og dei protestantiske landa dominerte statistikken.
+    - id: f10
+      statement: Den katolske kyrkja har to kjelder (Bibelen og tradisjonen); Luther meinte berre Bibelen skulle gjelde.
+      sourceQuote: Den katolske kyrkja har to kjelder til kva som er rett tradisjon
+    - id: f11
+      statement: Hoc est corpus meum betyr "Dette er lekamen min" og er truleg opphavet til Hokus Pokus.
+      sourceQuote: Hoc est corpus meum betyr "Dette er lekamen min", og er truleg opphavet til trylleformularet Hokus Pokus.
+    - id: f12
+      statement: Avtalen i Augsburg i 1555 lét fyrstane velje kyrkje. Konflikten blei avgjord med freden i Westfalen i 1648, som gav oss ideen om suverene statar.
+      sourceQuote: Konflikten heldt likevel fram og blei først avgjort etter trettiårskrigen i fredsavtalen i Westfalen (1648).
+    - id: f13
+      statement: Noreg fekk ei luthersk kyrkje 20 år etter Luthers brot. Lutheranarar er i dag rundt 10 % av protestantane i verda.
+      sourceQuote: Lutherske kristne utgjer i dag rundt 10 % av protestantane i verda
+    - id: f14
+      statement: Frå eit katolsk perspektiv var reformasjonen ein katastrofe. Avlatshandelen blei forboden i 1567.
+      sourceQuote: Frå eit katolsk perspektiv var reformasjonen ein katastrofe.
+    - id: f15
+      statement: I 2017 var det 500 år sidan reformasjonen, og det blei diskutert om det var noko å feire.
+      sourceQuote: I 2017 var det 500 år sidan Martin Luther starta reformasjonen sin.
+  keyTerms:
+    - term: reformasjonen
+    - term: statskyrkjer
+    - term: bannlyst
+    - term: humanistiske
+    - term: avlatshandelen
+      sourceDefinition: der kyrkja byrja å ta betalt for tilgiving gjennom å selje såkalla avlatsbrev
+    - term: skrifte
+      sourceDefinition: skrifte, det vil seie vedkjenne seg syndene sine
+    - term: skjærselden
+      sourceDefinition: ein slags mellomtilstand før ein kjem til himmelen
+    - term: protestantiske
+    - term: liturgien
+      sourceDefinition: Liturgien, dvs. dei faste, rituelle delane av gudstenesta
+    - term: nattverden
+    - term: suverene statar
+      sourceDefinition: "Ein stat skal kunne bestemme over sine indre saker utan at andre blandar seg inn."
+  mustPreserve:
+    - { value: "1517", kind: date }
+    - { value: "1555", kind: date }
+    - { value: "1648", kind: date }
+    - { value: "1567", kind: date }
+    - { value: "2017", kind: date }
+    - { value: nesten 70 år, kind: number }
+    - { value: 20 år, kind: number }
+    - { value: rundt 10 %, kind: number }
+    - { value: nesten 500 år, kind: number }
+    - { value: Hoc est corpus meum, kind: term }
+    - { value: Dette er lekamen min, kind: term }
+    - { value: Martin Luther, kind: name }
+    - { value: Johan Gutenberg, kind: name }
+    - { value: Avignon, kind: name }
+    - { value: Augsburg, kind: name }
+    - { value: Westfalen, kind: name }
+  qualifiers:
+    - quote: i utgangspunktet
+      note: Luther first wanted reform, not a split.
+    - quote: men makt, rikdom og frigjering frå paven var nok medverkande årsaker
+      note: '"nok" and "medverkande": a likely contributing reason, not the reason. Many princes were also convinced Lutherans.'
+    - quote: Fleire kongar og fyrstar var overtydde lutheranarar
+    - quote: Kyrkja skulle i mindre grad vere eit mellomledd
+      note: Less of a go-between, not none at all.
+    - quote: Dei forstod kanskje ikkje kva orda betydde
+    - quote: er truleg opphavet til trylleformularet Hokus Pokus
+    - quote: Det er uvisst om trylleformularet oppstod før reformasjonen
+    - quote: ifølgje den katolske kyrkja
+      note: The transformation of bread and wine is the Catholic church's teaching, not stated as fact.
+    - quote: mange katolikkar meiner framleis i dag
+    - quote: men samtidig var det sider ved Luthers lære som la grunnen for ei slik utvikling
+      note: Keeps the balance in the last section; 1500s Lutheranism was not liberal.
+  expectations:
+    - "Religious teachings are reported as what each church or person believes (\"Luther meinte\", \"i katolsk tru\"), never as facts."
+    - "Both perspectives stay: the Lutheran story and the Catholic view that it was a catastrophe. The simplified text does not take a side."
+    - "\"Hoc est corpus meum\" stays word for word in Latin, with its translation."
+    - "The name is kept as written in the source (\"Johan Gutenberg\"), not silently corrected."
+    - "\"20 år etter Luthers brot\" is not turned into a year the source does not give."
+    - "The opening question of the Latin section (\"Er det noko kjent med desse orda?\") stays a question for the reader."
+    - "Written in Nynorsk throughout; no Bokmål forms."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Long (about 1,600 words) religion and history text. Many hedges and attributed beliefs; tests neutrality between denominations (krle).

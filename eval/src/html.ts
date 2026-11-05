@@ -145,7 +145,7 @@ export interface Representations {
 }
 
 /** Headings of reference lists. They are page furniture (001 FR-010): pasted, but not simplified. */
-const REFERENCE_HEADING = /^(kilder|kjelder|kildeliste|kjeldeliste|referanser|litteratur|litteraturliste|sources|references|bibliography)$/i;
+const REFERENCE_HEADING = /^(kilder?|kjelder?|kildeliste|kjeldeliste|kildehenvisning(ar|er)?|referanser?|litteratur|litteraturliste|sources?|references?|bibliography)$/i;
 
 /**
  * Remove what 001 should leave out of the text it hands to simplification: reference lists

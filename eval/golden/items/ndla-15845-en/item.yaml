@@ -4,10 +4,12 @@ split: test
 subject: engelsk
 gradeBand: vg
 language: en
-contentType: expository
+contentType: mixed
 features:
   - lists
   - dates-sequence
+  - exercises
+  - qualifiers
 source:
   type: ndla
   url: https://ndla.no/article/15845
@@ -21,10 +23,72 @@ source:
     - Anne Scott Hagen (writer)
   notes: NDLA article 15845, revision 5. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: Australia is a multicultural country.
+      sourceQuote: Australia is a multicultural country.
+    - id: f2
+      statement: The Aborigines, the indigenous Australians, probably came to Australia about 40,000 years ago. They were nomadic hunters with their own culture.
+      sourceQuote: The indigenous Australians or Aborigines probably arrived in Australia about 40,000 years ago.
+    - id: f3
+      statement: About 300,000 Aborigines lived in Australia when the Europeans came.
+      sourceQuote: When the Europeans came to Australia there were about 300,000 Aborigines living there.
+    - id: f4
+      statement: Some Aborigines were killed by settlers, and many died of new diseases the immigrants brought.
+      sourceQuote: Some were killed by the new settlers and many died from the new diseases that the immigrants brought with them.
+    - id: f5
+      statement: Many Aboriginal children were taken from their parents to grow up in white homes.
+      sourceQuote: Many Aboriginal children were taken away from their parents to be raised in white homes.
+    - id: f6
+      statement: In 2009 the Australian prime minister apologised to the Aborigines for how they had been treated.
+      sourceQuote: In 2009, the Australian prime minister apologised to the Aborigines for the way they had been treated.
+    - id: f7
+      statement: Aborigines still have more unemployment and shorter lives than other Australians.
+      sourceQuote: higher unemployment and lower life expectancy than for other Australians
+    - id: f8
+      statement: Uluru (Ayers Rock) is a holy place for the Aboriginal people.
+      sourceQuote: Uluru or Ayers Rock is a holy place for the Aboriginal people.
+    - id: f9
+      statement: From 1945 to 1965 the government paid half the ticket for anyone who wanted to settle in Australia, and many Europeans came.
+      sourceQuote: Between 1945 and 1965, the Australian government paid half the travel fare for anyone wanting to settle in Australia.
+    - id: f10
+      statement: Later, refugees from Vietnam and the former Soviet Union came, and people from Polynesia, China and India.
+      sourceQuote: Later many refugees from Vietnam and the former Soviet Union arrived.
+  keyTerms:
+    - term: Aborigines
+      sourceDefinition: The indigenous Australians or Aborigines
+    - term: indigenous
+    - term: nomadic
+    - term: multicultural
+    - term: immigrants
+    - term: refugees
+    - term: didjeridoo
+  mustPreserve:
+    - { value: "40,000", kind: number }
+    - { value: "300,000", kind: number }
+    - { value: "2009", kind: date }
+    - { value: "1945", kind: date }
+    - { value: "1965", kind: date }
+    - { value: half the travel fare, kind: number }
+    - { value: Uluru, kind: name }
+    - { value: Ayers Rock, kind: name }
+    - { value: the former Soviet Union, kind: name }
+  qualifiers:
+    - quote: probably arrived
+      note: The date is uncertain; do not state it as fact.
+    - quote: about 40,000 years ago
+    - quote: about 300,000 Aborigines
+    - quote: Some were killed by the new settlers and many died
+      note: '"Some" and "many" must not become "most" or "all".'
+    - quote: Many Aboriginal children
+      note: Not all children.
+  expectations:
+    - "This is already an easy text (\"Easy Text\"). It is a control item: changes should be small, and nothing important may be lost while simplifying it further."
+    - "The vocabulary list keeps all nine words exactly as written, because the task is to translate them. Their Norwegian translations are not given."
+    - "The \"Find out\", \"Discuss\" and \"Research\" tasks are explained, not answered. No facts about Uluru (state, nearest town, height, rock type) are added."
+    - "The first question (where immigrants come from today) is kept as a question, not answered."
+    - "The sentence about the link collection refers to a link that is not in the text; it may be left out."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Control item. Sensitive history (colonisation, removal of children); the simplified text must not soften or sharpen it.

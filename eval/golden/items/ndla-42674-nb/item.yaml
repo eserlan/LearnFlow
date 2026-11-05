@@ -8,6 +8,8 @@ contentType: expository
 features:
   - notation
   - lists
+  - qualifiers
+  - fact-box
 source:
   type: ndla
   url: https://ndla.no/article/42674
@@ -19,10 +21,87 @@ source:
     - Sølvi Skeide (writer)
   notes: NDLA article 42674, revision 247. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: De fleste vulkaner oppstår nær plategrenser.
+      sourceQuote: De fleste vulkaner oppstår i nærheten av plategrenser.
+    - id: f2
+      statement: Vulkaner oppstår når magma (smeltet stein) presser seg opp gjennom sprekker i jordskorpa. Ute på overflata kalles den lava.
+      sourceQuote: Vulkaner oppstår når smeltet stein, magma, presser seg opp gjennom sprekker og åpninger i jordskorpa. Når magmaen kommer ut på overflata, kalles den lava.
+    - id: f3
+      statement: Vulkaner dannes både der platene beveger seg fra hverandre (spredningssoner) og der de kolliderer (kollisjonssoner).
+      sourceQuote: dannes både når litosfæreplater beveger seg fra hverandre (spredningssoner), og når de kolliderer (kollisjonssoner)
+    - id: f4
+      statement: I spredningssoner er lavaen ofte tynn og lager skjoldvulkaner med slake sider.
+      sourceQuote: Den sprer seg utover og bygger vulkaner med slake sider, såkalte skjoldvulkaner.
+    - id: f5
+      statement: I kollisjonssoner er lavaen tykk og seig og bygger bratte stratovulkaner, som ofte har mer eksplosive utbrudd.
+      sourceQuote: Lag på lag med seig lava og annet vulkansk materiale som aske bygger opp bratte kjegleformede stratovulkaner.
+    - id: f6
+      statement: Noen vulkaner ligger over varmeflekker (hotspoter) der ekstra varm magma stiger opp. Hawaiiøyene ble til slik.
+      sourceQuote: Hawaiiøyene er blitt til fordi stillehavsplata beveger seg sakte over en varmeflekk.
+    - id: f7
+      statement: Vulkanutbrudd har ført til tap av liv, ødelagte bygninger og beitemarker, hungersnød, skogbranner, flom og skred.
+      sourceQuote: De har gjennom historien ført til tap av liv, ødelagte bygninger og beitemarker, hungersnød, skogbranner, flom og skred.
+    - id: f8
+      statement: Det er vanskelig å vite nøyaktig når et utbrudd kommer, men jordskjelv, gassutslipp og ras kan varsle om det.
+      sourceQuote: Det er vanskelig å vite nøyaktig når et vulkanutbrudd skjer
+    - id: f9
+      statement: Vi skiller mellom lava, pyroklastisk materiale og aske og gass. Pyroklastisk materiale er varme gasser og partikler som strømmer raskt nedover og er svært farlig.
+      sourceQuote: Vi skiller mellom lava, pyroklastisk materiale og aske og gass.
+    - id: f10
+      statement: Utbruddet på Eyjafjallajökull på Island i 2010 stanset flytrafikken i store deler av Europa.
+      sourceQuote: Ved vulkanutbruddet på Eyjafjallajökull på Island i 2010 ble det sluppet ut så mye aske i atmosfæren at flytrafikken i store deler av Europa ble stanset.
+    - id: f11
+      statement: Vulkaner gir også mineraler, metaller og fruktbar jord, og geotermisk energi brukes blant annet på Island og New Zealand.
+      sourceQuote: Lava og aske gir også fruktbar og mineralrik jord som gjør det lettere å drive jordbruk.
+    - id: f12
+      statement: Svovelgasser fra utbrudd kan gi kortvarig nedkjøling. Ett utbrudd alene øker ikke den globale CO₂-mengden, men mange store utbrudd over lang tid kan bidra til global oppvarming.
+      sourceQuote: men ett utbrudd alene vil ikke kunne øke den globale CO₂-mengden
+  keyTerms:
+    - term: magma
+      sourceDefinition: smeltet stein, magma
+    - term: lava
+      sourceDefinition: Når magmaen kommer ut på overflata, kalles den lava.
+    - term: plategrenser
+    - term: spredningssoner
+    - term: kollisjonssoner
+    - term: skjoldvulkaner
+    - term: stratovulkaner
+    - term: varmeflekker
+      sourceDefinition: Noen steder i mantelen stiger ekstra varm magma opp mot jordskorpa. Slike områder kalles varmeflekker eller hotspoter.
+    - term: pyroklastisk materiale
+      sourceDefinition: Pyroklastisk materiale er en blanding av varme gasser og partikler som kan strømme raskt nedover fjellsider.
+    - term: geotermisk energi
+  mustPreserve:
+    - { value: Eyjafjallajökull, kind: name }
+    - { value: "2010", kind: date }
+    - { value: Hawaiiøyene, kind: name }
+    - { value: New Zealand, kind: name }
+    - { value: CO₂, kind: formula }
+    - { value: "2:57", kind: number }
+  qualifiers:
+    - quote: De fleste vulkaner
+      note: Most, not all; the text later says not all are at plate boundaries.
+    - quote: Ikke alle vulkaner ligger langs plategrenser.
+    - quote: lavaen ofte tynn og lettflytende
+    - quote: ofte mer eksplosive utbrudd
+    - quote: men er ofte forutsigbare
+      note: Lava flows are often, not always, predictable.
+    - quote: påvirke klimaet kortvarig
+      note: Short-term only.
+    - quote: men ett utbrudd alene vil ikke kunne øke den globale CO₂-mengden
+      note: The most important hedge. Dropping it says volcanoes cause global warming.
+    - quote: Over lang tid kan likevel mange store vulkanutbrudd bidra til global oppvarming.
+      note: '"kan", "mange store", "over lang tid", "bidra" all limit the claim.'
+  expectations:
+    - "The climate paragraph keeps both directions (short-term cooling from sulphur gases, and CO₂ that alone does not raise global levels), with the hedges."
+    - "The \"Kort oppsummert\" summary may be merged with the text, but its three points must survive."
+    - "The fact box about Eyjafjallajökull keeps the place, the year and the consequence (flights stopped in much of Europe)."
+    - "The film paragraph refers to a video that is not in the text; it may be left out. Nothing is said about the film's content."
+    - "The rhetorical questions to the reader (\"Har du noen gang badet i en varm kilde …\") are not answered."
+    - "\"Askefast\" is in quotation marks in the source; if kept, it stays marked as an everyday word."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Long expository text with summary box, fact box and an important climate hedge.

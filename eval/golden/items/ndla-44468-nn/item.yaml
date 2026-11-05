@@ -8,6 +8,8 @@ contentType: expository
 features:
   - lists
   - dates-sequence
+  - qualifiers
+  - fact-box
 source:
   type: ndla
   url: https://ndla.no/article/44468
@@ -19,10 +21,98 @@ source:
     - Sølvi Skeide (writer)
   notes: NDLA article 44468, revision 248. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: Dei fleste jordskjelv skjer langs plategrenser, når litosfæreplater plutseleg flyttar seg i forhold til kvarandre og frigir energi.
+      sourceQuote: Jordskjelv oppstår når litosfæreplater plutseleg beveger seg i forhold til kvarandre og frigir energi.
+    - id: f2
+      statement: Når to plater pressar mot kvarandre lenge, byggjer det seg opp spenningar til ei plate gir etter.
+      sourceQuote: Når to plater pressar mot kvarandre over lang tid, bygger det seg opp spenningar mellom desse.
+    - id: f3
+      statement: Brotpunktet heiter fokus, forskyvinga heiter forkasting, og punktet på overflata rett over fokus heiter episenter.
+      sourceQuote: Brotpunktet blir kalla fokuset til jordskjelvet, og forskyvinga av jordskorpa blir kalla ein forkasting.
+    - id: f4
+      statement: Dei kraftigaste skjelva skjer som oftast der to plater kolliderer. Områda rundt stillehavsplata er spesielt utsette.
+      sourceQuote: Dei kraftigaste skjelva skjer som oftast når to plater kolliderer.
+    - id: f5
+      statement: Noreg ligg langt frå ei plategrense, men har små jordskjelv, mest langs kysten og i Oslo-området.
+      sourceQuote: Dei fleste er små og finst langs kysten eller i Oslo-området.
+    - id: f6
+      statement: Jordskjelv i Noreg kjem av landheving etter istida og svakheiter i berggrunnen.
+      sourceQuote: Det er to grunnar til at vi får jordskjelv i Noreg
+    - id: f7
+      statement: Jordskjelv blir målte med seismometer. I dag brukar ein moment-magnitudeskalaen (MMS), ikkje lenger Richters skala.
+      sourceQuote: Tidlegare brukte ein Richters skala, men i dag blir den meir presise moment-magnitudeskalaen (MMS) brukt.
+    - id: f8
+      statement: Skalaen er logaritmisk. Magnitude 6 gir ti gonger kraftigare ristingar enn magnitude 5, men 32 gonger meir energi.
+      sourceQuote: Eit jordskjelv med styrke (magnitude) 6 har ti gonger kraftigare ristingar enn eit jordskjelv med styrke 5, men frigjer heile 32 gonger meir energi.
+    - id: f9
+      statement: Magnitude 1–3 merkast knapt, 4–6 merkast og kan gjere mindre skadar, 7 og oppover kan gjere store skadar.
+      sourceQuote: Dei svakaste jordskjelva (magnitude 1–3) vil knapt merkast av oss menneske
+    - id: f10
+      statement: Jordskjelv er den naturkatastrofen som tek flest liv, men det er bygningar som rasar saman som drep, ikkje skjelvet sjølv.
+      sourceQuote: Det er ikkje skjelvet i seg sjølv som gjer at folk mister livet, men det skjer i samband med bygningar som rasar saman.
+    - id: f11
+      statement: Kraftige jordskjelv på havbotnen kan lage tsunamiar, som er vanlegast i Stillehavet og Indiahavet. Eksempel er Indiahavet (2004) og Japan (2011).
+      sourceQuote: Dei seinare åra har vi opplevd store jordskjelv med tsunamibølger i mellom anna Indiahavet (2004) og i Japan (2011).
+    - id: f12
+      statement: Sommaren 2025 blei det sendt ut tsunamivarsel i fleire land etter eit kraftig jordskjelv aust i Russland.
+      sourceQuote: Sommaren 2025 vart det òg sendt ut tsunamivarsel i fleire land etter eit kraftig jordskjelv aust i Russland.
+    - id: f13
+      statement: Fattige land får ofte større skadar og fleire døde fordi dei har dårleg råd til å forsterke bygningar.
+      sourceQuote: Fattige land har ofte dårleg råd til å kunne gjere førebyggande tiltak som å forsterke svake bygningar.
+  keyTerms:
+    - term: plategrenser
+    - term: litosfæreplater
+    - term: fokus
+      sourceDefinition: Brotpunktet blir kalla fokuset til jordskjelvet
+    - term: forkasting
+      sourceDefinition: forskyvinga av jordskorpa blir kalla ein forkasting
+    - term: episenter
+      sourceDefinition: Punktet på jordoverflata rett over fokus blir kalla episenter
+    - term: landheving
+    - term: seismometer
+    - term: seismologi
+      sourceDefinition: seismologi (læra om jordskjelv)
+    - term: magnitude
+    - term: logaritmisk skala
+      sourceDefinition: logaritmisk skala, som betyr at kvart trinn er ti gonger kraftigare enn det førre
+    - term: tsunami
+      sourceDefinition: ein tsunami – ei kjempestor havbølge
+    - term: etterskjelv
+  mustPreserve:
+    - { value: ti gonger, kind: number }
+    - { value: 32 gonger, kind: number }
+    - { value: magnitude 1–3, kind: number }
+    - { value: magnitude 4–6, kind: number }
+    - { value: magnitude 7 og oppover, kind: number }
+    - { value: "2004", kind: date }
+    - { value: "2011", kind: date }
+    - { value: Sommaren 2025, kind: date }
+    - { value: NORSAR, kind: name }
+    - { value: https://www.jordskjelv.no/, kind: name }
+    - { value: moment-magnitudeskalaen (MMS), kind: term }
+    - { value: Richters skala, kind: name }
+  qualifiers:
+    - quote: Dei fleste jordskjelv skjer langs plategrenser.
+      note: Most, not all; Norway is the counter-example.
+    - quote: som oftast når to plater kolliderer
+    - quote: Dei fleste er små
+    - quote: spesielt der bygningar ikkje toler ristingane
+    - quote: Nokre av desse landa vart trefte av tsunamibølger, mens andre slapp unna.
+      note: Do not say all the warned countries were hit.
+    - quote: Rike land har som regel råd
+    - quote: Fattige land har ofte dårleg råd
+      note: '"som regel" and "ofte" keep this from being a blanket claim about rich and poor countries.'
+    - quote: risikoen nokre stader vil vere større
+  expectations:
+    - "The magnitude comparison keeps both numbers and both quantities: ten times stronger shaking, 32 times more energy. Mixing them up (e.g. \"ten times more energy\") is a factual error."
+    - "The three magnitude bands stay three, with their ranges unchanged."
+    - "Focus, fault (forkasting) and epicentre stay distinct; the epicentre is on the surface above the focus."
+    - "The point that buildings, not the shaking itself, cause most deaths is kept."
+    - "The NORSAR box may be shortened but keeps the organisation's name and what the website shows. The URL may be kept or left out, but never changed."
+    - "Written in Nynorsk throughout; no Bokmål forms."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Number-heavy (logarithmic scale, magnitude bands, years) with a recent date (2025). Test split.

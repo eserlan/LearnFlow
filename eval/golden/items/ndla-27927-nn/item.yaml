@@ -9,6 +9,7 @@ features:
   - exercises
   - lists
   - dates-sequence
+  - qualifiers
 source:
   type: ndla
   url: https://ndla.no/article/27927
@@ -20,10 +21,63 @@ source:
     - Eivind Sehested Zakariassen (writer)
   notes: NDLA article 27927, revision 58. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: Athen i antikken hadde direkte demokrati, mens Noreg i dag har indirekte demokrati.
+      sourceQuote: I Athen i antikken hadde ein eit direkte demokrati, mens vi i Noreg i dag har eit indirekte demokrati.
+    - id: f2
+      statement: Noreg har òg brukt direkte demokrati nokre gonger i moderne tid.
+      sourceQuote: Noreg har òg teke i bruk direkte demokrati i enkelte tilfelle i moderne tid.
+    - id: f3
+      statement: For borgarane i Athen tydde demokrati at dei sjølve var med på å ta avgjerder om sitt eige liv.
+      sourceQuote: For borgarane i Athen i antikken betydde demokrati at dei sjølv var med på å ta avgjerder som påverka deira eige liv.
+    - id: f4
+      statement: Noreg har vore med i krigar i tidlegare Jugoslavia (1999), Afghanistan (2001) og Libya (2011).
+      sourceQuote: som til dømes i tidlegare Jugoslavia i 1999, i Afghanistan i 2001 og i Libya i 2011
+    - id: f5
+      statement: I 1999 og 2001 tok både Regjeringa og Stortinget stilling. I 2011 avgjorde Regjeringa åleine, og det er lov etter norsk lov.
+      sourceQuote: I 1999 og 2001 blei saka behandla både i Regjeringa og på Stortinget, men i 2011 blei avgjerda teken av Regjeringa åleine.
+    - id: f6
+      statement: Veljarane blei ikkje spurde direkte i nokon av desse tilfella.
+      sourceQuote: Uansett blei ikkje dei norske veljarane spurde direkte i nokon av tilfella.
+    - id: f7
+      statement: Oppgåve 3 ber eleven drøfte påstanden at direkte demokrati er meir demokratisk enn indirekte demokrati.
+      sourceQuote: Direkte demokrati er meir demokratisk enn indirekte demokrati.
+    - id: f8
+      statement: Oppgåve 4 ber eleven finne argument for begge synspunkta.
+      sourceQuote: Prøv å finne argument for begge synspunkta.
+  keyTerms:
+    - term: direkte demokrati
+    - term: indirekte demokrati
+    - term: Stortinget
+    - term: Regjeringa
+    - term: veljarane
+    - term: drøft
+    - term: grunngi
+  mustPreserve:
+    - { value: "1999", kind: date }
+    - { value: "2001", kind: date }
+    - { value: "2011", kind: date }
+    - { value: tidlegare Jugoslavia, kind: name }
+    - { value: Afghanistan, kind: name }
+    - { value: Libya, kind: name }
+    - { value: Athen, kind: name }
+  qualifiers:
+    - quote: i enkelte tilfelle
+      note: Only a few cases; do not suggest Norway often uses direct democracy.
+    - quote: som til dømes
+      note: The wars are examples, not a complete list.
+    - quote: Dette er mogleg etter norsk lov.
+      note: The 2011 decision was lawful; leaving this out suggests wrongdoing.
+    - quote: veljarane ofte ikkje får nokon direkte medverknad
+      note: '"ofte", not "aldri".'
+  expectations:
+    - "All five tasks stay, in order, each explained and never answered. The difference between direct and indirect democracy is not explained, because that is what task 1 asks."
+    - "The claim in task 3 stays a claim to discuss (\"Drøft påstanden\"), never a statement of fact."
+    - "Task 4 stays neutral: the simplified text does not take a side or hint at the expected answer."
+    - "Task verbs (undersøk, forklar, drøft, grunngi) are kept and may be explained, e.g. drøft = finn argument for og mot."
+    - "Written in Nynorsk throughout; no Bokmål forms."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Exercise page whose context paragraphs carry facts (dates, which body decided). Tests explain-not-answer and neutrality.

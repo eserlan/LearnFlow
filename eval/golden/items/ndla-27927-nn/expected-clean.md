@@ -37,7 +37,3 @@ I nyare tid har Noreg delteke i fleire krigar, som til dømes i tidlegare Jugosl
 - Er det praktisk mogleg å berre bruke ei direkte form for demokrati i eit moderne samfunn som Noreg? Grunngi svaret!
 
 - I kva tilfelle meiner du ein bør bruke direkte demokrati i Noreg?
-
-Kjelde
-
-Galtung, I. M. A. (2018). Regjeringens plikt til å innhente Stortingets samtykke til norske militæroperasjoner (Masteroppgave, Universitetet i Oslo). Hentet fra https://www.duo.uio.no/handle/10852/64236?show=full

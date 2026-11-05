@@ -6,8 +6,9 @@ gradeBand: vg
 language: nb
 contentType: exercises
 features:
-  - lists
   - exercises
+  - lists
+  - qualifiers
 source:
   type: ndla
   url: https://ndla.no/article/25609
@@ -19,10 +20,48 @@ source:
     - Thomas Bedin (originator)
   notes: NDLA article 25609, revision 148. Images and media embeds removed.
 annotations:
-  keyFacts: []
-  keyTerms: []
-  mustPreserve: []
-  qualifiers: []
-  expectations: []
+  keyFacts:
+    - id: f1
+      statement: Oppgavene handler om hovedpunktene i emnet om klimaendringer.
+      sourceQuote: Disse oppgavene tar for seg hovedpunktene i emnet om klimaendringer.
+    - id: f2
+      statement: Den første oppgaven spør hvorfor dinosaurene døde ut for omtrent 65 millioner år siden.
+      sourceQuote: Hvorfor døde dinosaurene ut for omtrent 65 millioner år siden?
+    - id: f3
+      statement: Fenotypiske endringer kan føre til evolusjon; eleven skal forklare hvordan.
+      sourceQuote: Fenotypiske endringer kan gi opphav til evolusjon. Forklar hvordan dette kan foregå.
+    - id: f4
+      statement: I dag er ikke klimaendringer den største trusselen mot det biologiske mangfoldet; eleven skal forklare hvorfor de likevel får så mye oppmerksomhet.
+      sourceQuote: Per i dag er ikke klimaendringer den største trusselen mot det biologiske mangfoldet.
+    - id: f5
+      statement: Arter kan tilpasse seg miljøet uten at genmaterialet endres; eleven skal gi eksempler.
+      sourceQuote: uten at det skjer en endring i genmaterialet til arten
+  keyTerms:
+    - term: klimaendringer
+    - term: fenotype
+    - term: genotype
+    - term: evolusjon
+    - term: genetisk mangfold
+    - term: biologiske mangfoldet
+    - term: atferd
+  mustPreserve:
+    - { value: 65 millioner år, kind: number }
+    - { value: fenotypiske og genotypiske endringer, kind: term }
+  qualifiers:
+    - quote: omtrent 65 millioner år siden
+    - quote: mulige effekter
+      note: Possible effects, not certain ones.
+    - quote: noen arter
+      note: Some species, not all.
+    - quote: relativt kort tid
+    - quote: Per i dag er ikke klimaendringer den største trusselen
+      note: The negation and "per i dag" are both essential; easy to invert.
+  expectations:
+    - "All 16 questions stay, in order, as questions. None is answered."
+    - "Terms that are themselves asked about (fenotype, genotype, evolusjon) are not defined or explained, because that would answer the question. The questions may be reworded more simply."
+    - "Questions that contain a fact (dinosaurs 65 million years ago, climate change not the biggest threat today) keep that fact unchanged."
+    - "The heading numbering \"Oppgave 7\" may be kept or dropped; tasks 1–6 were interactive and are not in the pasted text, and nothing is invented for them."
 review:
-  status: imported
+  status: draft
+  annotatedBy: claude-draft
+  notes: Pure question list. The hard part is not answering by "explaining" a term the question asks about.
