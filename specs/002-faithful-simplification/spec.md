@@ -6,14 +6,15 @@
 
 **Status**: Draft
 
-**Input**: User description: "Turn the confirmed textbook text into an easier-to-read version that keeps every key fact and adds nothing that is not in the source."
+**Input**: User description: "As soon as the pupil pastes a text, turn it into an easier-to-read version that keeps every key fact and adds nothing that is not in the source. The simplified text is what the pupil reads and what the audio (003) is made from; seeing the original is optional."
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Read an easier version of the page (Priority: P1)
+### User Story 1 - Read an easier version of the text (Priority: P1)
 
-After confirming the extracted page (001), the pupil gets a simplified version: shorter sentences, everyday
-words where possible, and a clear structure. All the key facts from the page are still there, and nothing new
+As soon as the pupil pastes a text (001), they get a simplified version, with no review step in between:
+shorter sentences, everyday words where possible, and a clear structure. The simplified text is the main
+thing the pupil sees, and the audio (003) is made from it. All the key facts from the source are still there, and nothing new
 has been added.
 
 **Why this priority**: Faithful simplification is the core value of LearnFlow and the input to narrated
@@ -25,43 +26,24 @@ Delivers value as a stand-alone "easy read" view.
 
 **Acceptance Scenarios**:
 
-1. **Given** a confirmed source document, **When** simplification completes, **Then** the pupil sees a
-   simplified text that is measurably easier to read than the source.
+1. **Given** the pupil has pasted a text, **When** simplification completes, **Then** the pupil sees a
+   simplified text that is measurably easier to read than the source, without having reviewed the original
+   first.
 2. **Given** the source contains numbers, dates, names, units and formulas, **When** simplification
    completes, **Then** each of them appears exactly as in the source.
 3. **Given** the source states a key fact, **When** the simplified version is produced, **Then** that fact is
    present in the simplified version.
-4. **Given** the simplified text fails the automatic faithfulness check, **When** the pupil would otherwise
-   see it, **Then** the pupil is instead shown the original text with a short explanation and the option to
-   retry.
+4. **Given** the simplified text fails the automatic faithfulness check (after an automatic retry), **When**
+   the pupil would otherwise see it, **Then** the pupil is instead shown the original text with a short
+   explanation and the option to try again, and the audio is made from the original text.
 5. **Given** the source states something with a qualification ("usually", "about", "some researchers
    believe"), **When** it is simplified, **Then** the qualification is kept.
-6. **Given** a passage is ambiguous or incomplete (for example cut off at the page edge), **When** it is
+6. **Given** a passage is ambiguous or incomplete (for example cut off at the page edge or where the copied selection ended), **When** it is
    simplified, **Then** the app marks it as uncertain instead of filling in the gap.
 
 ---
 
-### User Story 2 - Check where a sentence came from (Priority: P1)
-
-The pupil taps any sentence in the simplified version and sees the passage of the original page it is based
-on, highlighted in context.
-
-**Why this priority**: Traceability is required by Constitution Principles I and VI. It lets the pupil, and a
-teacher or guardian, verify the simplification against the textbook.
-
-**Independent Test**: For every simplified sentence on the reference set, tapping it shows a non-empty source
-passage; spot-check that the passage supports the sentence.
-
-**Acceptance Scenarios**:
-
-1. **Given** a simplified sentence, **When** the pupil taps it, **Then** the matching source passage is shown
-   and highlighted in the original-text view.
-2. **Given** the pupil is reading the simplified version, **When** they switch to "Original", **Then** the
-   original text opens at the corresponding position.
-
----
-
-### User Story 3 - Keep and explain subject terms (Priority: P2)
+### User Story 2 - Keep and explain subject terms (Priority: P2)
 
 Key subject terms from the textbook ("fotosyntese", "demokrati", "brøk") are kept in the simplified text, not
 replaced with everyday words, so the pupil learns the vocabulary they will be tested on. Each term has a short
@@ -78,11 +60,11 @@ explanation is marked as added help.
 1. **Given** the source uses a subject term, **When** it is simplified, **Then** the term is kept and visually
    marked as a key term.
 2. **Given** the pupil taps a key term, **When** the explanation opens, **Then** it is labelled as an
-   explanation added by LearnFlow, and uses the textbook's own definition if one exists on the page.
+   explanation added by LearnFlow, and uses the textbook's own definition if one exists in the source.
 
 ---
 
-### User Story 4 - Make one part easier (Priority: P2)
+### User Story 3 - Make one part easier (Priority: P2)
 
 While reading or listening, the pupil gets stuck on one paragraph. They tap "Make this easier" on that
 section and get an even simpler version of just that part. The rest of the lesson and the original source
@@ -105,7 +87,7 @@ changes, the result passes the faithfulness check, and the pupil can return to t
 
 ---
 
-### User Story 5 - Choose how much to simplify (Priority: P3)
+### User Story 4 - Choose how much to simplify (Priority: P3)
 
 The pupil can choose between two levels: "Lettere" (much easier) and "Nærmere originalen" (closer to the
 original), and switch at any time.
@@ -124,7 +106,7 @@ and that readability differs measurably between them.
 
 ---
 
-### User Story 6 - Get a short summary (Priority: P3)
+### User Story 5 - Get a short summary (Priority: P3)
 
 After reading or listening, the pupil can open a short summary of the main points, for quick revision before
 a test. The summary is clearly labelled as a summary and does not replace the full simplified lesson.
@@ -142,6 +124,29 @@ covers the annotated main points, and is labelled as a summary.
 2. **Given** a summary is shown, **When** the pupil wants the details, **Then** one tap opens the full
    simplified text at the relevant point.
 
+---
+
+### User Story 6 - See the original if I want to (Priority: P3)
+
+Seeing the original is not part of the main flow, but a pupil (or a teacher or guardian) who wants to check
+something can tap "Show original" and see the passage a simplified sentence is based on, highlighted in
+context.
+
+**Why this priority**: The pupil's goal is the simplified text and its audio, not the original. Links from
+each sentence to the source are still kept internally, because the faithfulness check depends on them
+(Constitution Principle I); showing them is an optional extra.
+
+**Independent Test**: For every simplified sentence on the reference set, "Show original" shows a non-empty
+source passage; spot-check that the passage supports the sentence.
+
+**Acceptance Scenarios**:
+
+1. **Given** a simplified sentence, **When** the pupil chooses "Show original" for it (from the sentence's
+   menu, since tapping a sentence plays the audio from there, see 003), **Then** the matching source passage
+   is shown and highlighted in the original-text view.
+2. **Given** the pupil is reading the simplified version, **When** they switch to "Original", **Then** the
+   original text opens at the corresponding position.
+
 ### Edge Cases
 
 - The source appears to contain a factual error: the simplification preserves the source statement and does
@@ -156,14 +161,15 @@ covers the annotated main points, and is labelled as a summary.
   the textbook's framing and does not soften, editorialise or omit it.
 - The source contains a table: table content is kept as a table, or as a list with every value preserved. It
   is never summarised into approximate statements.
-- The pupil edited the extracted text in 001 with errors of their own: the simplification is faithful to the
-  confirmed text, and the confirmed text is what the source view shows.
+- The pupil fixed uncertain words in a photo (001) and introduced errors of their own: the simplification is
+  faithful to the text as the pupil left it, and that text is what "Show original" shows.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: System MUST generate a simplified version only from a confirmed source document (001).
+- **FR-001**: System MUST start simplification automatically as soon as the source document is ready (001),
+  without a review or confirmation step.
 - **FR-002**: System MUST link every simplified sentence to one or more extracted blocks of the source
   document.
 - **FR-003**: System MUST NOT introduce facts, numbers, names, dates, causal claims, examples or conclusions
@@ -173,14 +179,15 @@ covers the annotated main points, and is labelled as a summary.
   and MUST preserve relationships between facts and the source's caveats and qualifications.
 - **FR-005**: System MUST run an automatic faithfulness check on every simplified text before showing it,
   covering unsupported statements, missing key facts and altered numbers or terms.
-- **FR-006**: When the faithfulness check fails, System MUST NOT show the failing simplification; it MUST
-  show the original text and offer a retry.
+- **FR-006**: When the faithfulness check fails, System MUST retry once automatically. If it fails again,
+  System MUST NOT show the failing simplification; it MUST show the original text, explain why, offer to try
+  again, and let 003 make the audio from the original text.
 - **FR-007**: Term explanations MUST be visibly labelled as added help, MUST prefer definitions present in the
   source, and MUST be checked for age-appropriateness and safety.
 - **FR-008**: System MUST keep the source's language variant (Bokmål stays Bokmål, Nynorsk stays Nynorsk)
   by default.
-- **FR-009**: System MUST provide a side-by-side or toggle view between simplified and original text, with
-  position kept between views.
+- **FR-009**: System MUST make the original text available on request ("Show original"), opening at the
+  position matching the current simplified sentence. Viewing the original MUST never be a required step.
 - **FR-010**: System MUST support at least two simplification levels, with the pupil's last choice remembered.
 - **FR-011**: System MUST NOT rewrite literary text and MUST NOT answer exercise/task blocks.
 - **FR-012**: System MUST let the pupil request an easier version of a single section, leaving the rest of
@@ -228,11 +235,13 @@ covers the annotated main points, and is labelled as a summary.
   unsupported points.
 - **SC-007**: In testing with pupils, at least 80% rate the simplified version as easier to understand than
   the original, without lower scores on comprehension questions based on the original.
+- **SC-008**: For pasted texts of about one textbook page (300–500 words), the simplified text appears within
+  10 seconds of pasting for 90% of texts.
 
 ## Assumptions
 
-- Input is always the pupil-confirmed source document from 001; quality of extraction is that feature's
-  responsibility.
+- Input is the source document from 001 (pasted text in the main scenario); for photos, text-recognition
+  quality is 001's responsibility.
 - Human-annotated key facts and key terms exist for each page in the reference set.
 - Choice of language model and of the method for checking faithfulness are planning decisions. The check may
   use a different model or method than generation.

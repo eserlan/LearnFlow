@@ -1,12 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: (none) → 1.0.0 (initial ratification)
+- Version change: 1.0.1 → 2.0.0 (MAJOR: Principle IV redefined)
+- 2.0.0: The product is now "simplified text + audio". Principle IV renamed from "Audio and Visual in Concert"
+  to "Simplified Text and Audio Together"; visuals become optional and must be synchronised only when used.
+  Principle III core flow is now "paste → simplified text and audio → resume" with no review step.
+  Principle VI: the original is available on request instead of always shown for comparison. Mission
+  statement updated. Affected specs: 001, 002, 003, 004, 005, 007 (updated in the same change).
+- 1.0.1: core flow reworded to "add material → review → lesson → resume"; lesson length expressed as a
+  typical textbook section rather than "one page"; release gate 2 covers import as well as extraction.
+- 1.0.0: initial ratification
 - Origin: merges the local draft constitution with the draft from PR #1 (docs/initial-spec-kit).
   From PR #1: "test with actual users", respectful (non-childish, non-diagnostic) design, preserving
   relationships and caveats, simplification vs summarisation, audio-first with optional text, avoiding
   unnecessary accounts, progressive complexity, failure handling, and the delivery-gate test matrix.
 - Principles: I. Faithful to the Source; II. Child Privacy by Default; III. Independent Learner First;
-  IV. Audio and Visual in Concert; V. Accessible, Inclusive and Respectful; VI. Honest, Visible AI;
+  IV. Simplified Text and Audio Together; V. Accessible, Inclusive and Respectful; VI. Honest, Visible AI;
   VII. Small, Verifiable Slices
 - Sections: Child Safety, Legal and Content Constraints; Quality Gates and Development Workflow; Governance
 - Templates requiring updates: ✅ .specify/templates/ initialised (Spec Kit 1.1.0). plan-template.md derives
@@ -16,8 +24,8 @@ Sync Impact Report
 
 # LearnFlow Constitution
 
-LearnFlow is a mobile-first, audio-visual learning companion that pupils use independently with their own
-school materials. These principles are non-negotiable product rules. Every specification, plan, task list and
+LearnFlow is a mobile-first learning companion that pupils use independently with their own school
+materials: it turns a text the pupil pastes in into a faithful, simplified version and reads it aloud. These principles are non-negotiable product rules. Every specification, plan, task list and
 implementation is measured against them.
 
 ## Core Principles
@@ -76,7 +84,7 @@ a precondition for the product existing at all.
 
 A pupil MUST be able to go from school material to a finished lesson without help from an adult.
 
-- The core flow (capture → review → lesson → resume) MUST be completable unaided by a pupil in the target age
+- The core flow (paste a text → simplified text and audio → resume) MUST be completable unaided by a pupil in the target age
   group on their first attempt. This MUST be verified with actual target-age users, never assumed.
 - Progressive complexity: every screen MUST have one obvious next action. Advanced controls and settings are
   optional and MUST NOT be required to complete the core flow.
@@ -89,24 +97,23 @@ A pupil MUST be able to go from school material to a finished lesson without hel
 
 **Rationale**: The product's purpose is independent study. If it needs an adult to operate, it has failed.
 
-### IV. Audio and Visual in Concert
+### IV. Simplified Text and Audio Together
 
-Lessons are audio-first, supported by visuals, with text always available. They follow dual-coding
-principles.
+A lesson is the simplified text and its audio, used together. Audio leads; the text is always there to read
+along. Visuals may be added, but are never required.
 
-- Narration and visual cards MUST be synchronised; each card MUST correspond to the narration playing while it
-  is shown.
-- Neither channel may be required on its own: narration MUST have captions/transcript, and visuals MUST have
-  spoken or text descriptions. Text is optional for the pupil but always available.
-- Visuals MUST carry meaning tied to the source. Purely decorative imagery is permitted only when clearly
-  secondary and never when it could be mistaken for factual content.
+- The audio MUST read the displayed text, and the text MUST be shown with the current position highlighted
+  while the audio plays. Nothing is audio-only and nothing is text-only.
+- Where visual elements are used, they MUST be synchronised with the audio, carry meaning tied to the source,
+  and have text descriptions. Purely decorative imagery is permitted only when clearly secondary and never
+  when it could be mistaken for factual content.
 - Playback and navigation MUST be predictable: the same controls in the same places, and no automatic jumps
   the pupil did not ask for.
-- Lessons MUST be short and segmented; one page of material SHOULD produce a lesson of a few minutes, not a
-  long monologue.
+- Lessons MUST be short and segmented; a typical textbook section (about one page, 300–500 words) SHOULD
+  produce a lesson of a few minutes, not a long monologue.
 
-**Rationale**: Combined, synchronised audio and visuals improve comprehension and retention, especially for
-pupils who struggle with dense text.
+**Rationale**: Hearing and reading the same simplified text at once helps pupils who struggle with dense
+text, while keeping the product small enough to build and verify well.
 
 ### V. Accessible, Inclusive and Respectful by Design
 
@@ -133,7 +140,8 @@ Pupils and guardians MUST always be able to tell what the machine did.
 - Generated explanations MUST NOT be presented as authoritative. Uncertainty MUST be shown, not hidden:
   low-confidence extraction, unverifiable statements and failed checks are surfaced to the pupil in
   understandable terms.
-- The pupil MUST always be able to compare generated content with the original source.
+- The original source MUST remain available on request, so that the pupil, a teacher or a guardian can
+  check generated content against it. Viewing it is never a required step.
 - LearnFlow MUST NOT complete graded assignments on the pupil's behalf; it explains source material, it does
   not answer homework tasks.
 
@@ -179,7 +187,7 @@ guarantees credible.
 - Release gates for any build used by real pupils:
   1. Faithfulness evaluation meets the thresholds set in feature 002, on representative Norwegian school
      material including factual, mathematical and scientific notation.
-  2. Extraction evaluation meets the thresholds set in feature 001.
+  2. Import and extraction evaluation meets the thresholds set in feature 001.
   3. Changed screens pass testing with screen readers, keyboard navigation, mobile touch, reduced motion,
      text scaling and contrast, on real devices.
   4. Recovery from interruptions (connectivity loss, app restart, incoming calls) is tested for the changed
@@ -200,4 +208,4 @@ guarantees credible.
   principle or materially expanding guidance, PATCH for clarifications and wording.
 - Compliance is reviewed at every plan's Constitution Check and before each release.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-05 | **Last Amended**: 2026-11-05
+**Version**: 2.0.0 | **Ratified**: 2026-11-05 | **Last Amended**: 2026-11-05

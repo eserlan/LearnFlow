@@ -23,21 +23,21 @@ reads along with highlighted captions, and never meets a wall of text in the int
 for them, the product misses its purpose.
 
 **Independent Test**: With text settings at maximum and the alternative typeface on, a pupil with dyslexia
-completes capture → lesson → resume. Verify no truncated or overlapping text.
+completes paste → lesson → resume. Verify no truncated or overlapping text.
 
 **Acceptance Scenarios**:
 
 1. **Given** the pupil increases text size to 200%, **When** they use any screen in the core flow, **Then**
    all text remains readable and all controls usable without horizontal scrolling.
-2. **Given** the pupil chooses the alternative typeface and wider spacing, **When** they view simplified text,
-   captions and cards, **Then** the settings apply everywhere.
+2. **Given** the pupil chooses the alternative typeface and wider spacing, **When** they view the simplified
+   text and its read-along highlighting, **Then** the settings apply everywhere.
 
 ---
 
 ### User Story 2 - A pupil using a screen reader completes the core flow (Priority: P1)
 
-A blind or partially sighted pupil uses VoiceOver or TalkBack to capture a page (with guidance by speech and
-haptics), review the extracted text, and play a lesson with cards announced.
+A blind or partially sighted pupil uses VoiceOver or TalkBack to paste text (or capture a page, with guidance
+by speech and haptics), and listen to the lesson while navigating the simplified text sentence by sentence.
 
 **Why this priority**: WCAG 2.2 AA is a constitution requirement, and Norwegian regulations on universal
 design apply to digital services.
@@ -48,8 +48,9 @@ design apply to digital services.
 
 1. **Given** a screen reader is on, **When** the pupil frames a page, **Then** framing guidance is given by
    speech and haptics ("Move the phone up", "Page found").
-2. **Given** a lesson is playing with a screen reader, **When** a card appears, **Then** its text alternative
-   is available without interrupting narration.
+2. **Given** a lesson is playing with a screen reader, **When** the pupil moves focus through the text,
+   **Then** the screen reader does not talk over the lesson audio (it pauses or ducks the audio), and
+   sentence highlighting does not steal focus.
 3. **Given** any interactive element, **When** focused, **Then** it has a meaningful label in the interface
    language.
 4. **Given** the pupil navigates with an external keyboard or switch control, **When** they move through the
@@ -59,20 +60,21 @@ design apply to digital services.
 
 ### User Story 3 - One obvious next step, every time (Priority: P1)
 
-A pupil opening LearnFlow for the first time sees one clear primary action that starts capturing material.
+A pupil opening LearnFlow for the first time sees one clear primary action, "Paste text", that starts a lesson.
 On later visits, the home screen offers "Continue" for their unfinished lesson. Every screen has one obvious
 next action, and advanced options stay out of the way until the pupil looks for them.
 
 **Why this priority**: Progressive complexity (Constitution Principle III) is what makes unaided use possible,
 especially for pupils with attention difficulties or low confidence with apps.
 
-**Independent Test**: First-time pupils in moderated testing start a capture from the home screen without
-instruction; returning pupils resume their last lesson in one tap.
+**Independent Test**: First-time pupils in moderated testing start a lesson by pasting text from the home
+screen without instruction; returning pupils resume their last lesson in one tap.
 
 **Acceptance Scenarios**:
 
-1. **Given** a new pupil on the home screen, **When** it loads, **Then** one primary action clearly starts
-   material capture, and no setup or settings are required first.
+1. **Given** a new pupil on the home screen, **When** it loads, **Then** one primary action, "Paste text",
+   clearly starts a new lesson, with photo and file import as secondary options, and no setup or settings are
+   required first.
 2. **Given** an error occurs anywhere in the core flow, **When** it is shown, **Then** it explains in plain
    language what happened and offers one obvious recovery action.
 3. **Given** a screen with advanced options (speed, levels, typeface), **When** it is shown, **Then** those
@@ -121,8 +123,8 @@ flow.
 
 ### User Story 6 - Settings that suit me, without a diagnosis (Priority: P2)
 
-A pupil who finds busy screens distracting turns on a calmer layout (fewer elements, no animation, one card
-at a time). Another prefers captions always on and slower narration. Nobody is asked about diagnoses, and no
+A pupil who finds busy screens distracting turns on a calmer layout (fewer elements, no animation, one
+section of text at a time). Another prefers captions always on and slower narration. Nobody is asked about diagnoses, and no
 setting is labelled as "for ADHD" or "for dyslexia".
 
 **Why this priority**: Needs vary within any group of pupils, and one fixed "accessible mode" fails many of
@@ -143,7 +145,7 @@ interface copy for diagnostic labels.
 ### Edge Cases
 
 - The system font size is set very large in the operating system: LearnFlow respects it and layouts reflow.
-- The pupil has reduce-motion enabled: card transitions become simple fades or instant changes.
+- The pupil has reduce-motion enabled: auto-scrolling and highlight transitions become instant changes.
 - Colour vision deficiency: no state (correct/incorrect, low-confidence, selected) is communicated by colour
   alone.
 - Very small or older phones: the core flow stays usable at the smallest supported screen size.
@@ -191,8 +193,9 @@ interface copy for diagnostic labels.
 - **FR-017**: Primary actions in the core flow MUST be reachable one-handed on common phone sizes.
 - **FR-018**: Every screen MUST have one visually dominant primary action. Advanced controls MUST be
   optional and secondary (progressive complexity).
-- **FR-019**: The home screen MUST offer capture as the primary action for new pupils and "Continue" for the
-  most recent unfinished lesson for returning pupils.
+- **FR-019**: The home screen MUST offer "Paste text" as the primary action for new pupils (with photo and
+  file import as secondary options) and "Continue" for the most recent unfinished lesson for returning
+  pupils.
 - **FR-020**: System MUST offer preferences (calmer layout, captions default, speed default, text and
   typeface settings) described by what they do, MUST NOT ask for or infer diagnoses, and MUST NOT require
   preference setup before first use.
@@ -223,8 +226,8 @@ interface copy for diagnostic labels.
 - **SC-003**: Pupils with self-reported reading difficulties complete the core flow at a rate within 10
   percentage points of other pupils.
 - **SC-004**: 100% of interface strings in the core flow exist in both Bokmål and Nynorsk at every release.
-- **SC-005**: In moderated testing, at least 4 of 5 first-time pupils start a capture from the home screen
-  without instruction, and returning pupils resume their last lesson in one tap.
+- **SC-005**: In moderated testing, at least 4 of 5 first-time pupils start a lesson by pasting text from the
+  home screen without instruction, and returning pupils resume their last lesson in one tap.
 - **SC-006**: 0 interface strings use diagnostic labels, verified by copy review at each release.
 - **SC-007**: In testing, teenagers rate the tone as respectful (not childish) at least 4 out of 5.
 - **SC-008**: In testing, at least 90% of pupils aged 10–12 can explain what to do next after each error

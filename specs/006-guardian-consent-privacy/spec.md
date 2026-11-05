@@ -19,7 +19,7 @@ before any photo is processed.
 **Why this priority**: Under GDPR and the Norwegian Personal Data Act, consent for information society services
 to children under 13 must come from a guardian. No real-pupil release is possible without this.
 
-**Independent Test**: Set up as a pupil under 13; verify capture and processing are blocked until consent is
+**Independent Test**: Set up as a pupil under 13; verify adding material and processing are blocked until consent is
 recorded, and that a pupil aged 13 or over can consent themselves.
 
 **Acceptance Scenarios**:
@@ -49,7 +49,7 @@ device, LearnFlow storage, backups (after the backup window) and processors.
 **Acceptance Scenarios**:
 
 1. **Given** a lesson exists, **When** the pupil deletes it and confirms, **Then** the lesson, its source text,
-   any kept photos, audio, cards, questions and answers are removed from the device immediately and from all
+   any kept photos or formula crops, audio, questions and answers are removed from the device immediately and from all
    other storage within the documented period.
 2. **Given** the pupil deletes their account, **When** they confirm, **Then** all their data is deleted and
    they get a confirmation stating when deletion will be complete everywhere.
@@ -74,24 +74,24 @@ download an export that contains all personal data in a readable format.
 1. **Given** a pupil has lessons, **When** they open "My data", **Then** they see a summary of every category
    of stored data.
 2. **Given** the pupil requests an export, **When** it is ready, **Then** it contains their own data
-   (confirmed texts, simplified texts, answers, settings) in a common readable format. It does not include
+   (source texts, simplified texts, answers, settings) in a common readable format. It does not include
    generated audio that redistributes textbook content beyond the pupil's own use.
 
 ---
 
 ### User Story 4 - Short retention by default (Priority: P2)
 
-Photos of pages are deleted as soon as the pupil confirms the extracted text. Lessons the pupil has not opened
+Photos of pages are deleted as soon as they have been processed. Lessons the pupil has not opened
 for a long time are deleted automatically, with advance notice.
 
 **Why this priority**: Data minimisation by default reduces risk without the pupil doing anything.
 
-**Independent Test**: Confirm an extraction and verify the photo is gone; simulate inactivity and verify the
+**Independent Test**: Process a photo and verify the photo is gone; simulate inactivity and verify the
 notice and deletion.
 
 **Acceptance Scenarios**:
 
-1. **Given** the pupil confirms an extraction, **When** they have not chosen "Keep photo", **Then** the photo
+1. **Given** a photo has been processed, **When** the pupil has not chosen "Keep photo", **Then** the photo
    is deleted from all storage.
 2. **Given** a lesson has not been opened for the inactivity period, **When** the period is about to expire,
    **Then** the pupil is notified in the app and can keep the lesson.
@@ -105,7 +105,7 @@ notice and deletion.
 - The pupil turns 13 while using the app: they are invited to take over consent themselves, and the guardian
   is informed.
 - A photo accidentally contains a person's face or another child's work: only the detected page area is
-  processed (001), and the full photo is deleted on confirmation.
+  processed (001), and the full photo is deleted once processed.
 - A processor (an OCR or language-model provider) has a security incident: the incident process includes
   notifying the supervisory authority (Datatilsynet) and affected guardians/pupils as required.
 - A deletion is requested while the device is offline: on-device data is deleted immediately and server
@@ -128,8 +128,10 @@ notice and deletion.
   behavioural profiling, or third-party trackers.
 - **FR-006**: System MUST ensure that no pupil content is used to train or improve AI models, including by
   providers, through contractual guarantees and configuration.
-- **FR-007**: System MUST delete source photos on extraction confirmation unless the pupil chooses to keep
-  them.
+- **FR-007**: System MUST delete source photos once they have been processed, keeping only tightly cropped
+  complex-formula regions needed by the lesson (see 001 FR-028), unless the pupil chooses to keep the full
+  photo. Material whose processing has not finished, including pasted text, follows 001 FR-018 (device only,
+  deleted after 7 days).
 - **FR-008**: System MUST support deletion of single lessons and of the whole account, covering the device,
   LearnFlow storage and all processors.
 - **FR-009**: Deletion MUST be completed everywhere within 30 days, including backups, and the pupil MUST be

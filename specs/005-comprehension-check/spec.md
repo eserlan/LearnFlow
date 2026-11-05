@@ -6,13 +6,13 @@
 
 **Status**: Draft
 
-**Input**: User description: "After a lesson, give the pupil a few short questions, answerable from the page itself, to check understanding, with feedback that points back to the source, plus light recall practice later."
+**Input**: User description: "After a lesson, give the pupil a few short questions, answerable from the source text itself, to check understanding, with feedback that points back to the source, plus light recall practice later."
 
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Answer a few questions after the lesson (Priority: P1)
 
-When a lesson ends, the pupil is offered 3–5 short questions about the page: multiple choice, true/false, or
+When a lesson ends, the pupil is offered 3–5 short questions about the material: multiple choice, true/false, or
 matching a term to its meaning. Every question can be answered from the source page alone.
 
 **Why this priority**: Retrieval practice turns passive listening into learning and lets the pupil see what
@@ -37,13 +37,13 @@ source, has exactly one correct answer, and is age-appropriate.
 ### User Story 2 - Learn from feedback (Priority: P2)
 
 After answering, the pupil sees whether they were right. If they were wrong, they see the correct answer, a
-short explanation based on the source, and a button that replays the card where the topic was covered.
+short explanation based on the source, and a button that replays the sentence or section where the topic was covered.
 
 **Why this priority**: Feedback that links back to the lesson closes the learning loop, but questions alone
 already give value.
 
 **Independent Test**: Answer questions incorrectly and verify the feedback shows the source passage and that
-"Replay this part" plays the correct card.
+"Replay this part" plays the correct section.
 
 **Acceptance Scenarios**:
 
@@ -97,7 +97,7 @@ answered wrongly and spaces items answered correctly.
 - **FR-003**: System MUST support multiple choice, true/false and term-matching formats.
 - **FR-004**: Question sets MUST be optional and skippable, and MUST NOT be timed.
 - **FR-005**: Feedback for wrong answers MUST show the correct answer, point to the source passage and offer
-  to replay the relevant card.
+  to replay the relevant sentence or section.
 - **FR-006**: System MUST NOT show grades, scores relative to others, leaderboards or streak counters.
 - **FR-007**: System MUST provide an optional spaced recall session drawing on key terms and missed questions
   from the pupil's lessons.
