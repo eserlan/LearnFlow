@@ -20,10 +20,9 @@ Spec Kit is initialised with the Claude integration (`specify init --here --inte
 ## Suggested vertical slice
 Text copied from one source (digital textbook, learning platform, web page or PDF) → "Paste and simplify" in LearnFlow → faithful simplified text → audio of the simplified text, played in the app with read-along highlighting → resume playback. No review of the original is needed; it is available on request. Photographing a printed page is a secondary input path, and visual cards come in a later phase.
 
-## Architecture decisions to resolve during planning
-- Local-first versus hosted processing; child data handling and consent requirements.
-- OCR, LLM, TTS and image-generation providers and costs.
-- Data retention, school textbook copyright/licensing, deletion, and Norwegian/EU privacy compliance.
-- Offline playback and caching; provenance and hallucination evaluation.
+## Architecture
+See [ADR-0001](docs/adr/0001-web-platform-and-ai-stack.md): an installable SvelteKit web app (Dexie/IndexedDB, OPFS), stateless Vercel Node.js functions in an EU region, and Gemini via Vertex AI on an EU endpoint through the Vercel AI SDK. The model and thinking settings are chosen with a golden data set.
+
+Still open: text-to-speech provider (Nynorsk and word timing), child data handling and consent model (006), textbook copyright/licensing, and the DPIA.
 
 These are initial feature specifications, not yet implementation plans or task lists.

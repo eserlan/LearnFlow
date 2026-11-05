@@ -109,6 +109,9 @@ delete.
   "Waiting for connection".
 - The app is updated and stored lessons use an older format: they remain playable or are migrated without
   loss of progress.
+- The browser has deleted LearnFlow's stored data (for example iOS Safari clearing data for a website that
+  has not been visited for a while, or the pupil clearing site data): the library explains in plain language
+  that saved lessons were removed by the browser and how adding LearnFlow to the home screen prevents it.
 
 ## Requirements *(mandatory)*
 
@@ -131,7 +134,11 @@ delete.
   status, most recent first.
 - **FR-010**: Pupils MUST be able to rename and delete lessons; deletion follows the rules in 006.
 - **FR-011**: System MUST mark lessons as completed when the final section has been played.
-- **FR-012**: Offline data on the device MUST be stored so that it is not readable by other apps.
+- **FR-012**: Offline data on the device MUST be stored so that it is not readable by other apps or websites.
+- **FR-013**: System MUST request persistent storage from the browser and MUST encourage the pupil, once and
+  without nagging, to add LearnFlow to the home screen so that the browser does not delete saved lessons.
+- **FR-014**: Background playback MUST continue with the screen locked for at least the length of a chapter,
+  and lock-screen controls MUST show the lesson title and allow play, pause and skip back.
 
 ### Key Entities *(include if feature involves data)*
 

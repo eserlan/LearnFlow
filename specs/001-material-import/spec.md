@@ -46,8 +46,9 @@ real content, has the right structure, and has page furniture removed.
 3. **Given** the copied text comes from a PDF with hard line breaks, words hyphenated across lines, and
    repeated page headers, footers or page numbers, **When** it is pasted, **Then** lines are joined into
    paragraphs, hyphenated words are re-joined, and the page furniture is left out automatically.
-4. **Given** the pupil has selected text in another app, **When** they share it to LearnFlow, **Then** it is
-   processed exactly as with "Paste and simplify".
+4. **Given** LearnFlow is installed on an Android phone and the pupil has selected text in another app,
+   **When** they share it to LearnFlow, **Then** it is processed exactly as with "Paste and simplify". (iOS
+   does not let web apps receive shared text; there, pasting is the only text path.)
 5. **Given** a text has been processed, **When** the lesson is created, **Then** it gets a title from the
    first heading (or first line), which the pupil can change later, and the pupil can optionally note where
    the text came from (for example "Naturfag 9, kapittel 3").
@@ -238,12 +239,13 @@ part and leave out the fact box; verify the simplified text and audio change onl
 
 **Pasted text (main path)**
 
-- **FR-001**: System MUST offer "Paste and simplify" as the primary way to add material: an action on the home
-  screen and when starting a new lesson, and a system share target that accepts selected text from other
-  apps.
-- **FR-002**: System MUST read the clipboard only when the pupil explicitly taps "Paste and simplify", never
-  automatically or in the background. That tap, or sharing text to LearnFlow, is the pupil's clear action to
-  process the material (Constitution Principle II).
+- **FR-001**: System MUST offer "Paste and simplify" as the primary way to add material: a paste area with a
+  clear action on the home screen and when starting a new lesson. Where the platform allows an installed web
+  app to receive shared text (Android), System MUST also accept text shared from other apps.
+- **FR-002**: System MUST take clipboard content only when the pupil pastes into the paste area or taps
+  "Paste and simplify", never automatically or in the background. Pasting, or sharing text to LearnFlow, is
+  the pupil's clear action to process the material (Constitution Principle II). When the pasted content
+  includes formatting (HTML), System MUST use it for structure (FR-004).
 - **FR-003**: System MUST keep pasted text exactly as copied. The only allowed automatic normalisations are
   whitespace clean-up, joining hard line breaks into paragraphs, re-joining words hyphenated across line
   breaks, and leaving out page furniture (FR-005).
@@ -381,8 +383,9 @@ part and leave out the fact box; verify the simplified text and audio change onl
   300–500 words) and keeps lessons short (Principle IV). Both limits can be revisited after testing.
 - Handwritten notes, and content locked inside publishers' digital textbook platforms that cannot be copied,
   are out of scope for this feature.
-- Target devices are smartphones from roughly the last five years. The camera is needed only for the photo
-  path.
+- LearnFlow is an installable web app (ADR-0001). Target devices are smartphones from roughly the last five
+  years running current iOS Safari or Android Chrome; desktop browsers are also supported. The camera is
+  needed only for the photo path.
 - Whether processing runs on the device or on a server is a planning decision, constrained by Constitution
   Principle II.
 - Full recognition of complex mathematical and chemical formulas in photos is out of scope for the first

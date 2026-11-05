@@ -240,5 +240,5 @@ interface copy for diagnostic labels.
   together with the DPIA from 006.
 - The specific dyslexia-friendly typeface is a design decision; the requirement is that an alternative with
   proven readability benefits is offered.
-- Native mobile platforms (iOS and Android) are the primary targets. A web version, if any, must meet the
-  same constraints.
+- LearnFlow is an installable web app (ADR-0001). Phones running current iOS Safari and Android Chrome are
+  the primary targets, tested with VoiceOver and TalkBack; desktop browsers must meet the same constraints.
