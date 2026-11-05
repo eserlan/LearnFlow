@@ -1,0 +1,29 @@
+id: ndla-35063-nb
+title: Bakgrunnen for første verdenskrig
+split: dev
+subject: historie
+gradeBand: vg
+language: nb
+contentType: expository
+features:
+  - dates-sequence
+source:
+  type: ndla
+  url: https://ndla.no/article/35063
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Tor Ivar Utvik (writer)
+    - Jostein Saakvitne (writer)
+    - Stein Ugelvik Larsen (writer)
+  notes: NDLA article 35063, revision 188. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

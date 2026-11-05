@@ -1,0 +1,61 @@
+# Easy Text: Australia's People
+
+Australia is a multicultural country. Which part of the world do you think many of the immigrants come from today?
+
+## Aborigines
+
+The indigenous Australians or Aborigines probably arrived in Australia about 40,000 years ago. They were nomadic hunters and had their own culture.
+
+When the Europeans came to Australia there were about 300,000 Aborigines living there. Some were killed by the new settlers and many died from the new diseases that the immigrants brought with them. Many Aboriginal children were taken away from their parents to be raised in white homes.
+
+In 2009, the Australian prime minister apologised to the Aborigines for the way they had been treated. However, there are still many problems for the Aboriginal people, for example, higher unemployment and lower life expectancy than for other Australians. Aboriginal culture and traditions have become important again. Uluru or Ayers Rock is a holy place for the Aboriginal people. (In the link collektion you will find a link to a video of Aboriginal guys playing a traditional instrument called a didjeridoo.)
+
+## More Immigrants
+
+Some years ago, Australia needed immigrants. Between 1945 and 1965, the Australian government paid half the travel fare for anyone wanting to settle in Australia. Many Europeans came. Later many refugees from Vietnam and the former Soviet Union arrived. Polynesians looking for work have also settled in Australia. Large numbers of immigrants have also come from China and India. Australia is a multicultural nation.
+
+## Tasks and Activities
+
+### Find out
+
+Go to this page about the Demographics of Australia (Wikipedia) and scroll down to the table showing country of birth. Find the 10 main countries where immigrants have come from.
+
+### Vocabulary
+
+Use the dictionary and translate these words into Norwegian.
+
+- Nomadic
+
+- Settler
+
+- Disease
+
+- Prime Minister
+
+- Unemployment
+
+- Life expectancy
+
+- Holy
+
+- Fare
+
+- Refugees
+
+### Discuss
+
+1. Australian culture is very easygoing. 'It'll work out', is their favourite expression. Would you describe your personality as easygoing or strict?
+
+2. Use www.flickr.com/ to find examples of Australian Aboriginal art and cave paintings. What would you say is typical of Aboriginal art?
+
+### Research
+
+Search the Internet for facts about Uluru or Ayer's Rock.
+
+- which state is it in
+
+- the name of the nearest town
+
+- height
+
+- type of rock

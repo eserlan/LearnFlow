@@ -1,0 +1,28 @@
+id: ndla-44468-nn
+title: Jordskjelv
+split: test
+subject: geografi
+gradeBand: vg
+language: nn
+contentType: expository
+features:
+  - lists
+  - dates-sequence
+source:
+  type: ndla
+  url: https://ndla.no/article/44468
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Sølvi Skeide (writer)
+  notes: NDLA article 44468, revision 248. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

@@ -1,0 +1,83 @@
+# Bakgrunnen for første verdenskrig
+
+Første verdenskrig var en verdensomspennende krig som varte fra 1914 til 1918. Hva var de bakenforliggende årsakene til krigen, og hva var den utløsende årsaken?
+
+## Bakenforliggende årsaker
+
+Når vi skal forklare årsakene til viktige hendelser som krig, bruker vi å skille mellom bakenforliggende og utløsende årsaker. Bakenforliggende årsaker er årsaker til en hendelse som går bakover i tid. For å forstå hvorfor første verdenskrig brøt ut 1914, og hvorfor krigen varte så lenge, må vi se på flere ulike årsaksforklaringer.
+
+Se gjerne animasjonsfilmen fra NRK skole (lengde 11:20) om årsakene til første verdenskrig.
+
+### Nasjonalisme og Tysklands samling
+
+Wienkongressen i 1815 introduserte prinsippet om en europeisk maktbalanse som skulle forhindre at en stormakt ble for sterk. Maktbalanseprinsippet fungerte store deler av 1800-tallet, men ble utfordret av den framvoksende nasjonalismen. I 1860-årene ble Italia samlet til en nasjonalstat, og i 1871 ble også Tysklands samling fullført. Samlingen av Tyskland var spesielt viktig.
+
+I den tyske samlingsprosessen ble Frankrike beseiret og ydmyket i den fransk-tyske krigen (1870-1871) hvor Frankrike måtte avstå grenseområdene Alsace og Lorraine. Etter krigen ble keiserdømmet Tyskland opprettet og framsto snart som Europas nye økonomiske, politiske og militære stormakt. Tysklands nye rolle midt i Europa skremte de andre stormaktene. Gradvis ser vi nå en endring hvor det gamle maktbalanseprinsippet i Europa ble erstattet av to maktblokker som sto mot hverandre.
+
+### Revansjelyst og stormaktsrivalisering
+
+I tiårene før krigsutbruddet i 1914 var det en økende stormaktsrivalisering i Europa. Frankrike hadde ikke glemt krigsnederlaget i 1871 og ønsket å ta tilbake områdene de hadde måttet avstå til Tyskland. I øst var russerne opptatt av ideen om å samle alle de slaviske folkene under sin ledelse. Denne panslavismen kunne imidlertid ikke gjennomføres så lenge Østerrike-Ungarn kontrollerte store slaviske områder.
+
+Tyskland, under ledelse av keiser Vilhelm 2., mente det var en selvfølge at landet skulle være en europeisk stormakt. Tyskland kom sent med i kolonikappløpet i Afrika, men ønsket også å kontrollere Sentral- og Øst-Europa. En krig mot Russland ville sikre en slik tysk maktposisjon. Denne generasjonen tyskere var oppdratt til å være stolte av sin nasjon og skulle sørge for at Tyskland fikk sin rettmessige plass i det store verdensbildet.
+
+Tysklands framtredende rolle i Europa, kombinert med ulike ambisjoner hos stormaktene, førte til en intens stormaktsrivalisering fram mot 1914.
+
+### Våpenkappløp
+
+Stormaktsrivalisering kombinert med industrialiseringens masseproduksjon førte til våpenkappløp i tiårene før krigsutbruddet. Frykten for Tyskland førte til en anspent atmosfære i Europa. Alle stormaktene rustet opp militært, men Tyskland var spesielt ivrig og fikk en stor og moderne hær som var overlegen de andre stormaktene.
+
+Keiser Vilhelm 2. av Tyskland hadde store ambisjoner og ønsket å utfordre Storbritannia som verdensmakt ved en storstilt oppbygging av militæret. Særlig vekt ble lagt på marinen. Den britiske flåten var verdens mektigste, noe som var en forutsetning for landets dominans på verdenshavene og i koloniene. Den tyske opprustningen førte til et flåtekappløp. De siste årene før krigsutbruddet steg utgiftene til våpenproduksjon med femti prosent for de europeiske stormaktene.
+
+### Europa blir delt opp i to allianser
+
+Den endrede maktbalansen i Europa, økende usikkerhet og rivaliseringen førte gradvis til at stormaktene fant sammen i allianser for å beskytte seg selv.
+
+Tyskland fryktet en tofrontskrig hvis de skulle bli angrepet av Frankrike og Russland. Derfor inngikk Tyskland og Østerrike-Ungarn en militær forsvarsallianse om å hjelpe hverandre hvis dette skulle skje. Senere ble også Italia med i alliansen, som fikk navnet trippelalliansen.
+
+Frykten for Tyskland og den aggressive tyske utenrikspolitikken fikk de to gamle rivalene Frankrike og Russland til å inngå et militært samarbeid. Like etter århundreskiftet ble også Storbritannia med. Denne forståelsen ble kjent som trippelententen.
+
+Europa ble nå delt i to militære allianser som sto mot hverandre. Stormaktene hadde i tillegg forståelser og samarbeid med mindre stater. Russland hadde en avtale med Serbia om å beskytte dem mot østerriksk aggresjon, mens Storbritannia garanterte sikkerheten til Belgia.
+
+### Kolonisering og imperialisme
+
+Perioden 1870–1914 blir ofte kalt imperialismens tidsalder og kjennetegnes ved at det foregikk et intenst kappløp om kolonier i Afrika. Storbritannia og Frankrike var de to største kolonimaktene, men også mindre europeiske stater var involvert.
+
+Tyskland kom sent med i kolonikappløpet, men ble etter hvert en konkurrent til de etablerte kolonimaktene. Den aggressive tyske utenrikspolitikken forbindes særlig med keiser Vilhelm 2. og var en endring fra den mer forsiktige utenrikspolitikken til rikskansler Otto von Bismarck. Tyskland skaffet seg kolonier i Stillehavet og Øst- og Vest-Afrika, men ønsket også å overta kolonier i Afrika fra mindre stater som Belgia.
+
+Kolonikappløpet bidro til å skjerpe motsetningene mellom de europeiske stormaktene. Samarbeid og kommunikasjon var vanskelig og ble erstattet av militær opprustning, mistenksomhet og alliansebygging.
+
+### Balkankrigene
+
+Mange av de europeiske stormaktene fokuserte på Afrika for å utvide sin territoriale makt. Samtidig var det flere stormakter som hadde ambisjoner på Balkan, som tradisjonelt har vært Europas urolige hjørne.
+
+Det osmanske riket hadde vært en dominerende makt på Balkan i Sør-Europa i flere århundrer, men nasjonalisme førte til frigjøringskamp og selvstendighet for Hellas, Serbia og Bulgaria på slutten av 1800-tallet. I Balkankrigene (1912-1913) mistet Det osmanske riket nesten alle sine europeiske områder. Den store seierherren på Balkan var Serbia.
+
+Etter hvert som Det osmanske riket ble svekket og grensene ble uklare, vokste de nasjonale motsetningene på Balkan. Serbia ønsket å bli en stormakt i regionen og danne et "Stor-Serbia". Blant annet var Bosnia og Hercegovina områder Serbia ønsket seg. Dette vakte bekymring i Østerrike-Ungarn som hadde innlemmet området i 1908. Russland støttet Serbia, delvis for å skaffe seg mer innflytelse på Balkan, og delvis på grunn av panslavismen, tanken om et fellesskap mellom slaviske folkeslag.
+
+Motsetningene på Balkan, spesielt mellom Serbia og Østerrike-Ungarn la grunnlaget for gnisten som utløste krigen, skuddene i Sarajevo.
+
+### Tenk etter
+
+Noen historikere mener Europa var som en "en kruttønne" i årene før utbruddet av første verdenskrig. Hva tror du disse historikerne legger i det utsagnet?
+
+## Utløsende årsak
+
+Det er mange bakenforliggende årsaker til at det ble en verdenskrig i 1914, men det er spesielt en hendelse som satte Europa i brann, nemlig skuddene i Sarajevo. Denne hendelsen blir av de fleste historikere betraktet som den utløsende årsaken til første verdenskrig.
+
+### Skuddene i Sarajevo
+
+28. juni 1914 var tronfølgeren i Østerrike-Ungarn, Franz Ferdinand, på besøk i Sarajevo, hovedstaden i Bosnia. Her ble han og hans kone skutt og drept av en bosnisk-serbisk nasjonalist ved navn Gavrilo Princip. Attentatmannen hadde forbindelser til den serbiske terrororganisasjon Den svarte hånd. Denne handlingen, kjent som skuddene i Sarajevo, var den utløsende årsaken til første verdenskrig.
+
+Hendelsen førte til julikrisen hvor Østerrike-Ungarn påsto at serbiske myndigheter var involvert i attentatet. Østerrikerne brukte dermed situasjonen til å ta et oppgjør med Serbia gjennom å stille dem et ultimatum med mange krav. Hvis ikke kravene ble akseptert, ville det bli krig.
+
+Tyskland ga sin alliansepartner full støtte, dersom det skulle bli krig, i det som er blitt kjent som blankofullmakten. Det har i ettertid blitt påstått at Tyskland ønsket krig på dette tidspunktet. Serbia fikk på sin side støtte fra Russland, som samtidig startet å mobilisere sine militære styrker.
+
+### Alliansesystemet aktiveres
+
+Serbia aksepterte de fleste kravene til Østerrike-Ungarn, men ikke alle. 28. juli 1914 erklærte derfor Østerrike-Ungarn krig mot Serbia. Tyskland ba Russland stoppe mobiliseringen, noe de ikke gjorde. Den 1. august erklærte derfor Tyskland krig mot Russland. To dager senere erklærte Tyskland krig mot Frankrike og invaderte landet ved å gå gjennom Belgia. Storbritannia hadde garantert Belgias nøytralitet og erklærte krig mot Tyskland. De forskjellige krigserklæringene ble mottatt med jubel og begeistring blant befolkningene.
+
+De ulike allianseforbindelsene ble altså aktivert som følge av skuddene i Sarajevo. Hærene ble mobilisert, og det virket som det ikke var noen vei tilbake. I ettertid er det lettere å se hvordan den ene hendelsen utløste den andre, og hvorfor begivenhetene øyensynlig ikke lot seg stanse. De store hærene krevde en mobilisering som tok tid. Alle var redde for at hvis de ensidig demobiliserte, ville de ikke få tid til å mobilisere på nytt før fienden slo til.
+
+### Tenk etter
+
+Kunne første verdenskrig vært unngått, selv etter skuddene i Sarajevo?

@@ -1,0 +1,29 @@
+id: ndla-27927-nn
+title: Direkte og indirekte demokrati
+split: dev
+subject: samfunnsfag
+gradeBand: vg
+language: nn
+contentType: exercises
+features:
+  - exercises
+  - lists
+  - dates-sequence
+source:
+  type: ndla
+  url: https://ndla.no/article/27927
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Eivind Sehested Zakariassen (writer)
+  notes: NDLA article 27927, revision 58. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

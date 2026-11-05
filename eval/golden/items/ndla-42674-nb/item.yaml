@@ -1,0 +1,28 @@
+id: ndla-42674-nb
+title: Vulkanutbrudd
+split: dev
+subject: geografi
+gradeBand: vg
+language: nb
+contentType: expository
+features:
+  - notation
+  - lists
+source:
+  type: ndla
+  url: https://ndla.no/article/42674
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Sølvi Skeide (writer)
+  notes: NDLA article 42674, revision 247. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

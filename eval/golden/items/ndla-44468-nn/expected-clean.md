@@ -1,0 +1,77 @@
+# Jordskjelv
+
+Visste du at det blir registrert fleire jordskjelv i verda kvar einaste dag? Jordskjelv oppstår når jordskorpa beveger seg, og kan forårsake store øydeleggingar. I denne artikkelen utforskar vi kvar og kvifor jordskjelv oppstår, og kva konsekvensar dette kan føre til.
+
+## Kort oppsummert
+
+- Dei fleste jordskjelv skjer langs plategrenser.
+
+- Jordskjelv oppstår når litosfæreplater plutseleg beveger seg i forhold til kvarandre og frigir energi.
+
+- I Noreg skjer små jordskjelv på grunn av landheving og svakheiter i berggrunnen.
+
+- Store jordskjelv kan føre til øydeleggingar og tap av liv, spesielt der bygningar ikkje toler ristingane.
+
+## Korleis oppstår jordskjelv?
+
+Eit jordskjelv oppstår gjerne langs plategrensene til jordskorpa, når platene beveger seg i rykk og napp. Når to plater pressar mot kvarandre over lang tid, bygger det seg opp spenningar mellom desse. Til slutt vil ei av platene gi etter, og vi får ei plutseleg rørsle ut frå eit brot som skaper ei forskyving av jordskorpa. Brotpunktet blir kalla fokuset til jordskjelvet, og forskyvinga av jordskorpa blir kalla ein forkasting.
+
+Når dette skjer, blir det frigjort mykje energi. Energien spreier seg i alle retningar frå fokus. Viss skjelvet er sterkt nok, vil vi oppleve denne energien som rørsler eller ristingar i bakken, som kan merkast av oss menneske. Punktet på jordoverflata rett over fokus blir kalla episenter, og det er ofte her skjelva kjennest best. Det er ofte dette punktet som blir omtalt i media når eit jordskjelv hender. Jordskjelv kan oppstå både på land og på havbotnen og har altså ein klar samanheng med rørslene til litosfæreplatene.
+
+### Samanheng med platetektonikk
+
+Dei fleste og største jordskjelva skjer langs grensene mellom litosfæreplatene. Dette gjeld både der plater kolliderer, der plater beveger seg frå kvarandre, og der plater glir sidelengs i forhold til kvarandre.
+
+Dei kraftigaste skjelva skjer som oftast når to plater kolliderer. Kollisjonen vil skape stor spenning som kan utløyse mykje energi. Områda rundt stillehavsplata er spesielt utsette for jordskjelv på grunn av at denne plata beveger seg meir enn andre plater i nærleiken.
+
+### Jordskjelv i Noreg
+
+Jordskjelv oppstår først og fremst langs plategrensene. Sjølv om Noreg ligg langt frå ei plategrense, kan det likevel oppstå jordskjelv her. Dei fleste er små og finst langs kysten eller i Oslo-området. Det er to grunnar til at vi får jordskjelv i Noreg:
+
+- Landheving etter istida: Under istida pressa isen landet vårt ned. Då isen trekte seg tilbake, byrja landet å heve seg. Hevinga går framleis føre seg i dag. Dette skaper spenningar i bakken som kan gi jordskjelv.
+
+- Svakheiter i berggrunnen: Berggrunnen i Noreg har vore utsett for endringar i samband med platekollisjonar og oppsprekking. Dette har skapt nokre svakare område i berggrunnen som lettare kan bli utsette for press og rørsler.
+
+Sjekk ut dei siste jordskjelvhendingane i Skandinavia
+
+NORSAR er ei forskingsstifting som er spesialistar på seismologi (læra om jordskjelv) og seismisk overvaking. På nettsida deira https://www.jordskjelv.no/ kan du sjå automatiske registreringar som er gjorde i Skandinavia den siste veka, og kva styrke (magnitude) dei ulike registreringane hadde.
+
+## Korleis blir styrken på jordskjelv målt?
+
+Rørsler i bakken blir registrerte med eit måleinstrument som blir kalla eit seismometer. Utslaga viser kor sterkt jordskjelvet er. Styrken blir oppgitt på ein logaritmisk skala, som betyr at kvart trinn er ti gonger kraftigare enn det førre.
+
+Tidlegare brukte ein Richters skala, men i dag blir den meir presise moment-magnitudeskalaen (MMS) brukt. Denne måler kor mykje energi jordskjelvet frigjer. Eit jordskjelv med styrke (magnitude) 6 har ti gonger kraftigare ristingar enn eit jordskjelv med styrke 5, men frigjer heile 32 gonger meir energi.
+
+Jordskjelv kan variere mykje i styrke, og konsekvensane avheng av kor kraftige dei er:
+
+- Dei svakaste jordskjelva (magnitude 1–3) vil knapt merkast av oss menneske, berre måleinstrument kan registrere desse.
+
+- Middels sterke jordskjelv (magnitude 4–6) vil merkast av menneske og kan gjere mindre skadar.
+
+- Sterke jordskjelv (magnitude 7 og oppover) kan føre til større skadar som kan ha store konsekvensar for menneske og natur.
+
+## Konsekvensar
+
+Jordskjelv oppstår kvar einaste dag, men dei fleste er heldigvis så svake at vi menneske ikkje merkar dei. Større jordskjelvhendingar kan påverke både natur, menneske og samfunn.
+
+Når sterke jordskjelv treffer stader der det er mange menneske, kan det få store konsekvensar som vil føre til ein naturkatastrofe. Dette kan øydelegge vegar, hus og viktige bygg i områda som blir hardast ramma.
+
+Jordskjelv er òg den naturkatastrofen som tek flest menneskeliv. Det er ikkje skjelvet i seg sjølv som gjer at folk mister livet, men det skjer i samband med bygningar som rasar saman.
+
+I tillegg er det vanleg med fleire mindre etterskjelv, noko som kan by på utfordringar.
+
+### Tsunami
+
+Når eit kraftig jordskjelv skjer på havbotnen, kan det flytte på store vassmassar og lage ein tsunami – ei kjempestor havbølge. Langt ute på havet ser ikkje bølgene særleg farlege ut, men når desse bølgene nærmar seg land, kan dei bli enorme og øydeleggande.
+
+Slike bølger er vanlegast i Stillehavet og Indiahavet. I Stillehavet har det blitt oppretta varslingssystem i tilknyting til ristingar på havbotnen, dei kan varsle om potensielle tsunamibølger.
+
+Dei seinare åra har vi opplevd store jordskjelv med tsunamibølger i mellom anna Indiahavet (2004) og i Japan (2011). Sidan hendinga i 2004 har fleire måleinstrument og smarttelefonar gjort varsling av potensielle tsunamibølger enklare og meir effektivt. Dette bidreg til å minimere potensielle skadar og dødstal. Sommaren 2025 vart det òg sendt ut tsunamivarsel i fleire land etter eit kraftig jordskjelv aust i Russland. Nokre av desse landa vart trefte av tsunamibølger, mens andre slapp unna.
+
+### Kven blir ramma hardast?
+
+I dag har vi god kunnskap om kvar og kvifor jordskjelv oppstår. Dette gjer at ein i større grad enn tidlegare kan kartlegge utsette område og førebu seg på konsekvensane av slike hendingar. Auka befolkningsvekst og befolkningstettleik i verda gjer at risikoen nokre stader vil vere større. Kor store skadar slike hendingar fører til, avheng av økonomiske forhold i ulike land.
+
+Rike land har som regel råd til å førebygge store øydeleggingar ved å bygge trygge hus som kan sikre menneskeliv og hindre større materielle skadar.
+
+Fattige land har ofte dårleg råd til å kunne gjere førebyggande tiltak som å forsterke svake bygningar. Det gjer at skadane blir mykje større her, og at liv ofte går tapt.

@@ -1,0 +1,27 @@
+id: ndla-27137-nn
+title: Reformasjonen
+split: dev
+subject: krle
+gradeBand: vg
+language: nn
+contentType: expository
+features:
+  - dates-sequence
+source:
+  type: ndla
+  url: https://ndla.no/article/27137
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Eivind Sehested Zakariassen (writer)
+  notes: NDLA article 27137, revision 87. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

@@ -1,0 +1,30 @@
+id: ndla-15845-en
+title: "Easy Text: Australia's People"
+split: test
+subject: engelsk
+gradeBand: vg
+language: en
+contentType: expository
+features:
+  - lists
+  - dates-sequence
+source:
+  type: ndla
+  url: https://ndla.no/article/15845
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Engelsk for videregående (Vega) (writer)
+    - Catharine Ruud (writer)
+    - Anne Scott Hagen (writer)
+  notes: NDLA article 15845, revision 5. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

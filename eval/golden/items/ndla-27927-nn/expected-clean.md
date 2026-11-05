@@ -1,0 +1,43 @@
+# Direkte og indirekte demokrati
+
+I Athen i antikken hadde ein eit direkte demokrati, mens vi i Noreg i dag har eit indirekte demokrati. Kva er mest demokratisk?
+
+## Oppgåve 1: Omgrepsforklaringar
+
+Undersøk og forklar kort:
+
+- Kva er direkte demokrati?
+
+- Kva er indirekte demokrati?
+
+- Kva er forskjellane og likskapane mellom desse to ulike formene for demokrati?
+
+## Oppgåve 2: Undersøk det athenske og norske demokratiet
+
+- Undersøk korleis det direkte demokratiet i Athen fungerte, og forklar kort.
+
+- Undersøk korleis det indirekte demokratiet i Noreg fungerer, og forklar kort.
+
+- Noreg har òg teke i bruk direkte demokrati i enkelte tilfelle i moderne tid. Undersøk korleis dette blir gjennomført, og i kva tilfelle dette har blitt gjort. Forklar kort.
+
+## Oppgåve 3: Drøft påstanden
+
+For borgarane i Athen i antikken betydde demokrati at dei sjølv var med på å ta avgjerder som påverka deira eige liv. Drøft påstanden:
+
+Direkte demokrati er meir demokratisk enn indirekte demokrati.
+
+## Oppgåve 4: Er eit indirekte demokrati nok?
+
+I nyare tid har Noreg delteke i fleire krigar, som til dømes i tidlegare Jugoslavia i 1999, i Afghanistan i 2001 og i Libya i 2011. I 1999 og 2001 blei saka behandla både i Regjeringa og på Stortinget, men i 2011 blei avgjerda teken av Regjeringa åleine. Dette er mogleg etter norsk lov. Uansett blei ikkje dei norske veljarane spurde direkte i nokon av tilfella.
+
+Å gå i krig er ei alvorleg avgjerd. Er det eit demokratisk problem at veljarane ofte ikkje får nokon direkte medverknad i slike store spørsmål, eller er eit indirekte demokrati tilstrekkeleg i slike tilfelle? Prøv å finne argument for begge synspunkta.
+
+## Oppgåve 5: Indirekte demokrati i eit moderne samfunn?
+
+- Er det praktisk mogleg å berre bruke ei direkte form for demokrati i eit moderne samfunn som Noreg? Grunngi svaret!
+
+- I kva tilfelle meiner du ein bør bruke direkte demokrati i Noreg?
+
+Kjelde
+
+Galtung, I. M. A. (2018). Regjeringens plikt til å innhente Stortingets samtykke til norske militæroperasjoner (Masteroppgave, Universitetet i Oslo). Hentet fra https://www.duo.uio.no/handle/10852/64236?show=full

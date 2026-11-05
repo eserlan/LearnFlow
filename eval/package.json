@@ -1,0 +1,21 @@
+{
+  "name": "learnflow-eval",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "import:ndla": "bun scripts/import-ndla.ts",
+    "validate": "bun scripts/validate.ts",
+    "coverage": "bun scripts/validate.ts --coverage",
+    "attribution": "bun scripts/validate.ts --write-attribution",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "node-html-parser": "^9.0.6",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
+  }
+}

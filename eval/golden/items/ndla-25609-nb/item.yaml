@@ -1,0 +1,28 @@
+id: ndla-25609-nb
+title: Oppsummeringsoppgaver om klimaendringer
+split: dev
+subject: naturfag
+gradeBand: vg
+language: nb
+contentType: exercises
+features:
+  - lists
+  - exercises
+source:
+  type: ndla
+  url: https://ndla.no/article/25609
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Thomas Bedin (originator)
+  notes: NDLA article 25609, revision 148. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported

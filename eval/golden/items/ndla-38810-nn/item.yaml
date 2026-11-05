@@ -1,0 +1,28 @@
+id: ndla-38810-nn
+title: Fotosyntesen
+split: dev
+subject: naturfag
+gradeBand: vg
+language: nn
+contentType: expository
+features:
+  - notation
+  - lists
+source:
+  type: ndla
+  url: https://ndla.no/article/38810
+  retrieved: 2026-11-05
+  licence:
+    id: CC-BY-SA-4.0
+    url: https://creativecommons.org/licenses/by-sa/4.0/
+  creators:
+    - Anne Langerud (writer)
+  notes: NDLA article 38810, revision 94. Images and media embeds removed.
+annotations:
+  keyFacts: []
+  keyTerms: []
+  mustPreserve: []
+  qualifiers: []
+  expectations: []
+review:
+  status: imported
