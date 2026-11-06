@@ -9,7 +9,7 @@ import { structuredCall, type CallOptions, type Usage } from "./llm.ts";
 import type { GoldenItem, Language } from "./schema.ts";
 
 /** Bump when the prompt or schema changes, so results from different prompts are never mixed. */
-export const PROMPT_VERSION = "simplify-v5";
+export const PROMPT_VERSION = "simplify-v6";
 
 export type Level = "lettere" | "naermere";
 
@@ -53,8 +53,11 @@ Before you answer, compare each sentence you wrote with the source sentence it c
 const LEVEL_PROMPT: Record<Level, string> = {
   lettere: `Level: much easier ("lettere"). Give the main points in bite-sized pieces.
 
-- Keep what a teacher would expect every pupil to take away. Leave out examples, side remarks, repetition and secondary detail.
-- Length: for a text of several paragraphs, aim for about a third of the source's words, and never more than half. Short texts shrink less.
+Shorten hard. This level is for a pupil who gives up on long texts: a short text they finish teaches more than a complete one they abandon. Reduction is the goal, not a side effect.
+- Keep only what a teacher would expect every pupil to take away: the main points, every task, and what is needed so the rest is not misleading (rule 5). Everything else goes.
+- Cut, every time: examples (keep at most one, if the point needs it), extra explanations, background, side stories, repetition, lists of more than four items unless the list itself is the point, and names, dates and numbers that are not part of a main point.
+- When in doubt whether something is a main point, leave it out.
+- Length: aim for about a quarter to a third of the source's words, never more than 40%. The user message gives a word target; stay at or under it. Only a source of a few sentences may stay close to its length.
 - Sections: at most 4 sentences each, each under a short heading that only names what the part is about. You may split a long section into several. Start each section with its main point.
 - Sentences: one idea each, no sentence over 12 words. Split until it fits. Active voice.
 - Words: use common everyday words. Replace hard words that are not subject terms with everyday ones, or leave them out (e.g. "benytte" becomes "bruke", "betydelig" becomes "stor"). Subject terms stay, as rule 7 says.
@@ -68,18 +71,16 @@ Honningbier lever i store samfunn der hver bie har sin oppgave. De fleste biene 
 Simplified:
 [heading] Bier lever sammen
 [statement] Honningbier lever i store samfunn.
-[statement] De fleste biene er arbeidere.
 [statement] De samler nektar og pollen fra blomster.
 [heading] Bier hjelper plantene
 [statement] Biene bærer pollen fra blomst til blomst.
 [added-help] Pollen er et fint støv som blomstene lager.
 [statement] Mange planter trenger det for å lage frø og frukt.
-[statement] Forskere regner med at omtrent en tredjedel av maten vår trenger pollinering.
 [heading] Færre bier
 [statement] I mange land er det blitt færre bier.
 [statement] Det er fortsatt uenighet om hvorfor.
 
-Left out: "hver bie har sin oppgave", "i et bol", "de siste tiårene". Kept: the hedges "de fleste", "mange planter", "anslår … omtrent" (as "regner med … omtrent"), and "omdiskutert" (as "uenighet").`,
+Left out: that each bee has a task, that most bees are workers, "i et bol", "de siste tiårene", and the estimate about a third of our food (a detail here; if kept, it would have needed "anslår … omtrent"). Kept: the hedges "mange planter", "i mange land" and "omdiskutert" (as "uenighet").`,
   naermere: `Level: closer to the original ("naermere"). Keep every detail and most of the original wording. Use shorter sentences and simpler words where that helps, and keep the source's sections.`,
 };
 
@@ -96,13 +97,21 @@ export interface Part {
   title: string;
 }
 
+const words = (s: string) => (s.match(/[\p{L}\p{N}]+/gu) ?? []).length;
+
 export function userMessage(blocks: SourceBlock[], language: Language, level: Level, part?: Part): string {
+  const n = blocks.reduce((t, b) => t + words(b.text), 0);
+  // At "lettere" every call gets its own target, so a part of a long text shrinks as much as the whole would.
+  const target =
+    level === "lettere" && n > 80
+      ? `\n${part ? "This part" : "The source"} has ${n} words. Word target for your simplified version: at most ${Math.round(n / 3)} words (headings and added help not counted).`
+      : "";
   const partNote = part
     ? `\nThis is part ${part.index} of ${part.total} of a longer text titled "${part.title}". The other parts are simplified separately and shown right after each other, so simplify only this part: do not repeat or summarise other parts, and do not add an introduction or conclusion for the whole text.${
         part.index > 1 ? " Start with a heading for this part." : ""
       }`
     : "";
-  return `Level: ${level}\nSource language: ${LANGUAGE_NAME[language]}${partNote}\n\n<source>\n${renderBlocks(blocks)}\n</source>`;
+  return `Level: ${level}\nSource language: ${LANGUAGE_NAME[language]}${partNote}${target}\n\n<source>\n${renderBlocks(blocks)}\n</source>`;
 }
 
 /** Options for one simplification: the call options, plus how to split long texts (0 = never). */
