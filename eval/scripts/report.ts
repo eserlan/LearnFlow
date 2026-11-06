@@ -25,7 +25,7 @@ interface Row {
   configId: string;
   status: string;
   judgeId: string | null;
-  simplify: { requestedModel: string; latencyMs: number; costUsd: number | null; inferenceGeo: string | null; servedModel: string } | null;
+  simplify: { requestedModel: string; latencyMs: number; firstPartMs?: number; parts?: number; costUsd: number | null; inferenceGeo: string | null; servedModel: string } | null;
   judge: { costUsd: number | null; missingIds: string[] } | null;
   metrics: Metrics;
   checks: CheckResult;
@@ -108,8 +108,8 @@ out.push(
   "",
 );
 out.push(
-  "| Config | Length (median) | Words / sentence | Longest section (sentences) | LIX source → output (mean) | LIX without terms | LIX pass | Latency p50 / p90 | p90 at 300–500 words | Cost / item |",
-  "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+  "| Config | Length (median) | Words / sentence | Longest section (sentences) | LIX source → output (mean) | LIX without terms | LIX pass | Parts per text | First part p50 / p90 | Whole text p50 / p90 | p90 at 300–500 words | Cost / item |",
+  "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
 );
 for (const id of configIds) {
   const rs = rows.filter((r) => r.configId === id && r.status === "ok");
@@ -121,6 +121,8 @@ for (const id of configIds) {
   };
   const lixRows = ms.filter((m) => m.lixPass !== null);
   const lat = rs.map((r) => r.simplify?.latencyMs).filter((x): x is number => x !== undefined);
+  const first = rs.map((r) => r.simplify?.firstPartMs ?? r.simplify?.latencyMs).filter((x): x is number => x !== undefined);
+  const parts = rs.map((r) => r.simplify?.parts ?? 1);
   const latPage = rs.filter((r) => r.sourceWords >= 300 && r.sourceWords <= 500).map((r) => r.simplify?.latencyMs).filter((x): x is number => x !== undefined);
   const cost = rs.map((r) => r.simplify?.costUsd).filter((x): x is number => typeof x === "number");
   const ratio = quantile(cs.map((c) => c.lengthRatio).filter((x) => typeof x === "number"), 0.5);
@@ -131,6 +133,8 @@ for (const id of configIds) {
       cs.map((c) => c.lixAdjusted?.output),
     )} | ${
       lixRows.length ? `${lixRows.filter((m) => m.lixPass).length}/${lixRows.length}` : "–"
+    } | ${rs.some((r) => r.simplify) ? `${Math.min(...parts)}–${Math.max(...parts)}` : "–"} | ${
+      first.length ? `${secs(quantile(first, 0.5))} / ${secs(quantile(first, 0.9))}` : "–"
     } | ${lat.length ? `${secs(quantile(lat, 0.5))} / ${secs(quantile(lat, 0.9))}` : "–"} | ${latPage.length ? secs(quantile(latPage, 0.9)) : "–"} | ${
       cost.length ? usd(sum(cost, (x) => x) / cost.length) : "–"
     } |`,

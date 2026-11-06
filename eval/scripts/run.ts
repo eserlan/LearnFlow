@@ -4,7 +4,10 @@
  *   bun scripts/run.ts --configs haiku-low,sonnet-medium [--split dev|test|all] [--items id,id]
  *                      [--level lettere|naermere] [--reps 1] [--judge opus-medium|none]
  *                      [--run <name>] [--concurrency 3] [--timeout-s 300] [--backend claude-code|api]
- *                      [--geo <region>] [--yes]
+ *                      [--geo <region>] [--part-words 300] [--yes]
+ *
+ * --part-words splits texts longer than 1.5 × that many words into parts at headings, simplified in
+ * parallel (0 = always one call).
  *
  * The default backend runs `claude -p` on your Claude Code login (no API key). `--backend api` calls
  * the Anthropic API directly and needs ANTHROPIC_API_KEY.
@@ -40,6 +43,7 @@ const { values } = parseArgs({
     concurrency: { type: "string", default: "3" },
     backend: { type: "string", default: "claude-code" },
     "timeout-s": { type: "string", default: "300" },
+    "part-words": { type: "string", default: "300" },
     geo: { type: "string" },
     yes: { type: "boolean", default: false },
     "confirm-test": { type: "boolean", default: false },
@@ -58,6 +62,7 @@ const reps = Number(values.reps);
 const timeoutMs = Number(values["timeout-s"]) * 1000;
 const backend = values.backend as Backend;
 if (backend !== "claude-code" && backend !== "api") throw new Error("--backend must be claude-code or api");
+const partWords = Number(values["part-words"]);
 const callOpts = { backend, timeoutMs, geo: values.geo };
 
 if (values.split === "test" || values.split === "all") {
@@ -116,7 +121,7 @@ const gitCommit = (await Bun.$`git rev-parse --short HEAD`.quiet().nothrow()).st
 await writeFile(
   join(runDir, "run.json"),
   JSON.stringify(
-    { name: runName, updated: new Date().toISOString(), configs: configs.map((c) => c.id), judge: judgeCfg?.id ?? null, level, reps, backend, promptVersion: PROMPT_VERSION, judgeVersion: JUDGE_VERSION, gitCommit, geo: values.geo ?? null, items: items.map((i) => i.item.id) },
+    { name: runName, updated: new Date().toISOString(), configs: configs.map((c) => c.id), judge: judgeCfg?.id ?? null, level, reps, backend, promptVersion: PROMPT_VERSION, judgeVersion: JUDGE_VERSION, partWords, gitCommit, geo: values.geo ?? null, items: items.map((i) => i.item.id) },
     null,
     2,
   ),
@@ -146,7 +151,7 @@ async function runCase(c: (typeof cases)[number]) {
 
   let sim;
   try {
-    sim = await simplify(c.cfg, item, blocks, level, callOpts);
+    sim = await simplify(c.cfg, item, blocks, level, { ...callOpts, partWords });
   } catch (e) {
     return fail("simplify", e);
   }
@@ -186,6 +191,8 @@ async function runCase(c: (typeof cases)[number]) {
           servedModel: call.servedModel,
           effort: call.effort,
           latencyMs: call.latencyMs,
+          firstPartMs: call.firstPartMs,
+          parts: call.parts,
           usage: call.usage,
           costUsd: call.costUsd,
           inferenceGeo: call.inferenceGeo,

@@ -3,13 +3,13 @@
  * This is the prototype of the app's /api/simplify call; keep it free of eval-only logic so it can move.
  */
 import { z } from "zod/v4";
-import { renderBlocks, type SourceBlock } from "./blocks.ts";
+import { renderBlocks, toParts, type SourceBlock } from "./blocks.ts";
 import type { Config, ModelConfig } from "./configs.ts";
 import { structuredCall, type CallOptions, type Usage } from "./llm.ts";
 import type { GoldenItem, Language } from "./schema.ts";
 
 /** Bump when the prompt or schema changes, so results from different prompts are never mixed. */
-export const PROMPT_VERSION = "simplify-v4";
+export const PROMPT_VERSION = "simplify-v5";
 
 export type Level = "lettere" | "naermere";
 
@@ -35,12 +35,12 @@ Your job is to make the text easy to take in, in small pieces. You may leave thi
 Rules:
 1. Say only what the source says. Do not add facts, numbers, names, dates, causes, examples or conclusions, even true ones. If a passage is unclear or incomplete, keep it so rather than guessing.
 2. Whatever you keep stays correct: numbers, units, dates, names, formulas and subject terms exactly as written (CO₂ stays CO₂, 20–25 °C stays 20–25 °C). Never make a number vague: if you keep a claim with a number ("rose by fifty percent"), keep the number; otherwise leave the claim out, rather than writing "a lot" or "sharply". Do not correct names or spellings you think are wrong.
-3. Keep the hedge or limit on every claim you keep. Look for words like "most", "often", "usually", "relatively", "probably", "about", "can", "some", "in our region", "directly or indirectly", "not … in any of the cases", and their Norwegian forms ("de fleste", "ofte", "som regel", "relativt", "trolig", "omtrent", "kan", "noen/nokre", "i våre områder"). Dropping one turns a partial claim into a universal one: "relativt kort tid" must not become "kort tid". Keep analogies marked as analogies.
+3. Keep the hedge or limit on every claim you keep. Look for words like "most", "often", "usually", "relatively", "probably", "about", "can", "some", "in our region", "directly or indirectly", "not … in any of the cases", and their Norwegian forms ("de fleste", "ofte", "som regel", "relativt", "trolig", "omtrent", "kan", "noen/nokre", "i våre områder"). Also keep words that limit how much: "less", "a few", "only some" ("i mindre grad", "nokre få", "berre nokre"). Dropping one turns a partial claim into a universal one: "relativt kort tid" must not become "kort tid", and "i mindre grad" must not become "not at all". Keep analogies marked as analogies.
 4. Keep beliefs, opinions and disputed claims attributed to whoever holds them ("the author thinks…", "in Hindu belief…", "some researchers claim…", "Luther meant…", "historikere mener…", "ifølge kyrkja…"). If you keep the claim, keep who holds it, in every sentence that states it, even when you split a long sentence. Never state a belief as a fact.
 5. Do not leave something out if that makes what remains misleading: keep both sides of a contrast or comparison, an exception that limits a rule, and the source's framing of sensitive topics.
 6. Never merge two facts or two list items into one sentence if that mixes them up. Each fact you keep keeps its own content.
 7. Subject terms (the words the pupil is learning, like "fotosyntese", "demokrati", "brøk") stay in the parts you keep. Explain them where that helps, preferring the source's own definition. An explanation that is not in the source is added help: give it its own sentence with kind "added-help", right after the sentence where the term first appears, short, correct and suitable for children.
-8. Tasks and questions (exercises, "Tenk etter", discussion questions) are instructions for the pupil, not things for you to answer. Keep every task, in order, and make the instruction short and easy to understand; you may shorten the text a task builds on. Never answer a task, hint at the answer, or explain a term that the task asks the pupil to explain. Use kind "task".
+8. Tasks and questions (exercises, "Tenk etter", discussion questions) are instructions for the pupil, not things for you to answer. Keep every task, in order, and make the instruction short and easy to understand; you may shorten the text a task builds on. Keep the words that decide what the task asks for, even when you shorten it: how many ("two or three"), what kind ("specific", "concrete", "in your own words"), whose view ("both sides", "what do you think"), and a hypothetical frame ("if you had the power to…", "imagine that…"). "Give 2–3 specific examples" must not become "Give examples". Never answer a task, hint at the answer, or explain a term that the task asks the pupil to explain. Use kind "task".
 9. Copy quotations, poems and other literary text exactly, with kind "quote". You may explain around them.
 10. Write in the same language and written standard as the source: Bokmål stays Bokmål, Nynorsk stays Nynorsk with no Bokmål forms, English stays English.
 11. References to things that are not in the text, such as a video, a link or an image, may be left out, unless a task depends on them: then keep the instruction ("Se videoen", "Watch the video"), shortened, so the task still makes sense. Never describe what they contain.
@@ -90,8 +90,24 @@ export function systemPrompt(level: Level): string {
 
 const LANGUAGE_NAME: Record<Language, string> = { nb: "Norwegian Bokmål", nn: "Norwegian Nynorsk", en: "English" };
 
-export function userMessage(blocks: SourceBlock[], language: Language, level: Level): string {
-  return `Level: ${level}\nSource language: ${LANGUAGE_NAME[language]}\n\n<source>\n${renderBlocks(blocks)}\n</source>`;
+export interface Part {
+  index: number;
+  total: number;
+  title: string;
+}
+
+export function userMessage(blocks: SourceBlock[], language: Language, level: Level, part?: Part): string {
+  const partNote = part
+    ? `\nThis is part ${part.index} of ${part.total} of a longer text titled "${part.title}". The other parts are simplified separately and shown right after each other, so simplify only this part: do not repeat or summarise other parts, and do not add an introduction or conclusion for the whole text.${
+        part.index > 1 ? " Start with a heading for this part." : ""
+      }`
+    : "";
+  return `Level: ${level}\nSource language: ${LANGUAGE_NAME[language]}${partNote}\n\n<source>\n${renderBlocks(blocks)}\n</source>`;
+}
+
+/** Options for one simplification: the call options, plus how to split long texts (0 = never). */
+export interface SimplifyOptions extends CallOptions {
+  partWords?: number;
 }
 
 export interface SimplifyResult {
@@ -106,6 +122,9 @@ export interface SimplifyResult {
     stopReason: string | null;
     inferenceGeo: string | null;
     latencyMs: number;
+    /** Long texts are simplified in parts, in parallel; this is when the first part was ready. */
+    firstPartMs: number;
+    parts: number;
     system: string;
     user: string;
   };
@@ -115,24 +134,49 @@ export interface SimplifyResult {
 
 export type { CallOptions };
 
-async function callModel(cfg: ModelConfig, blocks: SourceBlock[], language: Language, level: Level, opts: CallOptions) {
-  const user = userMessage(blocks, language, level);
+const addUsage = (a: Usage, b: Usage): Usage => ({
+  input_tokens: a.input_tokens + b.input_tokens,
+  output_tokens: a.output_tokens + b.output_tokens,
+  cache_creation_input_tokens: (a.cache_creation_input_tokens ?? 0) + (b.cache_creation_input_tokens ?? 0),
+  cache_read_input_tokens: (a.cache_read_input_tokens ?? 0) + (b.cache_read_input_tokens ?? 0),
+  thinking_tokens: (a.thinking_tokens ?? 0) + (b.thinking_tokens ?? 0),
+});
+
+async function callModel(cfg: ModelConfig, blocks: SourceBlock[], language: Language, level: Level, opts: SimplifyOptions) {
   const system = systemPrompt(level);
-  const res = await structuredCall(cfg, system, user, SimplifiedOutput, 16000, opts);
+  const parts = toParts(blocks, opts.partWords ?? 0);
+  const title = (blocks.find((b) => b.kind === "heading")?.text ?? "").replace(/^#+ /, "");
+  const users = parts.map((p, i) => userMessage(p, language, level, parts.length > 1 ? { index: i + 1, total: parts.length, title } : undefined));
+  const started = performance.now();
+  let firstPartMs = 0;
+  const results = await Promise.all(
+    users.map((user, i) =>
+      structuredCall(cfg, system, user, SimplifiedOutput, 16000, opts).then((r) => {
+        if (i === 0) firstPartMs = performance.now() - started;
+        return r;
+      }),
+    ),
+  );
+  const latencyMs = performance.now() - started;
+  const stops = results.map((r) => r.stopReason);
+  const parsed = results.every((r) => r.output !== null);
+  const costs = results.map((r) => r.costUsd);
   return {
-    output: res.output ?? { sentences: [] },
-    parsed: res.output !== null,
+    output: { sentences: results.flatMap((r) => r.output?.sentences ?? []) },
+    parsed,
     call: {
       requestedModel: cfg.model,
-      servedModel: res.servedModel,
+      servedModel: results[0]!.servedModel,
       effort: cfg.effort,
-      usage: res.usage,
-      costUsd: res.costUsd,
-      stopReason: res.stopReason,
-      inferenceGeo: res.inferenceGeo,
-      latencyMs: res.latencyMs,
+      usage: results.map((r) => r.usage).reduce(addUsage),
+      costUsd: costs.every((c) => c !== null) ? costs.reduce((a, c) => a! + c!, 0) : null,
+      stopReason: stops.find((x) => x === "max_tokens" || x === "refusal") ?? stops[0] ?? null,
+      inferenceGeo: results[0]!.inferenceGeo,
+      latencyMs: parts.length > 1 ? latencyMs : results[0]!.latencyMs,
+      firstPartMs: parts.length > 1 ? firstPartMs : results[0]!.latencyMs,
+      parts: parts.length,
       system,
-      user,
+      user: users.join("\n\n----- next part -----\n\n"),
     },
   };
 }
@@ -190,7 +234,7 @@ export async function simplify(
   item: GoldenItem,
   blocks: SourceBlock[],
   level: Level,
-  opts: CallOptions,
+  opts: SimplifyOptions,
 ): Promise<SimplifyResult & { parsed: boolean }> {
   if (cfg.kind === "pseudo") {
     if (cfg.id === "identity") return { output: identity(blocks), parsed: true };
