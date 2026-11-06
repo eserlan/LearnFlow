@@ -1,2 +1,5 @@
-# Set exact trusted frontend origins for local development, comma-separated.
+# Exact trusted frontend browser origins for local development
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173
+# Test-only synthetic fixture. Never enable on a public deployment:
+# APP_ENV=test
+# ENABLE_MOCK_PROCESSING=true
