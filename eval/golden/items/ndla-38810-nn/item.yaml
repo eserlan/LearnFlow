@@ -25,7 +25,7 @@ annotations:
       core: true
       statement: Plantene tek opp karbondioksid og vatn og lagar sukker (glukose) og oksygen.
       gist: "Plantene lagar sukker og oksygen av karbondioksid og vatn."
-      sourceQuote: Plantene tek opp karbondioksid (CO₂) og vatn (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og oksygen (O₂).
+      sourceQuote: Plantene tek opp karbondioksid (CO2) og vatn (H2O) og produserer sukker/glukose (C6H12O6) og oksygen (O2).
     - id: f2
       core: true
       statement: Energien som driv fotosyntesen, kjem frå lys.
@@ -55,15 +55,15 @@ annotations:
       sourceQuote: Energien blir send vidare til andre delar i kloroplasten og brukt til å drive prosessen der karbondioksid blir bunden og blir til sukker (calvinsyklus).
     - id: f9
       core: true
-      statement: "Viktige faktorar for effektiv fotosyntese er lys, vatn, næring, temperatur og CO₂."
-      gist: "Lys, vatn, næring, temperatur og CO₂ påverkar kor effektiv fotosyntesen er."
+      statement: "Viktige faktorar for effektiv fotosyntese er lys, vatn, næring, temperatur og CO2."
+      gist: "Lys, vatn, næring, temperatur og CO2 påverkar kor effektiv fotosyntesen er."
       sourceQuote: "Det følgande er viktige faktorar i dette arbeidet:"
     - id: f10
       statement: I områda våre er fotosyntesen mest effektiv rundt 20–25 °C.
       sourceQuote: mest effektiv rundt 20–25 °C.
     - id: f11
-      statement: Utan lys eller utan CO₂ stoppar fotosyntesen.
-      sourceQuote: Utan CO₂ stoppar fotosyntesen.
+      statement: Utan lys eller utan CO2 stoppar fotosyntesen.
+      sourceQuote: Utan CO2 stoppar fotosyntesen.
   keyTerms:
     - term: fotosyntese
     - term: respirasjonen
@@ -80,10 +80,10 @@ annotations:
       sourceDefinition: prosessen der karbondioksid blir bunden og blir til sukker (calvinsyklus)
     - term: spalteopningane
   mustPreserve:
-    - { value: CO₂, kind: formula }
-    - { value: H₂O, kind: formula }
-    - { value: C₆H₁₂O₆, kind: formula }
-    - { value: O₂, kind: formula }
+    - { value: CO2, kind: formula }
+    - { value: H2O, kind: formula }
+    - { value: C6H12O6, kind: formula }
+    - { value: O2, kind: formula }
     - { value: 20–25 °C, kind: unit }
     - { value: karbondioksid, kind: term }
     - { value: glukose, kind: term }
@@ -96,13 +96,13 @@ annotations:
       note: An analogy, not a literal claim.
     - quote: Sjølve fotosyntesen krev lite vatn.
       note: Easy to invert into "plants need a lot of water for photosynthesis".
-    - quote: Utandørs er ikkje mangel på CO₂ noko problem
+    - quote: Utandørs er ikkje mangel på CO2 noko problem
       note: Keep the outdoor/greenhouse contrast.
   expectations:
-    - "The chemical formulas stay exactly as written, with subscripts: CO₂, H₂O, C₆H₁₂O₆, O₂."
+    - "The chemical formulas stay exactly as copied; optional notation suggestions do not change the source: CO2, H2O, C6H12O6, O2."
     - "The term \"glukose\" is kept (it can be explained as a kind of sugar), not replaced by \"sukker\" alone."
     - "The five factors stay a list of five; none is dropped or merged."
-    - "No extra facts are added, e.g. the balanced equation (6CO₂ + 6H₂O), which the source does not give."
+    - "No extra facts are added, e.g. the balanced equation (6CO2 + 6H2O), which the source does not give."
     - "Written in Nynorsk throughout; no Bokmål forms (e.g. \"vatn\", not \"vann\"; \"kloroplastar\", not \"kloroplaster\")."
     - "Its facts should match the Bokmål twin ndla-38810-nb; a difference between the two outputs points to a language-variant problem."
 review:

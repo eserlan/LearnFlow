@@ -170,8 +170,9 @@ source passage; spot-check that the passage supports the sentence.
 
 ### Functional Requirements
 
-- **FR-001**: System MUST start simplification automatically as soon as the source document is ready (001),
-  without a review or confirmation step.
+- **FR-001**: System MUST accept the unchanged `text/plain` clipboard value and optional unchanged `text/html`
+  from 001, then use Gemini Flash to extract and structure the source, clean page furniture and line breaks,
+  and simplify it without a review or confirmation step.
 - **FR-002**: System MUST link every simplified sentence to one or more extracted blocks of the source
   document.
 - **FR-003**: System MUST NOT introduce facts, numbers, names, dates, causal claims, examples or conclusions
@@ -212,6 +213,10 @@ source passage; spot-check that the passage supports the sentence.
   confirmed in scope [NEEDS CLARIFICATION: Is translation, for example to English, Ukrainian or Arabic for recently arrived
   pupils, in scope for the first release, or should output always stay in the source language? Translation
   greatly increases faithfulness risk and evaluation effort.]
+- **FR-018**: For copied material, System MUST treat `text/plain` as authoritative for characters and use
+  optional `text/html` only for formatting and structure. It MUST produce a separate cleaned source without
+  altering the stored original. Every cleaned block and simplified sentence MUST cite exact source excerpts;
+  deterministic server checks MUST validate those excerpts before the faithfulness check or display.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -253,8 +258,9 @@ source passage; spot-check that the passage supports the sentence.
 
 ## Assumptions
 
-- Input is the source document from 001 (pasted text in the main scenario); for photos, text-recognition
-  quality is 001's responsibility.
+- Input is the unchanged plain-text clipboard value and optional HTML from 001 (pasted text in the main
+  scenario). Flash performs source extraction, structure and cleanup before simplification; deterministic
+  checks validate source excerpts and faithfulness. Photo and file import are deferred from 001 to issue #2.
 - Human-annotated key facts, with the main points marked, and key terms exist for each page in the reference set.
 - Choice of language model and of the method for checking faithfulness are planning decisions. The check may
   use a different model or method than generation.

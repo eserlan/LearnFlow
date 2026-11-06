@@ -1,5 +1,10 @@
 <!--
 Sync Impact Report
+- Version change: 2.0.0 → 2.1.0 (MINOR: added agent-development guidance to the development workflow)
+- Added: repository skill `.agents/skills/karpathy-agent-guidelines/SKILL.md`, referenced below
+- Principles modified: none; product requirements and feature specs are unchanged
+- Removed sections: none
+- Follow-up TODOs: Remove this temporary impact report before committing the amendment
 - Version change: 1.0.1 → 2.0.0 (MAJOR: Principle IV redefined)
 - 2.0.0: The product is now "simplified text + audio". Principle IV renamed from "Audio and Visual in Concert"
   to "Simplified Text and Audio Together"; visuals become optional and must be synchronised only when used.
@@ -180,6 +185,7 @@ guarantees credible.
 ## Quality Gates and Development Workflow
 
 - Follow the Spec Kit flow per feature: specify → clarify → plan → tasks → implement.
+- Coding agents MUST follow the repository's [Karpathy-inspired agent development skill](../../.agents/skills/karpathy-agent-guidelines/SKILL.md) when implementing, reviewing or refactoring code. The skill supplements this constitution and active feature artifacts; it MUST NOT override the user's full scope, required safeguards, or release gates.
 - Every plan MUST include a Constitution Check against principles I–VII; violations block progress unless
   justified and approved in Complexity Tracking.
 - Feature 007 (accessible, child-centred design) applies as cross-cutting constraints to every other feature.
@@ -208,4 +214,4 @@ guarantees credible.
   principle or materially expanding guidance, PATCH for clarifications and wording.
 - Compliance is reviewed at every plan's Constitution Check and before each release.
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-05 | **Last Amended**: 2026-11-05
+**Version**: 2.1.0 | **Ratified**: 2026-11-05 | **Last Amended**: 2026-11-06

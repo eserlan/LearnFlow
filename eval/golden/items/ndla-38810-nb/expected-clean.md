@@ -4,7 +4,7 @@ I fotosyntesen dannes det sukker som plantene bruker som byggemateriale, energik
 
 ## Fotosyntesen gir sukker
 
-Alle de grønne plantene driver fotosyntese. Plantene tar opp karbondioksid (CO₂) og vann (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og oksygen (O₂). Plantene bruker energien fra lyset til å drive fotosyntesen. Ute i naturen og på åker og eng er det sola som er lyskilden. I veksthuset, eller i stua, kan vi gi ekstra lys fra lamper.
+Alle de grønne plantene driver fotosyntese. Plantene tar opp karbondioksid (CO2) og vann (H2O) og produserer sukker/glukose (C6H12O6) og oksygen (O2). Plantene bruker energien fra lyset til å drive fotosyntesen. Ute i naturen og på åker og eng er det sola som er lyskilden. I veksthuset, eller i stua, kan vi gi ekstra lys fra lamper.
 
 ## Hva bruker plantene sukkeret til?
 
@@ -36,10 +36,10 @@ For oss som skal produsere korn, gras, grønnsaker, blomster eller frukt, er det
 
 - lys: Uten lys stopper fotosyntesen. I veksthus kan vi gi vi ekstra lys for mer effektiv fotosyntese.
 
-- vann: Selve fotosyntesen krever lite vann. Men vann er viktig for å holde plantene saftspente slik at spalteåpningene er åpne og plantene kan ta opp CO₂ som er viktig for fotosyntesen.
+- vann: Selve fotosyntesen krever lite vann. Men vann er viktig for å holde plantene saftspente slik at spalteåpningene er åpne og plantene kan ta opp CO2 som er viktig for fotosyntesen.
 
 - næring: Næringsmangel vil generelt hemme alle prosesser i plantene.
 
 - temperatur: I våre områder er fotosyntesen, som andre prosesser i plantene, mest effektiv rundt 20–25 °C.
 
-- CO₂: Uten CO₂ stopper fotosyntesen. Utendørs er ikke mangel på CO₂ noe problem, men i veksthus er det vanlig å gi ekstra tilskudd av CO₂ for at fotosyntesen skal bli mer effektiv.
+- CO2: Uten CO2 stopper fotosyntesen. Utendørs er ikke mangel på CO2 noe problem, men i veksthus er det vanlig å gi ekstra tilskudd av CO2 for at fotosyntesen skal bli mer effektiv.

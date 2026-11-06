@@ -55,6 +55,7 @@ export const CONFIGS: Config[] = [
   model("gemini-argon-low", "gemini-4-argon-low", "low", "agy"),
   model("gpt-luna-low", "gpt-6-luna", "low", "codex"),
   model("gpt-luna-medium", "gpt-6-luna", "medium", "codex"),
+  model("gpt-luna-high", "gpt-6-luna", "high", "codex"),
   model("muse-wonder-low", "muse-wonder-1.0", "low", "muse"),
   model("muse-wonder-medium", "muse-wonder-1.0", "medium", "muse"),
   { kind: "pseudo", id: "identity", description: "The source blocks, unchanged, one sentence per block." },

@@ -25,8 +25,8 @@ annotations:
       core: true
       statement: Plantene tar opp karbondioksid og vann og lager sukker (glukose) og oksygen.
       gist: "Plantene lager sukker og oksygen av karbondioksid og vann."
-      sourceQuote: Plantene tar opp karbondioksid (CO₂) og vann (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og
-        oksygen (O₂).
+      sourceQuote: Plantene tar opp karbondioksid (CO2) og vann (H2O) og produserer sukker/glukose (C6H12O6) og
+        oksygen (O2).
     - id: f2
       core: true
       statement: Energien som driver fotosyntesen, kommer fra lys.
@@ -59,15 +59,15 @@ annotations:
         karbondioksid bindes og blir til sukker (calvinsyklus).
     - id: f9
       core: true
-      statement: Viktige faktorer for effektiv fotosyntese er lys, vann, næring, temperatur og CO₂.
-      gist: "Lys, vann, næring, temperatur og CO₂ påvirker hvor effektiv fotosyntesen er."
+      statement: Viktige faktorer for effektiv fotosyntese er lys, vann, næring, temperatur og CO2.
+      gist: "Lys, vann, næring, temperatur og CO2 påvirker hvor effektiv fotosyntesen er."
       sourceQuote: "Det følgende er viktige faktorer i dette arbeidet:"
     - id: f10
       statement: I våre områder er fotosyntesen mest effektiv rundt 20–25 °C.
       sourceQuote: mest effektiv rundt 20–25 °C.
     - id: f11
-      statement: Uten lys eller uten CO₂ stopper fotosyntesen.
-      sourceQuote: Uten CO₂ stopper fotosyntesen.
+      statement: Uten lys eller uten CO2 stopper fotosyntesen.
+      sourceQuote: Uten CO2 stopper fotosyntesen.
   keyTerms:
     - term: fotosyntese
     - term: respirasjonen
@@ -85,13 +85,13 @@ annotations:
       sourceDefinition: prosessen der karbondioksid bindes og blir til sukker (calvinsyklus)
     - term: spalteåpningene
   mustPreserve:
-    - value: CO₂
+    - value: CO2
       kind: formula
-    - value: H₂O
+    - value: H2O
       kind: formula
-    - value: C₆H₁₂O₆
+    - value: C6H12O6
       kind: formula
-    - value: O₂
+    - value: O2
       kind: formula
     - value: 20–25 °C
       kind: unit
@@ -108,15 +108,15 @@ annotations:
       note: An analogy, not a literal claim. Must stay an analogy ("nesten som", "litt som").
     - quote: Selve fotosyntesen krever lite vann.
       note: Easy to turn into "plants need a lot of water for photosynthesis", which inverts it.
-    - quote: Utendørs er ikke mangel på CO₂ noe problem
-      note: Keep the outdoor/greenhouse contrast; do not say plants generally lack CO₂.
+    - quote: Utendørs er ikke mangel på CO2 noe problem
+      note: Keep the outdoor/greenhouse contrast; do not say plants generally lack CO2.
   expectations:
-    - "The chemical formulas stay exactly as written, with subscripts: CO₂, H₂O, C₆H₁₂O₆, O₂."
+    - "The chemical formulas stay exactly as copied; optional notation suggestions do not change the source: CO2, H2O, C6H12O6, O2."
     - The term "glukose" is kept (it can be explained as a kind of sugar), not replaced by "sukker" alone.
     - The five factors stay a list of five; none is dropped or merged.
     - '"granum" may be left out (detail), but if kept it is not explained as anything other than the stacks of
       discs.'
-    - No extra facts are added, e.g. about the equation's balancing numbers (6CO₂ + 6H₂O), which the source
+    - No extra facts are added, e.g. about the equation's balancing numbers (6CO2 + 6H2O), which the source
       does not give.
     - The "matpakke" analogy may be kept as an analogy; it must not become a claim that the plant eats.
 review:

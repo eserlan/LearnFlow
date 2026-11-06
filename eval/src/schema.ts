@@ -5,7 +5,7 @@ import { z } from "zod";
  * faithful simplification must keep. Lives in golden/items/<id>/item.yaml next to:
  *   - source.html        what the clipboard's text/html would hold (cleaned of images and embeds)
  *   - source.txt         what the clipboard's text/plain would hold (notation flattened, e.g. CO2)
- *   - expected-clean.md  the source document 001 should hand to 002 (structure kept, CO₂ restored)
+ *   - expected-clean.md  the source document 001 should hand to 002 (structure kept, plain text preserved)
  * Annotation quotes are checked against expected-clean.md.
  */
 

@@ -4,38 +4,8 @@ import { parse, type HTMLElement, type Node, NodeType } from "node-html-parser";
  * Turns article HTML into the three representations a golden item needs:
  *   html  – what a browser would put on the clipboard as text/html (images and embeds removed)
  *   text  – what it would put on the clipboard as text/plain (sub/sup flattened: CO2, x2)
- *   clean – the expected 001 output as Markdown (structure kept, sub/sup as Unicode: CO₂, x²)
+ *   clean – the expected 001 output as Markdown (structure kept, plain-text notation unchanged)
  */
-
-const SUB: Record<string, string> = {
-  "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄", "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
-  "+": "₊", "-": "₋", "−": "₋", "=": "₌", "(": "₍", ")": "₎",
-};
-const SUP: Record<string, string> = {
-  "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
-  "+": "⁺", "-": "⁻", "−": "⁻", "=": "⁼", "(": "⁽", ")": "⁾", n: "ⁿ", i: "ⁱ",
-  // Authors often write the degree sign as a superscript o: 25 <sup>o</sup>C.
-  o: "°", "°": "°",
-};
-
-/**
- * Map a sub/superscript run to Unicode. Trailing punctuation or spaces that authors often include
- * inside the tag ("CO<sub>2: </sub>") are kept as ordinary text. Returns null if a character in
- * the core has no Unicode form, so the caller can keep a visible marker instead.
- */
-function toScript(text: string, map: Record<string, string>): string | null {
-  const m = /^(.*?)([\s.,:;!?)]*)$/su.exec(text);
-  const core = m?.[1] ?? text;
-  const tail = m?.[2] ?? "";
-  if (!core) return tail;
-  let out = "";
-  for (const ch of core) {
-    const mapped = map[ch];
-    if (mapped === undefined) return null;
-    out += mapped;
-  }
-  return out + tail;
-}
 
 const BLOCK = new Set(["p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "tr", "blockquote", "figcaption", "summary"]);
 const DROP = new Set(["script", "style", "figure", "img", "video", "audio", "iframe", "math"]);
@@ -67,11 +37,8 @@ function inline(node: Node, mode: "text" | "clean"): string {
   const tag = el.tagName?.toLowerCase();
   const inner = el.childNodes.map((c) => inline(c, mode)).join("");
   if (tag === "br") return "\n";
-  if (mode === "clean" && (tag === "sub" || tag === "sup")) {
-    const mapped = toScript(inner.replace(/^\s+/, ""), tag === "sub" ? SUB : SUP);
-    // No Unicode form available: keep a readable marker instead of silently flattening.
-    return mapped ?? (tag === "sub" ? `_(${inner})` : `^(${inner})`);
-  }
+  // Formatting may describe notation, but plain clipboard characters are authoritative.
+  // Keep the flattened characters and let the pupil choose any later correction.
   return inner;
 }
 

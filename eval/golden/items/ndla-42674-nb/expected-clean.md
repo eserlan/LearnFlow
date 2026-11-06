@@ -66,4 +66,4 @@ I områder med vulkansk aktivitet kan man utnytte energi som er lagret som varme
 
 ### Vulkaner og klima
 
-Vulkanutbrudd kan også påvirke klimaet. De kan slippe ut svovelgasser som blokkerer noe av sollyset og gir kortvarig nedkjøling. Samtidig slipper vulkaner ut klimagasser som CO₂ og vanndamp til atmosfæren, men ett utbrudd alene vil ikke kunne øke den globale CO₂-mengden. Over lang tid kan likevel mange store vulkanutbrudd bidra til global oppvarming.
+Vulkanutbrudd kan også påvirke klimaet. De kan slippe ut svovelgasser som blokkerer noe av sollyset og gir kortvarig nedkjøling. Samtidig slipper vulkaner ut klimagasser som CO2 og vanndamp til atmosfæren, men ett utbrudd alene vil ikke kunne øke den globale CO2-mengden. Over lang tid kan likevel mange store vulkanutbrudd bidra til global oppvarming.

@@ -2,11 +2,12 @@
 
 **Status:** Accepted. The simplification model was chosen on pilot results and is confirmed on the full
 practice split (see Decision 4).
-**Date:** 2026-11-05. **Revised:** 2026-11-06, twice. First the language model moved from Gemini on Vertex AI
+**Date:** 2026-11-05. **Revised:** 2026-11-06, three times. First the language model moved from Gemini on Vertex AI
 (EU endpoint) to Claude through the Anthropic API with global inference. Then, after the first harness
 pilots, simplification moved to **Gemini 3.8 Flash through the Gemini API** (not Vertex AI), because it
 gave the shortest, most bite-sized texts at the target speed. Decision 4, the options and the action items
-changed accordingly.
+changed accordingly. Third, copied-text cleanup moved from local TypeScript parsing into the Gemini Flash
+pipeline at the user's direction; exact source is still retained locally and validated before display.
 **Deciders:** Espen Erlandsen (product owner)
 
 ## Context
@@ -72,9 +73,14 @@ shaped by:
    these requirements: Bokmål, Nynorsk and English; correct pronunciation of subject terms; word-level timing
    (native, or by running speech-to-text over the generated audio); no retention of inputs; a processing
    location with a documented legal basis; acceptable cost.
-7. **Text clean-up runs in the browser.** Removing page furniture, joining lines and re-joining hyphenated
-   words is deterministic TypeScript run on the device. Pasted text arrives through the browser's paste event
-   on a paste area, which provides both `text/html` (for structure) and `text/plain`.
+7. **Copied-text cleanup runs through Gemini Flash.** The browser's paste event captures exact `text/plain`
+   and optional `text/html`; the client retains both locally and sends them unchanged only after the pupil's
+   explicit action and 006 consent gate. Gemini Flash extracts structure, classifies content, removes page
+   furniture, joins lines and handles line-break hyphenation as part of the source-to-simplified pipeline.
+   Deterministic server checks validate exact source excerpts, offsets, limits and faithfulness before results
+   are returned. Clipboard HTML is never rendered. This supersedes local deterministic cleanup to avoid a
+   second, heuristic copy of the same parsing work; raw source remains available for faithfulness checks and
+   optional original viewing.
 8. **Abuse and cost control without accounts:** an anonymous per-install token, per-token and per-IP rate
    limits, and the 2,000-word limit from 001. Cloudflare Turnstile is added only if misuse appears.
 9. **A golden data set and test harness** live in the repository (`eval/`, TypeScript). They are used to

@@ -66,8 +66,8 @@ annotations:
       statement: Vulkaner gir også mineraler, metaller og fruktbar jord, og geotermisk energi brukes blant annet på Island og New Zealand.
       sourceQuote: Lava og aske gir også fruktbar og mineralrik jord som gjør det lettere å drive jordbruk.
     - id: f12
-      statement: Svovelgasser fra utbrudd kan gi kortvarig nedkjøling. Ett utbrudd alene øker ikke den globale CO₂-mengden, men mange store utbrudd over lang tid kan bidra til global oppvarming.
-      sourceQuote: men ett utbrudd alene vil ikke kunne øke den globale CO₂-mengden
+      statement: Svovelgasser fra utbrudd kan gi kortvarig nedkjøling. Ett utbrudd alene øker ikke den globale CO2-mengden, men mange store utbrudd over lang tid kan bidra til global oppvarming.
+      sourceQuote: men ett utbrudd alene vil ikke kunne øke den globale CO2-mengden
   keyTerms:
     - term: magma
       sourceDefinition: smeltet stein, magma
@@ -88,7 +88,7 @@ annotations:
     - { value: "2010", kind: date }
     - { value: Hawaiiøyene, kind: name }
     - { value: New Zealand, kind: name }
-    - { value: CO₂, kind: formula }
+    - { value: CO2, kind: formula }
     - { value: "2:57", kind: number }
   qualifiers:
     - quote: De fleste vulkaner
@@ -100,12 +100,12 @@ annotations:
       note: Lava flows are often, not always, predictable.
     - quote: påvirke klimaet kortvarig
       note: Short-term only.
-    - quote: men ett utbrudd alene vil ikke kunne øke den globale CO₂-mengden
+    - quote: men ett utbrudd alene vil ikke kunne øke den globale CO2-mengden
       note: The most important hedge. Dropping it says volcanoes cause global warming.
     - quote: Over lang tid kan likevel mange store vulkanutbrudd bidra til global oppvarming.
       note: '"kan", "mange store", "over lang tid", "bidra" all limit the claim.'
   expectations:
-    - "The climate paragraph keeps both directions (short-term cooling from sulphur gases, and CO₂ that alone does not raise global levels), with the hedges."
+    - "The climate paragraph keeps both directions (short-term cooling from sulphur gases, and CO2 that alone does not raise global levels), with the hedges."
     - "The \"Kort oppsummert\" summary may be merged with the text, but its three points must survive."
     - "The fact box about Eyjafjallajökull keeps the place, the year and the consequence (flights stopped in much of Europe)."
     - "The film paragraph refers to a video that is not in the text; it may be left out. Nothing is said about the film's content."

@@ -36,8 +36,7 @@ completes paste → lesson → resume. Verify no truncated or overlapping text.
 
 ### User Story 2 - A pupil using a screen reader completes the core flow (Priority: P1)
 
-A blind or partially sighted pupil uses VoiceOver or TalkBack to paste text (or capture a page, with guidance
-by speech and haptics), and listen to the lesson while navigating the simplified text sentence by sentence.
+A blind or partially sighted pupil uses VoiceOver or TalkBack to paste text and listen to the lesson while navigating the simplified text sentence by sentence.
 
 **Why this priority**: WCAG 2.2 AA is a constitution requirement, and Norwegian regulations on universal
 design apply to digital services.
@@ -46,14 +45,12 @@ design apply to digital services.
 
 **Acceptance Scenarios**:
 
-1. **Given** a screen reader is on, **When** the pupil frames a page, **Then** framing guidance is given by
-   speech and haptics ("Move the phone up", "Page found").
-2. **Given** a lesson is playing with a screen reader, **When** the pupil moves focus through the text,
+1. **Given** a lesson is playing with a screen reader, **When** the pupil moves focus through the text,
    **Then** the screen reader does not talk over the lesson audio (it pauses or ducks the audio), and
    sentence highlighting does not steal focus.
-3. **Given** any interactive element, **When** focused, **Then** it has a meaningful label in the interface
+2. **Given** any interactive element, **When** focused, **Then** it has a meaningful label in the interface
    language.
-4. **Given** the pupil navigates with an external keyboard or switch control, **When** they move through the
+3. **Given** the pupil navigates with an external keyboard or switch control, **When** they move through the
    core flow, **Then** every core action is reachable, focus is always visible, and the order is logical.
 
 ---
@@ -73,7 +70,7 @@ screen without instruction; returning pupils resume their last lesson in one tap
 **Acceptance Scenarios**:
 
 1. **Given** a new pupil on the home screen, **When** it loads, **Then** one primary action, "Paste text",
-   clearly starts a new lesson, with photo and file import as secondary options, and no setup or settings are
+   clearly starts a new lesson, with no setup or settings
    required first.
 2. **Given** an error occurs anywhere in the core flow, **When** it is shown, **Then** it explains in plain
    language what happened and offers one obvious recovery action.
@@ -193,8 +190,7 @@ interface copy for diagnostic labels.
 - **FR-017**: Primary actions in the core flow MUST be reachable one-handed on common phone sizes.
 - **FR-018**: Every screen MUST have one visually dominant primary action. Advanced controls MUST be
   optional and secondary (progressive complexity).
-- **FR-019**: The home screen MUST offer "Paste text" as the primary action for new pupils (with photo and
-  file import as secondary options) and "Continue" for the most recent unfinished lesson for returning
+- **FR-019**: The home screen MUST offer "Paste text" as the primary action for new pupils and "Continue" for the most recent unfinished lesson for returning
   pupils.
 - **FR-020**: System MUST offer preferences (calmer layout, captions default, speed default, text and
   typeface settings) described by what they do, MUST NOT ask for or infer diagnoses, and MUST NOT require
