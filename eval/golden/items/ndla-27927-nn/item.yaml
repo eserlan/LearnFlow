@@ -23,27 +23,33 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: Athen i antikken hadde direkte demokrati, mens Noreg i dag har indirekte demokrati.
       sourceQuote: I Athen i antikken hadde ein eit direkte demokrati, mens vi i Noreg i dag har eit indirekte demokrati.
     - id: f2
       statement: Noreg har òg brukt direkte demokrati nokre gonger i moderne tid.
       sourceQuote: Noreg har òg teke i bruk direkte demokrati i enkelte tilfelle i moderne tid.
     - id: f3
+      core: true
       statement: For borgarane i Athen tydde demokrati at dei sjølve var med på å ta avgjerder om sitt eige liv.
       sourceQuote: For borgarane i Athen i antikken betydde demokrati at dei sjølv var med på å ta avgjerder som påverka deira eige liv.
     - id: f4
+      core: true
       statement: Noreg har vore med i krigar i tidlegare Jugoslavia (1999), Afghanistan (2001) og Libya (2011).
       sourceQuote: som til dømes i tidlegare Jugoslavia i 1999, i Afghanistan i 2001 og i Libya i 2011
     - id: f5
       statement: I 1999 og 2001 tok både Regjeringa og Stortinget stilling. I 2011 avgjorde Regjeringa åleine, og det er lov etter norsk lov.
       sourceQuote: I 1999 og 2001 blei saka behandla både i Regjeringa og på Stortinget, men i 2011 blei avgjerda teken av Regjeringa åleine.
     - id: f6
+      core: true
       statement: Veljarane blei ikkje spurde direkte i nokon av desse tilfella.
       sourceQuote: Uansett blei ikkje dei norske veljarane spurde direkte i nokon av tilfella.
     - id: f7
+      core: true
       statement: Oppgåve 3 ber eleven drøfte påstanden at direkte demokrati er meir demokratisk enn indirekte demokrati.
       sourceQuote: Direkte demokrati er meir demokratisk enn indirekte demokrati.
     - id: f8
+      core: true
       statement: Oppgåve 4 ber eleven finne argument for begge synspunkta.
       sourceQuote: Prøv å finne argument for begge synspunkta.
   keyTerms:

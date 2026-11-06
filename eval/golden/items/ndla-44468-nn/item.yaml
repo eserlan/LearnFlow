@@ -23,9 +23,11 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: Dei fleste jordskjelv skjer langs plategrenser, når litosfæreplater plutseleg flyttar seg i forhold til kvarandre og frigir energi.
       sourceQuote: Jordskjelv oppstår når litosfæreplater plutseleg beveger seg i forhold til kvarandre og frigir energi.
     - id: f2
+      core: true
       statement: Når to plater pressar mot kvarandre lenge, byggjer det seg opp spenningar til ei plate gir etter.
       sourceQuote: Når to plater pressar mot kvarandre over lang tid, bygger det seg opp spenningar mellom desse.
     - id: f3
@@ -35,12 +37,14 @@ annotations:
       statement: Dei kraftigaste skjelva skjer som oftast der to plater kolliderer. Områda rundt stillehavsplata er spesielt utsette.
       sourceQuote: Dei kraftigaste skjelva skjer som oftast når to plater kolliderer.
     - id: f5
+      core: true
       statement: Noreg ligg langt frå ei plategrense, men har små jordskjelv, mest langs kysten og i Oslo-området.
       sourceQuote: Dei fleste er små og finst langs kysten eller i Oslo-området.
     - id: f6
       statement: Jordskjelv i Noreg kjem av landheving etter istida og svakheiter i berggrunnen.
       sourceQuote: Det er to grunnar til at vi får jordskjelv i Noreg
     - id: f7
+      core: true
       statement: Jordskjelv blir målte med seismometer. I dag brukar ein moment-magnitudeskalaen (MMS), ikkje lenger Richters skala.
       sourceQuote: Tidlegare brukte ein Richters skala, men i dag blir den meir presise moment-magnitudeskalaen (MMS) brukt.
     - id: f8
@@ -50,9 +54,11 @@ annotations:
       statement: Magnitude 1–3 merkast knapt, 4–6 merkast og kan gjere mindre skadar, 7 og oppover kan gjere store skadar.
       sourceQuote: Dei svakaste jordskjelva (magnitude 1–3) vil knapt merkast av oss menneske
     - id: f10
+      core: true
       statement: Jordskjelv er den naturkatastrofen som tek flest liv, men det er bygningar som rasar saman som drep, ikkje skjelvet sjølv.
       sourceQuote: Det er ikkje skjelvet i seg sjølv som gjer at folk mister livet, men det skjer i samband med bygningar som rasar saman.
     - id: f11
+      core: true
       statement: Kraftige jordskjelv på havbotnen kan lage tsunamiar, som er vanlegast i Stillehavet og Indiahavet. Eksempel er Indiahavet (2004) og Japan (2011).
       sourceQuote: Dei seinare åra har vi opplevd store jordskjelv med tsunamibølger i mellom anna Indiahavet (2004) og i Japan (2011).
     - id: f12

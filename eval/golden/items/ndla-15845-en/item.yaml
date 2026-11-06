@@ -25,18 +25,22 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: Australia is a multicultural country.
       sourceQuote: Australia is a multicultural country.
     - id: f2
+      core: true
       statement: The Aborigines, the indigenous Australians, probably came to Australia about 40,000 years ago. They were nomadic hunters with their own culture.
       sourceQuote: The indigenous Australians or Aborigines probably arrived in Australia about 40,000 years ago.
     - id: f3
       statement: About 300,000 Aborigines lived in Australia when the Europeans came.
       sourceQuote: When the Europeans came to Australia there were about 300,000 Aborigines living there.
     - id: f4
+      core: true
       statement: Some Aborigines were killed by settlers, and many died of new diseases the immigrants brought.
       sourceQuote: Some were killed by the new settlers and many died from the new diseases that the immigrants brought with them.
     - id: f5
+      core: true
       statement: Many Aboriginal children were taken from their parents to grow up in white homes.
       sourceQuote: Many Aboriginal children were taken away from their parents to be raised in white homes.
     - id: f6
@@ -49,6 +53,7 @@ annotations:
       statement: Uluru (Ayers Rock) is a holy place for the Aboriginal people.
       sourceQuote: Uluru or Ayers Rock is a holy place for the Aboriginal people.
     - id: f9
+      core: true
       statement: From 1945 to 1965 the government paid half the ticket for anyone who wanted to settle in Australia, and many Europeans came.
       sourceQuote: Between 1945 and 1965, the Australian government paid half the travel fare for anyone wanting to settle in Australia.
     - id: f10

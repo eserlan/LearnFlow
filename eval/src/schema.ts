@@ -48,6 +48,11 @@ export const KeyFact = z.object({
   statement: z.string().min(5),
   /** Exact quote from expected-clean.md that states the fact. */
   sourceQuote: z.string().min(3),
+  /**
+   * A main point: what the pupil must take away even from the shortest simplified version. At level
+   * "lettere" only core facts must be kept; the rest is detail the model may leave out.
+   */
+  core: z.boolean().default(false),
 });
 
 export const KeyTerm = z.object({
@@ -108,6 +113,9 @@ export const GoldenItem = z
     if (item.review.status !== "imported" && item.annotations.keyFacts.length < 3) {
       ctx.addIssue({ code: "custom", message: "annotated items need at least 3 key facts" });
     }
+    if (item.review.status !== "imported" && !item.annotations.keyFacts.some((f) => f.core)) {
+      ctx.addIssue({ code: "custom", message: "annotated items need at least one core key fact (core: true)" });
+    }
     if (item.review.status === "reviewed" && !item.review.reviewedBy) {
       ctx.addIssue({ code: "custom", message: "reviewed items need review.reviewedBy" });
     }
@@ -119,3 +127,4 @@ export const GoldenItem = z
 
 export type GoldenItem = z.infer<typeof GoldenItem>;
 export type Feature = z.infer<typeof Feature>;
+export type Language = z.infer<typeof Language>;

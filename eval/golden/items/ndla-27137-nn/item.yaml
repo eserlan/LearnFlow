@@ -21,27 +21,33 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: Under reformasjonen braut fleire statar med paven og laga sine eigne statskyrkjer.
       sourceQuote: Fleire statar bryt med paven og dannar sine eigne statskyrkjer.
     - id: f2
+      core: true
       statement: Martin Luther, ein tysk munk og teologiprofessor, starta protesten i 1517. Han ville først reformere den katolske kyrkja, men blei bannlyst av paven.
       sourceQuote: Han ønskte i utgangspunktet å reformere den katolske kyrkja, men blei i staden bannlyst av paven.
     - id: f3
       statement: Kyrkja var alt svekt av pavesetet i Avignon, periodar med fleire pavar samtidig, og svartedauden.
       sourceQuote: Fleire hendingar på 1300- og 1400-talet hadde svekt stillinga til kyrkja i Europa.
     - id: f4
+      core: true
       statement: Luther var inspirert av humanismen. For han var Bibelen den einaste kjelda til rett tru, og han ville ha Bibelen omsett til lokale språk.
       sourceQuote: For Luther var Bibelen den einaste kjelda til rett tru.
     - id: f5
       statement: Boktrykkjarkunsten, som Gutenberg fann opp på midten av 1400-talet, hjelpte reformatorane å spreie bodskapen og omsette biblar.
       sourceQuote: Denne teknologien blei flittig brukt av Luther og andre reformatorar for å spreie bodskapen sin
     - id: f6
+      core: true
       statement: Avlatshandelen, der kyrkja selde avlatsbrev for å sleppe straff i skjærselden, var ein viktig del av Luthers protest.
       sourceQuote: Ein viktig del av Luthers protest var avlatshandelen.
     - id: f7
+      core: true
       statement: Mange tyske fyrstar støtta Luther. Dei fekk meir makt og rikdom når kyrkja blei statskyrkje og staten tok over eigedommane.
       sourceQuote: Eigedommane til kyrkja blei overtekne av staten, og kongen blei overhovudet til den nye statskyrkja.
     - id: f8
+      core: true
       statement: Luther meinte menneska blir frelste gjennom trua åleine, og at tilgiving er ei sak mellom den enkelte og Gud.
       sourceQuote: Luther meinte dette var ei sak mellom den enkelte angrande synder og Gud.
     - id: f9

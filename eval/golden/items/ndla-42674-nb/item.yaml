@@ -23,12 +23,15 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: De fleste vulkaner oppstår nær plategrenser.
       sourceQuote: De fleste vulkaner oppstår i nærheten av plategrenser.
     - id: f2
+      core: true
       statement: Vulkaner oppstår når magma (smeltet stein) presser seg opp gjennom sprekker i jordskorpa. Ute på overflata kalles den lava.
       sourceQuote: Vulkaner oppstår når smeltet stein, magma, presser seg opp gjennom sprekker og åpninger i jordskorpa. Når magmaen kommer ut på overflata, kalles den lava.
     - id: f3
+      core: true
       statement: Vulkaner dannes både der platene beveger seg fra hverandre (spredningssoner) og der de kolliderer (kollisjonssoner).
       sourceQuote: dannes både når litosfæreplater beveger seg fra hverandre (spredningssoner), og når de kolliderer (kollisjonssoner)
     - id: f4
@@ -41,9 +44,11 @@ annotations:
       statement: Noen vulkaner ligger over varmeflekker (hotspoter) der ekstra varm magma stiger opp. Hawaiiøyene ble til slik.
       sourceQuote: Hawaiiøyene er blitt til fordi stillehavsplata beveger seg sakte over en varmeflekk.
     - id: f7
+      core: true
       statement: Vulkanutbrudd har ført til tap av liv, ødelagte bygninger og beitemarker, hungersnød, skogbranner, flom og skred.
       sourceQuote: De har gjennom historien ført til tap av liv, ødelagte bygninger og beitemarker, hungersnød, skogbranner, flom og skred.
     - id: f8
+      core: true
       statement: Det er vanskelig å vite nøyaktig når et utbrudd kommer, men jordskjelv, gassutslipp og ras kan varsle om det.
       sourceQuote: Det er vanskelig å vite nøyaktig når et vulkanutbrudd skjer
     - id: f9

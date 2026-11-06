@@ -25,15 +25,19 @@ annotations:
       statement: Oppgavene handler om hovedpunktene i emnet om klimaendringer.
       sourceQuote: Disse oppgavene tar for seg hovedpunktene i emnet om klimaendringer.
     - id: f2
+      core: true
       statement: Den første oppgaven spør hvorfor dinosaurene døde ut for omtrent 65 millioner år siden.
       sourceQuote: Hvorfor døde dinosaurene ut for omtrent 65 millioner år siden?
     - id: f3
+      core: true
       statement: Fenotypiske endringer kan føre til evolusjon; eleven skal forklare hvordan.
       sourceQuote: Fenotypiske endringer kan gi opphav til evolusjon. Forklar hvordan dette kan foregå.
     - id: f4
+      core: true
       statement: I dag er ikke klimaendringer den største trusselen mot det biologiske mangfoldet; eleven skal forklare hvorfor de likevel får så mye oppmerksomhet.
       sourceQuote: Per i dag er ikke klimaendringer den største trusselen mot det biologiske mangfoldet.
     - id: f5
+      core: true
       statement: Arter kan tilpasse seg miljøet uten at genmaterialet endres; eleven skal gi eksempler.
       sourceQuote: uten at det skjer en endring i genmaterialet til arten
   keyTerms:

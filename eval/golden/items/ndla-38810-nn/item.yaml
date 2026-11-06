@@ -22,12 +22,15 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: Plantene tek opp karbondioksid og vatn og lagar sukker (glukose) og oksygen.
       sourceQuote: Plantene tek opp karbondioksid (CO₂) og vatn (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og oksygen (O₂).
     - id: f2
+      core: true
       statement: Energien som driv fotosyntesen, kjem frå lys.
       sourceQuote: Plantene bruker energien frå lyset til å drive fotosyntesen.
     - id: f3
+      core: true
       statement: Alt liv på jorda er direkte eller indirekte avhengig av stoffa fotosyntesen lagar.
       sourceQuote: Alle levande organismar på jorda er direkte eller indirekte avhengige av dei organiske stoffa som blir produserte i fotosyntesen.
     - id: f4
@@ -40,12 +43,14 @@ annotations:
       statement: Plantene kan lagre sukker som stivelse, til dømes i poteta og kålrota.
       sourceQuote: I poteta eller kålrota er sukkeret danna om til stivelse som fungerer som opplagsnæring.
     - id: f7
+      core: true
       statement: Fotosyntesen skjer i kloroplastar i dei grøne plantedelane, og klorofyllet i dei gir den grøne fargen.
       sourceQuote: Det er klorofyllet som gir den grøne fargen på blada.
     - id: f8
       statement: Klorofyllet fangar energien i lyset (lysreaksjonen); energien blir brukt til å binde karbondioksid til sukker (calvinsyklus).
       sourceQuote: Energien blir send vidare til andre delar i kloroplasten og brukt til å drive prosessen der karbondioksid blir bunden og blir til sukker (calvinsyklus).
     - id: f9
+      core: true
       statement: "Viktige faktorar for effektiv fotosyntese er lys, vatn, næring, temperatur og CO₂."
       sourceQuote: "Det følgande er viktige faktorar i dette arbeidet:"
     - id: f10

@@ -1,12 +1,15 @@
 # LearnFlow evaluation: the golden data set
 
 A small, hand-checked set of real school texts. We use it to choose the simplification model and effort
-level (ADR-0001 leaves Gemini Flash 3.8 vs Flash Lite 3.5 open), and later to catch regressions in
-paste clean-up (spec 001) and faithful simplification (spec 002).
+level, and later to catch regressions in paste clean-up (spec 001) and faithful simplification (spec 002).
+The production choice in ADR-0001 is Gemini 3.8 Flash at low thinking (`gemini-flash-low`) with the prompt
+`simplify-v3`. The harness also runs Claude (Haiku, Sonnet, Opus), GPT and Muse models for comparison, and
+Claude Opus 5.5 is the judge.
 
-The set answers one question per item: **did the simplified text keep everything that matters, and add
-nothing?** (Constitution Principle I). Reading level is measured separately and automatically; the
-annotations here are about faithfulness.
+The set answers one question per item: **did the simplified text keep the main points, get everything it
+kept right, and add nothing?** (Constitution Principle I). At level "lettere" the text is meant to be shorter:
+leaving out examples and detail is wanted, so only the main points must survive. Reading level is measured
+separately and automatically; the annotations here are about faithfulness.
 
 ## Commands
 
@@ -19,6 +22,8 @@ bun run validate        # schema, quotes found verbatim, ATTRIBUTION.md up to da
 bun run coverage        # validate, then composition against the targets in src/targets.ts
 bun run attribution     # regenerate golden/ATTRIBUTION.md after adding or changing items
 bun run typecheck
+bun run run --configs haiku-low,sonnet-medium,seeded [--items id,id] [--judge opus-medium|none] [--yes]
+bun run report <run-name>
 ```
 
 ## Layout
@@ -64,7 +69,7 @@ character for character, so the validator can find it. Line breaks, list dashes 
 
 | Field | What it is | How many |
 | --- | --- | --- |
-| `keyFacts` | The claims a pupil must still be able to learn from the simplified text. `statement` is the fact in plain words; `sourceQuote` is the shortest exact quote that supports it. | 3–12, by importance |
+| `keyFacts` | The claims a pupil should be able to learn from the text. `statement` is the fact in plain words; `sourceQuote` is the shortest exact quote that supports it. Mark the main points `core: true`: what every pupil must take away even from the shortest version. Only core facts must survive at "lettere"; at "naermere" all must. | 3–12, by importance; 2–6 core |
 | `keyTerms` | Subject words the simplified text must keep (and may explain), not replace. `sourceDefinition` is an exact quote where the source defines it, if it does. | 3–10 |
 | `mustPreserve` | Exact strings that must appear unchanged: numbers, dates, names, units, formulas, terms. Kind is `number`, `date`, `name`, `unit`, `formula` or `term`. | all that matter |
 | `qualifiers` | Hedges, limits and analogies that change the meaning if dropped ("direkte eller indirekte", "I våre områder", "nesten som"). `note` says what goes wrong without it. | all you find |
@@ -73,7 +78,8 @@ character for character, so the validator can find it. Line breaks, list dashes 
 Guidelines:
 
 - **Key facts are what a teacher would test.** Leave out side remarks and examples unless the example
-  *is* the point. If you'd be unhappy to see it missing from the simplified text, it's a key fact.
+  *is* the point. If you'd be unhappy to see it missing from the simplified text, it's a key fact. If
+  you'd be unhappy to see it missing from a version a third as long, it's core.
 - **Write statements at the simplified level**, in the item's language. They're the reference for "is
   this fact still there?", not a model answer.
 - **Pick the shortest quote that proves the fact.** It only has to show where the fact comes from.
@@ -126,13 +132,81 @@ Roughly 48 items:
 - No item may contain anything about a real pupil (Principle II). Test texts are school material, not
   pupil work.
 
+## Running models
+
+`bun run run` simplifies each annotated item with each config, checks the output and has a judge model
+grade it, then `bun run report <run>` writes `runs/<run>/report.md`. Runs are gitignored.
+
+**Configs** (`src/configs.ts`): a model plus an effort level, e.g. `haiku-low`, `sonnet-medium`,
+`gemini-flash-low`, `gpt-luna-low`, `muse-wonder-low`. Three pseudo-configs make no simplification call
+and test the harness itself:
+
+- `identity` returns the source unchanged: it must keep every fact and value, and fail LIX.
+- `empty` returns nothing: it must fail everything.
+- `seeded` is identity with three planted errors (a changed number, a dropped qualifier, an invented
+  conclusion). The report shows whether the checks or the judge caught each one. This is the start of
+  the seeded-error set for SC-005.
+
+Run these with `--judge none` for a free check of the plumbing, and with a judge to check the judge.
+
+**What is measured**, per config, against the 002 success criteria:
+
+| Measure | How | Target |
+| --- | --- | --- |
+| Sentences supported | judge, per sentence against the source | ≥ 99%, at most 1 bad sentence per lesson (SC-001) |
+| Added numbers | checks: numbers in the output that are not in the source, so also changed ones | 0 (SC-002, FR-003) |
+| Values kept | checks: every `mustPreserve` value appears exactly | 100% at "naermere" (SC-002); shown only at "lettere" |
+| Main points | judge: core key facts present, partial, missing or distorted; with a 95% interval | ≥ 95% present at "lettere" (SC-003) |
+| All key facts | judge, as above, over every key fact | ≥ 95% at "naermere" (SC-003); shown only at "lettere" |
+| Misleading omissions | judge: something left out makes the rest wrong (one side of a contrast, an exception) | never (FR-017) |
+| Qualifiers, expectations | judge, per annotation | as high as possible |
+| Tasks answered or dropped | judge | never (FR-011, FR-017) |
+| LIX | checks, level `lettere`: output ≤ max(source − 10, 35) | pass (SC-004) |
+| Written standard | checks: Bokmål-only words in Nynorsk output and the reverse | none (FR-008) |
+| Length, bite size | checks: output words / source words; words per sentence; most sentences under one heading | shorter is better at "lettere"; prompt asks ≤ 4 per section |
+| Latency | wall clock per call; p90 for 300–500-word texts | ≤ 10 s (SC-008) |
+| Cost | tokens × prices in `src/configs.ts` | lowest that passes |
+
+An item passes when it meets every hard gate. The judge (`--judge`, default Opus 5.5 at medium effort)
+sees the source, the output and the annotations, not which config wrote it. When the judge and the
+candidate are the same model the report says so, since its scores may be optimistic.
+
+**Before spending money**, the runner prints its plan and stops unless you add `--yes`. Pilot on one
+item first (`--items ndla-38810-nb`) to measure real tokens, time and cost per case before a full run.
+`--split test` needs `--confirm-test`: use the test split only to confirm a final choice.
+
+**Results** go to `runs/<name>/`: `results.jsonl` (one row per item × config, written as each finishes,
+so a re-run with the same `--run` resumes), `errors.jsonl` (failed calls, never scored as zero), `traces/`
+(prompts, raw output, the rendered text and every judge verdict) and `run.json`. Every row records the
+inference region the API reports; `--geo` requests one.
+
+**Backends** (`src/llm.ts`). Nothing needs an API key by default; every call runs a CLI on your own login:
+
+| Models | CLI | Notes |
+| --- | --- | --- |
+| Claude | `claude -p` (default), or `--backend api` | Our system prompt replaces Claude Code's; no tools, settings or MCP servers. About 600 tokens of wrapper. Cost is reported at list price. `--backend api` calls the Anthropic API as the app will, and needs `ANTHROPIC_API_KEY`. |
+| Gemini | `agy -p` (Antigravity) | Effort is part of the model id. About 8k tokens of agent context. |
+| GPT | `codex exec` | Read-only sandbox, user config ignored. About 14k tokens of agent context. |
+| Muse | `muse exec` | `empty` preset. About 16k tokens of agent context. |
+
+The non-Claude CLIs have no system-prompt option, so the instructions go at the top of the prompt, and
+each is a coding agent with its own base instructions. That favours Claude slightly; it is fine for a
+first comparison, not for a final verdict on another provider. They report tokens but no price.
+Latency through any CLI includes its start-up time, so it is higher than a direct API call; use
+`--backend api` to measure SC-008 properly.
+
+Every run uses your plans' usage. The texts are openly licensed school material, not pupil data, but
+private publisher items are sent too when present, so check those providers' terms before adding any.
+
+The prompt lives in `src/simplify.ts`. Bump `PROMPT_VERSION` (or `JUDGE_VERSION` in `src/judge.ts`)
+whenever you change it, so results from different prompts are never mixed. Don't put examples taken
+from golden items into the prompt; that would leak the test into the thing being tested.
+
 ## Next
 
 1. Annotate the remaining imported items, then review them, starting with the worked example.
 2. Fill the coverage gaps: grades 5–7 and 8–10, teacher-written and publisher texts, tables, literary
    texts and near-limit texts.
-3. A seeded-error set: simplified versions of reviewed items with known, labelled mistakes (dropped
-   qualifier, changed number, added fact). We use it to measure the faithfulness checker itself.
-4. The model test harness: run each candidate model and effort level over `dev`, score with the
-   deterministic checks plus the model check, and record cost and latency. Outputs go to `runs/`
-   (gitignored).
+3. Grow the seeded-error set beyond the three planted errors per item: swapped cause and effect,
+   belief stated as fact, merged facts, an answered task. Real model mistakes from runs are the best source.
+4. Check the judge against people: have a teacher grade a sample of outputs and compare.

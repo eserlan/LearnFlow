@@ -21,21 +21,26 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: The task is to watch a 5-minute NASA video from the series "Science for a Hungry World".
       sourceQuote: Watch this video (5:12 min.) from American space agency NASA's series called "Science for a Hungry World".
     - id: f2
       statement: The video has difficult words, so turn on English subtitles and write down new words to look up later.
       sourceQuote: It uses a number of difficult words, so remember to activate the English subtitles and take note of any new words to look up in a dictionary afterwards.
     - id: f3
+      core: true
       statement: The video is about farming around the world when the climate changes.
       sourceQuote: This short video provides a global perspective on agriculture in a changing climate.
     - id: f4
+      core: true
       statement: Question 1 asks for two or three concrete examples of how climate can affect farming.
       sourceQuote: Give 2-3 specific examples of how the climate can affect agriculture.
     - id: f5
+      core: true
       statement: Question 2 asks the pupil to explain a quotation from the video.
       sourceQuote: '"Vulnerability to climate is uneven across the world." Can you explain what this quotation from the video means?'
     - id: f6
+      core: true
       statement: Question 3 asks how population growth affects farming; question 4 asks what the pupil would do if they could change the world's response.
       sourceQuote: How does population growth affect agriculture?
   keyTerms:

@@ -13,9 +13,10 @@
 ### User Story 1 - Read an easier version of the text (Priority: P1)
 
 As soon as the pupil pastes a text (001), they get a simplified version, with no review step in between:
-shorter sentences, everyday words where possible, and a clear structure. The simplified text is the main
-thing the pupil sees, and the audio (003) is made from it. All the key facts from the source are still there, and nothing new
-has been added.
+shorter sentences, everyday words where possible, and small pieces under clear headings. The simplified text
+is the main thing the pupil sees, and the audio (003) is made from it. At "Lettere" it is also shorter: it
+keeps the main points and leaves out examples, side remarks and secondary detail, so the pupil can take it in
+bite by bite. What it keeps is still right, and nothing new has been added.
 
 **Why this priority**: Faithful simplification is the core value of LearnFlow and the input to narrated
 lessons (003). It is the riskiest step for hallucination.
@@ -30,14 +31,14 @@ Delivers value as a stand-alone "easy read" view.
    simplified text that is measurably easier to read than the source, without having reviewed the original
    first.
 2. **Given** the source contains numbers, dates, names, units and formulas, **When** simplification
-   completes, **Then** each of them appears exactly as in the source.
-3. **Given** the source states a key fact, **When** the simplified version is produced, **Then** that fact is
+   completes, **Then** each one the simplified text keeps appears exactly as in the source.
+3. **Given** the source states a main point, **When** the simplified version is produced, **Then** that point is
    present in the simplified version.
 4. **Given** the simplified text fails the automatic faithfulness check (after an automatic retry), **When**
    the pupil would otherwise see it, **Then** the pupil is instead shown the original text with a short
    explanation and the option to try again, and the audio is made from the original text.
 5. **Given** the source states something with a qualification ("usually", "about", "some researchers
-   believe"), **When** it is simplified, **Then** the qualification is kept.
+   believe"), **When** the claim is kept, **Then** the qualification is kept with it.
 6. **Given** a passage is ambiguous or incomplete (for example cut off at the page edge or where the copied selection ended), **When** it is
    simplified, **Then** the app marks it as uncertain instead of filling in the gap.
 
@@ -82,8 +83,8 @@ changes, the result passes the faithfulness check, and the pupil can return to t
    rewritten, and the new version passes the same faithfulness check as the full text.
 2. **Given** a section has been made easier, **When** the pupil taps "Show previous version", **Then** the
    earlier version is restored.
-3. **Given** a section is already as simple as it can be without losing facts, **When** the pupil asks for
-   easier, **Then** the app says so and offers the term explanations instead of dropping content.
+3. **Given** a section is already as simple as it can be without losing a main point, **When** the pupil asks
+   for easier, **Then** the app says so and offers the term explanations instead of dropping that point.
 
 ---
 
@@ -159,8 +160,9 @@ source passage; spot-check that the passage supports the sentence.
   does not pad it with extra material.
 - The source covers sensitive topics (war, illness, sexuality in health education): the simplification keeps
   the textbook's framing and does not soften, editorialise or omit it.
-- The source contains a table: table content is kept as a table, or as a list with every value preserved. It
-  is never summarised into approximate statements.
+- The source contains a table: table content is kept as a table, or as a list with every kept value exact. At
+  "Lettere", rows that are not main points may be left out, but values are never summarised into approximate
+  statements.
 - The pupil fixed uncertain words in a photo (001) and introduced errors of their own: the simplification is
   faithful to the text as the pupil left it, and that text is what "Show original" shows.
 
@@ -175,10 +177,11 @@ source passage; spot-check that the passage supports the sentence.
 - **FR-003**: System MUST NOT introduce facts, numbers, names, dates, causal claims, examples or conclusions
   that are not present in the source document. Added term explanations are the only allowed exception and are
   governed by FR-007.
-- **FR-004**: System MUST preserve numbers, units, dates, proper names, formulas and subject terms exactly,
-  and MUST preserve relationships between facts and the source's caveats and qualifications.
+- **FR-004**: System MUST keep every number, unit, date, proper name, formula and subject term it uses exactly
+  as in the source, and MUST keep the relationships between the facts it keeps and their caveats and
+  qualifications.
 - **FR-005**: System MUST run an automatic faithfulness check on every simplified text before showing it,
-  covering unsupported statements, missing key facts and altered numbers or terms.
+  covering unsupported statements, missing main points, misleading omissions and altered numbers or terms.
 - **FR-006**: When the faithfulness check fails, System MUST retry once automatically. If it fails again,
   System MUST NOT show the failing simplification; it MUST show the original text, explain why, offer to try
   again, and let 003 make the audio from the original text.
@@ -198,6 +201,11 @@ source passage; spot-check that the passage supports the sentence.
 - **FR-014**: System MUST mark ambiguous or incomplete passages as uncertain rather than completing them.
 - **FR-015**: System MUST let the pupil report a sentence as wrong or confusing; reports are stored with the
   sentence and its source link for quality review, without other personal data.
+- **FR-017**: At the "Lettere" level, System SHOULD reduce the text to its main points, in the source's order,
+  as short sections under headings, leaving out examples, side remarks, repetition and secondary detail. It
+  MUST NOT leave anything out in a way that makes the rest misleading (one side of a contrast, an exception
+  that limits a rule, the framing of a sensitive topic), and MUST keep every task. At "Nærmere originalen"
+  every detail is kept.
 - **FR-016**: Simplification into a language other than the source's language variant is supported only if
   confirmed in scope [NEEDS CLARIFICATION: Is translation, for example to English, Ukrainian or Arabic for recently arrived
   pupils, in scope for the first release, or should output always stay in the source language? Translation
@@ -224,9 +232,10 @@ source passage; spot-check that the passage supports the sentence.
 
 - **SC-001**: On the faithfulness reference set, at least 99% of simplified sentences are judged supported by
   the source by human reviewers, and no lesson contains more than one unsupported sentence.
-- **SC-002**: 100% of numbers, dates, names, units and formulas in the source are preserved exactly on the
-  reference set.
-- **SC-003**: At least 95% of key facts annotated in the reference set are present in the simplified text.
+- **SC-002**: 100% of numbers, dates, names, units and formulas in the simplified text match the source exactly
+  on the reference set; at "Nærmere originalen", 100% of those in the source are kept.
+- **SC-003**: At "Lettere", at least 95% of the main points annotated in the reference set are present in the
+  simplified text; at "Nærmere originalen", at least 95% of all annotated key facts.
 - **SC-004**: At the "Lettere" level, the readability index (LIX) is at least 10 points lower than the source,
   or at most 35, whichever is higher.
 - **SC-005**: The automatic faithfulness check catches at least 95% of seeded unsupported statements in a
@@ -242,7 +251,7 @@ source passage; spot-check that the passage supports the sentence.
 
 - Input is the source document from 001 (pasted text in the main scenario); for photos, text-recognition
   quality is 001's responsibility.
-- Human-annotated key facts and key terms exist for each page in the reference set.
+- Human-annotated key facts, with the main points marked, and key terms exist for each page in the reference set.
 - Choice of language model and of the method for checking faithfulness are planning decisions. The check may
   use a different model or method than generation.
 - The two level names are working titles and will be validated with pupils.

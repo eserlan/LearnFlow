@@ -24,9 +24,11 @@ source:
 annotations:
   keyFacts:
     - id: f1
+      core: true
       statement: Første verdenskrig varte fra 1914 til 1918.
       sourceQuote: Første verdenskrig var en verdensomspennende krig som varte fra 1914 til 1918.
     - id: f2
+      core: true
       statement: Historikere skiller mellom bakenforliggende årsaker (som går bakover i tid) og den utløsende årsaken.
       sourceQuote: Bakenforliggende årsaker er årsaker til en hendelse som går bakover i tid.
     - id: f3
@@ -39,12 +41,15 @@ annotations:
       statement: Frankrike ville ta tilbake områdene, Russland ville samle de slaviske folkene (panslavisme), og Tyskland under Vilhelm 2. ville være en stormakt.
       sourceQuote: Frankrike hadde ikke glemt krigsnederlaget i 1871 og ønsket å ta tilbake områdene de hadde måttet avstå til Tyskland.
     - id: f6
+      core: true
       statement: Det ble et våpenkappløp og et flåtekappløp mellom Tyskland og Storbritannia. Utgiftene til våpen steg med femti prosent de siste årene før krigen.
       sourceQuote: De siste årene før krigsutbruddet steg utgiftene til våpenproduksjon med femti prosent for de europeiske stormaktene.
     - id: f7
+      core: true
       statement: Tyskland, Østerrike-Ungarn og Italia dannet trippelalliansen.
       sourceQuote: Senere ble også Italia med i alliansen, som fikk navnet trippelalliansen.
     - id: f8
+      core: true
       statement: Frankrike, Russland og senere Storbritannia dannet trippelententen.
       sourceQuote: Denne forståelsen ble kjent som trippelententen.
     - id: f9
@@ -57,6 +62,7 @@ annotations:
       statement: I Balkankrigene (1912–1913) mistet Det osmanske riket nesten alle sine områder i Europa, og Serbia vant mest. Serbia ville ha Bosnia og Hercegovina, som Østerrike-Ungarn hadde tatt i 1908.
       sourceQuote: I Balkankrigene (1912-1913) mistet Det osmanske riket nesten alle sine europeiske områder.
     - id: f12
+      core: true
       statement: 28. juni 1914 skjøt Gavrilo Princip, en bosnisk-serbisk nasjonalist, tronfølgeren Franz Ferdinand og kona hans i Sarajevo. Dette var den utløsende årsaken.
       sourceQuote: Her ble han og hans kone skutt og drept av en bosnisk-serbisk nasjonalist ved navn Gavrilo Princip.
     - id: f13
