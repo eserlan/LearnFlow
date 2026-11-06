@@ -1,52 +1,76 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { handleRequest } from './index.ts';
+import { handleRequest, SMOKE_FIXTURE } from './index.ts';
 
 const env = { ALLOWED_ORIGINS: 'http://localhost:5173,https://preview.example.test' };
+const mockEnv = { ...env, APP_ENV: 'test', ENABLE_MOCK_PROCESSING: 'true' };
 const api = 'https://api.example.test';
 
-describe('stateless LearnFlow Worker scaffold', () => {
-  it('serves a no-store health response without any server-side storage', async () => {
-    const response = handleRequest(new Request(api + '/health'), env);
+function post(payload: unknown, configuration = mockEnv, origin = 'http://localhost:5173'): Promise<Response> {
+  return handleRequest(new Request(api + '/api/simplify', {
+    method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }), configuration);
+}
+
+describe('stateless Cloudflare Worker API', () => {
+  it('serves health with no-store headers', async () => {
+    const response = await handleRequest(new Request(api + '/health'), env);
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
     assert.deepEqual(await response.json(), { status: 'ok' });
   });
 
-  it('allows only explicitly listed frontend origins', () => {
-    const allowed = handleRequest(new Request(api + '/health', { headers: { Origin: 'http://localhost:5173' } }), env);
+  it('allowlists exact origins and rejects unknown origins', async () => {
+    const allowed = await handleRequest(new Request(api + '/health', { headers: { Origin: 'http://localhost:5173' } }), env);
     assert.equal(allowed.headers.get('Access-Control-Allow-Origin'), 'http://localhost:5173');
-
-    const denied = handleRequest(new Request(api + '/health', { headers: { Origin: 'https://evil.example' } }), env);
+    const denied = await handleRequest(new Request(api + '/health', { headers: { Origin: 'https://evil.example' } }), env);
     assert.equal(denied.status, 403);
     assert.equal(denied.headers.get('Access-Control-Allow-Origin'), null);
   });
 
-  it('handles allowed preflight without wildcard origins', () => {
-    const response = handleRequest(new Request(api + '/api/simplify', {
-      method: 'OPTIONS',
-      headers: { Origin: 'https://preview.example.test', 'Access-Control-Request-Method': 'POST' }
+  it('handles only valid CORS preflight', async () => {
+    const ok = await handleRequest(new Request(api + '/api/simplify', {
+      method: 'OPTIONS', headers: { Origin: 'https://preview.example.test', 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'Content-Type' }
     }), env);
-    assert.equal(response.status, 204);
-    assert.equal(response.headers.get('Access-Control-Allow-Origin'), 'https://preview.example.test');
+    assert.equal(ok.status, 204);
+    const denied = await handleRequest(new Request(api + '/api/simplify', {
+      method: 'OPTIONS', headers: { Origin: 'https://preview.example.test', 'Access-Control-Request-Method': 'DELETE' }
+    }), env);
+    assert.equal(denied.status, 403);
   });
 
-  it('does not process or persist pupil content before service readiness', async () => {
-    const response = handleRequest(new Request(api + '/api/simplify', {
-      method: 'POST',
-      headers: { Origin: 'http://localhost:5173', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plainText: 'private textbook material' })
-    }), env);
+  it('production never reads or processes text (returns 501)', async () => {
+    const request = new Request(api + '/api/simplify', {
+      method: 'POST', headers: { Origin: 'http://localhost:5173', 'Content-Type': 'application/json' }, body: JSON.stringify({ plainText: 'private pupil text' })
+    });
+    const response = await handleRequest(request, env);
     assert.equal(response.status, 501);
-    assert.deepEqual((await response.json()).error, 'not_implemented');
+    assert.equal(request.bodyUsed, false);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
   });
 
-  it('fails closed when allowed origins are not configured', () => {
-    const response = handleRequest(new Request(api + '/api/speak', {
-      method: 'POST',
-      headers: { Origin: 'http://localhost:5173' }
-    }), {});
-    assert.equal(response.status, 403);
+  it('test fixture runs only in explicit test mode', async () => {
+    assert.equal((await post(SMOKE_FIXTURE, env)).status, 501);
+    assert.equal((await post(SMOKE_FIXTURE, { ...mockEnv, APP_ENV: 'production' })).status, 501);
+    const response = await post(SMOKE_FIXTURE);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      sourceVersion: 1, verified: true,
+      result: { kind: 'smoke-fixture', text: SMOKE_FIXTURE.plainText, forLearning: false }
+    });
+  });
+
+  it('rejects real input even in fixture mode', async () => {
+    const response = await post({ ...SMOKE_FIXTURE, plainText: 'Actual school work' });
+    assert.equal(response.status, 422);
+    assert.equal((await response.json() as { error: string }).error, 'fixture_only');
+  });
+
+  it('requires an approved browser origin for processing', async () => {
+    assert.equal((await post(SMOKE_FIXTURE, mockEnv, 'https://evil.example')).status, 403);
+    const noOrigin = await handleRequest(new Request(api + '/api/simplify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(SMOKE_FIXTURE)
+    }), mockEnv);
+    assert.equal(noOrigin.status, 403);
   });
 });
