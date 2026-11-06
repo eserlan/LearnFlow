@@ -162,7 +162,7 @@ Run these with `--judge none` for a free check of the plumbing, and with a judge
 | Misleading omissions | judge: something left out makes the rest wrong (one side of a contrast, an exception) | never (FR-017) |
 | Qualifiers, expectations | judge, per annotation | as high as possible |
 | Tasks answered or dropped | judge | never (FR-011, FR-017) |
-| LIX | checks, level `lettere`: output ≤ max(source − 10, 30), not counting the item's key terms and must-preserve values as long words (plain LIX shown too) | pass (SC-004) |
+| LIX | checks, level `lettere`: output ≤ max(source − 10, 30), not counting the item's key terms and must-preserve values as long words (plain LIX shown too); not gated on exercise items | pass (SC-004) |
 | Written standard | checks: Bokmål-only words in Nynorsk output and the reverse | none (FR-008) |
 | Length, bite size | checks: output words / source words; words per sentence; most sentences under one heading | shorter is better at "lettere"; prompt asks ≤ 4 per section |
 | Latency | wall clock per call; p90 for 300–500-word texts | ≤ 10 s (SC-008) |

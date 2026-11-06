@@ -140,7 +140,11 @@ export function runChecks(
     unlinkedSentences: out.sentences.filter((s) => s.sources.length === 0 || s.sources.some((id) => !ids.has(id))).length,
     lixSource,
     lixOutput,
-    lixPass: level === "lettere" && adj.source !== null && adj.output !== null ? adj.output <= Math.max(adj.source - 10, LIX_FLOOR) : null,
+    // Not gated on exercise pages: most of their text is tasks, which must stay in full (002 FR-011, SC-004).
+    lixPass:
+      level === "lettere" && item.contentType !== "exercises" && adj.source !== null && adj.output !== null
+        ? adj.output <= Math.max(adj.source - 10, LIX_FLOOR)
+        : null,
     lixAdjusted: adj,
     wrongVariantWords: wrongVariantWords(text, item.language),
     words: { source: count(clean), output: count(text) },

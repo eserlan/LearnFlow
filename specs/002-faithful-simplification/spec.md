@@ -241,7 +241,7 @@ source passage; spot-check that the passage supports the sentence.
 - **SC-004**: At the "Lettere" level, the readability index (LIX) is at least 10 points lower than the source,
   or at most 30, whichever is higher. LIX is counted without the text's subject terms and must-preserve
   values as long words, since the simplified text must keep them (provisional floor; to be checked with
-  teachers).
+  teachers). Not applied to exercise pages, where the tasks must stay in full.
 - **SC-005**: The automatic faithfulness check catches at least 95% of seeded unsupported statements in a
   red-team set.
 - **SC-006**: Summaries cover at least 90% of the annotated main points on the reference set, with no

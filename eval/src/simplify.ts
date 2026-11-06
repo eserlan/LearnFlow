@@ -9,7 +9,7 @@ import { structuredCall, type CallOptions, type Usage } from "./llm.ts";
 import type { GoldenItem, Language } from "./schema.ts";
 
 /** Bump when the prompt or schema changes, so results from different prompts are never mixed. */
-export const PROMPT_VERSION = "simplify-v7";
+export const PROMPT_VERSION = "simplify-v8";
 
 export type Level = "lettere" | "naermere";
 
@@ -40,7 +40,7 @@ Rules:
 5. Do not leave something out if that makes what remains misleading: keep both sides of a contrast or comparison, an exception that limits a rule, and the source's framing of sensitive topics.
 6. Never merge two facts or two list items into one sentence if that mixes them up. Each fact you keep keeps its own content.
 7. Subject terms (the words the pupil is learning, like "fotosyntese", "demokrati", "brøk") stay in the parts you keep. Explain them where that helps, preferring the source's own definition. An explanation that is not in the source is added help: give it its own sentence with kind "added-help", right after the sentence where the term first appears, short, correct and suitable for children.
-8. Tasks and questions (exercises, "Tenk etter", discussion questions) are instructions for the pupil, not things for you to answer. Keep every task, in order, and make the instruction short and easy to understand; you may shorten the text a task builds on. Keep the words that decide what the task asks for, even when you shorten it: how many ("two or three"), what kind ("specific", "concrete", "in your own words"), whose view ("both sides", "what do you think"), and a hypothetical frame ("if you had the power to…", "imagine that…"). "Give 2–3 specific examples" must not become "Give examples". Never answer a task, hint at the answer, or explain a term that the task asks the pupil to explain. Use kind "task".
+8. Tasks and questions (exercises, "Tenk etter", discussion questions) are instructions for the pupil, not things for you to answer. Keep every task, in order, and make the instruction short and easy to understand; you may shorten the text a task builds on. Keep the words that decide what the task asks for, even when you shorten it: how many ("two or three"), what kind ("specific", "concrete", "in your own words"), whose view ("both sides", "what do you think"), and a hypothetical frame ("if you had the power to…", "imagine that…"). "Give 2–3 specific examples" must not become "Give examples". A question that opens the text or frames the whole topic for the pupil ("Which is better, A or B?") is a task too: keep it, usually at the start. Never answer a task, hint at the answer, or explain a term that the task asks the pupil to explain. Use kind "task".
 9. Copy quotations, poems and other literary text exactly, with kind "quote". You may explain around them.
 10. Write in the same language and written standard as the source: Bokmål stays Bokmål, Nynorsk stays Nynorsk with no Bokmål forms, English stays English.
 11. References to things that are not in the text, such as a video, a link or an image, may be left out, unless a task depends on them: then keep the instruction ("Se videoen", "Watch the video"), shortened, so the task still makes sense. Never describe what they contain.
