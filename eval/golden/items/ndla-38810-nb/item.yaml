@@ -24,15 +24,18 @@ annotations:
     - id: f1
       core: true
       statement: Plantene tar opp karbondioksid og vann og lager sukker (glukose) og oksygen.
+      gist: "Plantene lager sukker og oksygen av karbondioksid og vann."
       sourceQuote: Plantene tar opp karbondioksid (CO₂) og vann (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og
         oksygen (O₂).
     - id: f2
       core: true
       statement: Energien som driver fotosyntesen, kommer fra lys.
+      gist: "Energien til fotosyntesen kommer fra lys."
       sourceQuote: Plantene bruker energien fra lyset til å drive fotosyntesen.
     - id: f3
       core: true
       statement: Alt liv på jorda er direkte eller indirekte avhengig av stoffene fotosyntesen lager.
+      gist: "Alt liv på jorda er direkte eller indirekte avhengig av fotosyntesen."
       sourceQuote: Alle levende organismer på jorda er direkte eller indirekte avhengige av de organiske stoffene
         som produseres i fotosyntesen.
     - id: f4
@@ -47,6 +50,7 @@ annotations:
     - id: f7
       core: true
       statement: Fotosyntesen skjer i kloroplaster i de grønne plantedelene, og klorofyllet i dem gir den grønne fargen.
+      gist: "Fotosyntesen skjer i kloroplastene i de grønne delene av planta."
       sourceQuote: Det er klorofyllet som gir den grønne fargen på bladene.
     - id: f8
       statement: Klorofyllet fanger energien i lyset (lysreaksjonen); energien brukes til å binde karbondioksid til
@@ -56,6 +60,7 @@ annotations:
     - id: f9
       core: true
       statement: Viktige faktorer for effektiv fotosyntese er lys, vann, næring, temperatur og CO₂.
+      gist: "Lys, vann, næring, temperatur og CO₂ påvirker hvor effektiv fotosyntesen er."
       sourceQuote: "Det følgende er viktige faktorer i dette arbeidet:"
     - id: f10
       statement: I våre områder er fotosyntesen mest effektiv rundt 20–25 °C.
@@ -97,8 +102,6 @@ annotations:
   qualifiers:
     - quote: direkte eller indirekte
       note: Not every organism eats plants; dropping this overstates the claim.
-    - quote: Litt forenklet
-      note: The source flags its own simplification; keep the hedge or an equivalent.
     - quote: I våre områder
       note: The 20–25 °C range is regional, not universal.
     - quote: nesten som solcellepaneler

@@ -25,10 +25,12 @@ annotations:
     - id: f1
       core: true
       statement: Dei fleste jordskjelv skjer langs plategrenser, når litosfæreplater plutseleg flyttar seg i forhold til kvarandre og frigir energi.
+      gist: "Dei fleste jordskjelv skjer langs plategrenser, når plater plutseleg flyttar seg."
       sourceQuote: Jordskjelv oppstår når litosfæreplater plutseleg beveger seg i forhold til kvarandre og frigir energi.
     - id: f2
       core: true
       statement: Når to plater pressar mot kvarandre lenge, byggjer det seg opp spenningar til ei plate gir etter.
+      gist: "Når plater pressar mot kvarandre, byggjer det seg opp spenningar til ei plate gir etter."
       sourceQuote: Når to plater pressar mot kvarandre over lang tid, bygger det seg opp spenningar mellom desse.
     - id: f3
       statement: Brotpunktet heiter fokus, forskyvinga heiter forkasting, og punktet på overflata rett over fokus heiter episenter.
@@ -39,6 +41,7 @@ annotations:
     - id: f5
       core: true
       statement: Noreg ligg langt frå ei plategrense, men har små jordskjelv, mest langs kysten og i Oslo-området.
+      gist: "Noreg har små jordskjelv, sjølv om landet ligg langt frå ei plategrense."
       sourceQuote: Dei fleste er små og finst langs kysten eller i Oslo-området.
     - id: f6
       statement: Jordskjelv i Noreg kjem av landheving etter istida og svakheiter i berggrunnen.
@@ -46,6 +49,7 @@ annotations:
     - id: f7
       core: true
       statement: Jordskjelv blir målte med seismometer. I dag brukar ein moment-magnitudeskalaen (MMS), ikkje lenger Richters skala.
+      gist: "Jordskjelv blir målte med seismometer."
       sourceQuote: Tidlegare brukte ein Richters skala, men i dag blir den meir presise moment-magnitudeskalaen (MMS) brukt.
     - id: f8
       statement: Skalaen er logaritmisk. Magnitude 6 gir ti gonger kraftigare ristingar enn magnitude 5, men 32 gonger meir energi.
@@ -56,10 +60,12 @@ annotations:
     - id: f10
       core: true
       statement: Jordskjelv er den naturkatastrofen som tek flest liv, men det er bygningar som rasar saman som drep, ikkje skjelvet sjølv.
+      gist: "Jordskjelv tek flest liv av naturkatastrofane, men det er bygningar som rasar saman som drep."
       sourceQuote: Det er ikkje skjelvet i seg sjølv som gjer at folk mister livet, men det skjer i samband med bygningar som rasar saman.
     - id: f11
       core: true
       statement: Kraftige jordskjelv på havbotnen kan lage tsunamiar, som er vanlegast i Stillehavet og Indiahavet. Eksempel er Indiahavet (2004) og Japan (2011).
+      gist: "Kraftige jordskjelv på havbotnen kan lage tsunamiar."
       sourceQuote: Dei seinare åra har vi opplevd store jordskjelv med tsunamibølger i mellom anna Indiahavet (2004) og i Japan (2011).
     - id: f12
       statement: Sommaren 2025 blei det sendt ut tsunamivarsel i fleire land etter eit kraftig jordskjelv aust i Russland.

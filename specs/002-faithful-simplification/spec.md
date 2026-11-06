@@ -237,7 +237,9 @@ source passage; spot-check that the passage supports the sentence.
 - **SC-003**: At "Lettere", at least 95% of the main points annotated in the reference set are present in the
   simplified text; at "Nærmere originalen", at least 95% of all annotated key facts.
 - **SC-004**: At the "Lettere" level, the readability index (LIX) is at least 10 points lower than the source,
-  or at most 35, whichever is higher.
+  or at most 30, whichever is higher. LIX is counted without the text's subject terms and must-preserve
+  values as long words, since the simplified text must keep them (provisional floor; to be checked with
+  teachers).
 - **SC-005**: The automatic faithfulness check catches at least 95% of seeded unsupported statements in a
   red-team set.
 - **SC-006**: Summaries cover at least 90% of the annotated main points on the reference set, with no

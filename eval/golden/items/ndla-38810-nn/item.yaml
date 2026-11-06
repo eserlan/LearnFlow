@@ -24,14 +24,17 @@ annotations:
     - id: f1
       core: true
       statement: Plantene tek opp karbondioksid og vatn og lagar sukker (glukose) og oksygen.
+      gist: "Plantene lagar sukker og oksygen av karbondioksid og vatn."
       sourceQuote: Plantene tek opp karbondioksid (CO₂) og vatn (H₂O) og produserer sukker/glukose (C₆H₁₂O₆) og oksygen (O₂).
     - id: f2
       core: true
       statement: Energien som driv fotosyntesen, kjem frå lys.
+      gist: "Energien til fotosyntesen kjem frå lys."
       sourceQuote: Plantene bruker energien frå lyset til å drive fotosyntesen.
     - id: f3
       core: true
       statement: Alt liv på jorda er direkte eller indirekte avhengig av stoffa fotosyntesen lagar.
+      gist: "Alt liv på jorda er direkte eller indirekte avhengig av fotosyntesen."
       sourceQuote: Alle levande organismar på jorda er direkte eller indirekte avhengige av dei organiske stoffa som blir produserte i fotosyntesen.
     - id: f4
       statement: Plantene bruker sukkeret som byggemateriale for å vekse.
@@ -45,6 +48,7 @@ annotations:
     - id: f7
       core: true
       statement: Fotosyntesen skjer i kloroplastar i dei grøne plantedelane, og klorofyllet i dei gir den grøne fargen.
+      gist: "Fotosyntesen skjer i kloroplastane i dei grøne delane av planta."
       sourceQuote: Det er klorofyllet som gir den grøne fargen på blada.
     - id: f8
       statement: Klorofyllet fangar energien i lyset (lysreaksjonen); energien blir brukt til å binde karbondioksid til sukker (calvinsyklus).
@@ -52,6 +56,7 @@ annotations:
     - id: f9
       core: true
       statement: "Viktige faktorar for effektiv fotosyntese er lys, vatn, næring, temperatur og CO₂."
+      gist: "Lys, vatn, næring, temperatur og CO₂ påverkar kor effektiv fotosyntesen er."
       sourceQuote: "Det følgande er viktige faktorar i dette arbeidet:"
     - id: f10
       statement: I områda våre er fotosyntesen mest effektiv rundt 20–25 °C.
@@ -85,8 +90,6 @@ annotations:
   qualifiers:
     - quote: direkte eller indirekte
       note: Not every organism eats plants; dropping this overstates the claim.
-    - quote: Litt forenkla
-      note: The source flags its own simplification; keep the hedge or an equivalent.
     - quote: I områda våre
       note: The 20–25 °C range is regional, not universal.
     - quote: nesten som solcellepanel

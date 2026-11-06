@@ -27,10 +27,12 @@ annotations:
     - id: f1
       core: true
       statement: Australia is a multicultural country.
+      gist: "Australia is a multicultural country."
       sourceQuote: Australia is a multicultural country.
     - id: f2
       core: true
       statement: The Aborigines, the indigenous Australians, probably came to Australia about 40,000 years ago. They were nomadic hunters with their own culture.
+      gist: "The Aborigines are the indigenous people of Australia."
       sourceQuote: The indigenous Australians or Aborigines probably arrived in Australia about 40,000 years ago.
     - id: f3
       statement: About 300,000 Aborigines lived in Australia when the Europeans came.
@@ -38,10 +40,12 @@ annotations:
     - id: f4
       core: true
       statement: Some Aborigines were killed by settlers, and many died of new diseases the immigrants brought.
+      gist: "Many Aborigines died after the Europeans came, killed by settlers or by new diseases."
       sourceQuote: Some were killed by the new settlers and many died from the new diseases that the immigrants brought with them.
     - id: f5
       core: true
       statement: Many Aboriginal children were taken from their parents to grow up in white homes.
+      gist: "Many Aboriginal children were taken from their parents."
       sourceQuote: Many Aboriginal children were taken away from their parents to be raised in white homes.
     - id: f6
       statement: In 2009 the Australian prime minister apologised to the Aborigines for how they had been treated.
@@ -55,6 +59,7 @@ annotations:
     - id: f9
       core: true
       statement: From 1945 to 1965 the government paid half the ticket for anyone who wanted to settle in Australia, and many Europeans came.
+      gist: "After 1945 Australia helped many Europeans to move there."
       sourceQuote: Between 1945 and 1965, the Australian government paid half the travel fare for anyone wanting to settle in Australia.
     - id: f10
       statement: Later, refugees from Vietnam and the former Soviet Union came, and people from Polynesia, China and India.

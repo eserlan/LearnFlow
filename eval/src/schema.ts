@@ -53,6 +53,11 @@ export const KeyFact = z.object({
    * "lettere" only core facts must be kept; the rest is detail the model may leave out.
    */
   core: z.boolean().default(false),
+  /**
+   * For core facts: the main point in one short sentence, without the details "lettere" may leave out.
+   * At "lettere" the judge grades core facts against this, at "naermere" against the full statement.
+   */
+  gist: z.string().min(5).optional(),
 });
 
 export const KeyTerm = z.object({
@@ -115,6 +120,9 @@ export const GoldenItem = z
     }
     if (item.review.status !== "imported" && !item.annotations.keyFacts.some((f) => f.core)) {
       ctx.addIssue({ code: "custom", message: "annotated items need at least one core key fact (core: true)" });
+    }
+    for (const f of item.annotations.keyFacts) {
+      if (f.core && !f.gist) ctx.addIssue({ code: "custom", message: `core key fact ${f.id} needs a gist` });
     }
     if (item.review.status === "reviewed" && !item.review.reviewedBy) {
       ctx.addIssue({ code: "custom", message: "reviewed items need review.reviewedBy" });

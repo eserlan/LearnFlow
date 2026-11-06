@@ -4,7 +4,7 @@
  *   SC-002 values in the output exact (no numbers that are not in the source); at "naermere" also every
  *          must-preserve value kept
  *   SC-003 key facts present (≥ 95%): core facts (main points) at "lettere", all facts at "naermere"
- *   SC-004 LIX at level "lettere" ≤ max(source − 10, 35)
+ *   SC-004 LIX at level "lettere" ≤ max(source − 10, 30), not counting protected terms as long words
  *   FR-011 tasks never answered, and never dropped
  *   FR-017 nothing left out in a way that makes the rest misleading
  * At "lettere", leaving out detail is the point, so missing detail facts and values are reported, not failed.
@@ -111,7 +111,7 @@ export function score(
   const gates = [
     fail(level === "naermere" && checks.missingValues.length > 0, `values missing: ${checks.missingValues.join(", ")}`),
     fail(checks.addedNumbers.length > 0, `numbers not in source: ${checks.addedNumbers.join(", ")}`),
-    fail(checks.lixPass === false, `LIX ${checks.lixOutput} (source ${checks.lixSource})`),
+    fail(checks.lixPass === false, `LIX without terms ${checks.lixAdjusted.output} (source ${checks.lixAdjusted.source})`),
     fail(checks.wrongVariantWords.length > 0, `wrong written standard: ${checks.wrongVariantWords.join(", ")}`),
   ];
   if (checks.unlinkedSentences) f.push(`${checks.unlinkedSentences} sentence(s) without a valid source link`);

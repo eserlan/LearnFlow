@@ -8,16 +8,43 @@ import type { SimplifiedOutput } from "./simplify.ts";
 
 const squash = (s: string) => s.replace(/\s+/g, " ").trim();
 
-/** LIX = words per sentence + percentage of words longer than six letters. */
-export function lix(text: string): number | null {
+/**
+ * LIX = words per sentence + percentage of words longer than six letters.
+ *
+ * With `protectedTerms`, a long word that is one of the item's subject terms or must-preserve values (or an
+ * inflection or compound starting with one) does not count as long. The simplified text must keep those
+ * words, so counting them would penalise faithfulness: shorter texts are left with mostly terms. This
+ * adjusted LIX is the SC-004 gate; the plain one is reported next to it.
+ */
+export function lix(text: string, protectedTerms: string[] = []): number | null {
   const body = text.replace(/^#{1,6} .*$/gm, "").replace(/^[->] /gm, "");
   const words = body.match(/[\p{L}\p{N}]+(?:[-'’][\p{L}\p{N}]+)*/gu) ?? [];
   if (words.length === 0) return null;
   // A sentence ends at . ! ? : or a line break (list items and headings count as sentences).
   const sentences = Math.max(1, body.split(/[.!?:]+(?=\s|$)|\n+/).filter((s) => /[\p{L}\p{N}]/u.test(s)).length);
-  const long = words.filter((w) => [...w.replace(/[-'’]/g, "")].length > 6).length;
+  const stems = termStems(protectedTerms);
+  const isLong = (w: string) => [...w.replace(/[-'’]/g, "")].length > 6;
+  const isProtected = (w: string) => {
+    const l = w.toLowerCase();
+    return stems.some((st) => l.startsWith(st));
+  };
+  const long = words.filter((w) => isLong(w) && !isProtected(w)).length;
   return Math.round((words.length / sentences + (100 * long) / words.length) * 10) / 10;
 }
+
+/** Stems of the long words in a list of terms: lower case, without a common Norwegian or English ending. */
+function termStems(terms: string[]): string[] {
+  const words = terms.flatMap((t) => t.toLowerCase().match(/\p{L}+/gu) ?? []).filter((w) => [...w].length > 6);
+  return [...new Set(words.map((w) => w.replace(/(ene|ane|ar|er|en|et|a|ne|n|s|e)$/u, "")).filter((w) => [...w].length >= 6))];
+}
+
+/**
+ * SC-004 floor for the adjusted LIX. The spec's 35 was set for plain LIX; leaving out the protected terms
+ * lowers scores by 3–15 points. Set to 30 by the product owner (2026-11-06). Sources that already score
+ * under 30 without terms (three dev items) pass with no simplification; the judge and length measures
+ * still show whether they were simplified. Provisional: tune with teachers.
+ */
+export const LIX_FLOOR = 30;
 
 /** Numbers as written, normalised so "40,000", "40 000" and "40000" compare equal. */
 function numbers(text: string): string[] {
@@ -57,8 +84,10 @@ export interface CheckResult {
   unlinkedSentences: number;
   lixSource: number | null;
   lixOutput: number | null;
-  /** SC-004 at level "lettere": LIX ≤ max(source − 10, 35). Null if not applicable. */
+  /** SC-004 at level "lettere": adjusted LIX ≤ max(adjusted source − 10, LIX_FLOOR). Null if not applicable. */
   lixPass: boolean | null;
+  /** LIX without the item's protected terms counted as long words; this is what lixPass uses. */
+  lixAdjusted: { source: number | null; output: number | null };
   wrongVariantWords: string[];
   /** Words in the output count added help, but not headings (that are new or copied). */
   words: { source: number; output: number };
@@ -92,7 +121,10 @@ export function runChecks(
   const sourceNums = new Set(numbers(clean));
   const ids = new Set(blocks.map((b) => b.id));
   const lixSource = lix(clean);
-  const lixOutput = lix(out.sentences.filter((s) => s.kind !== "heading").map((s) => s.text).join("\n"));
+  const outputText = out.sentences.filter((s) => s.kind !== "heading").map((s) => s.text).join("\n");
+  const lixOutput = lix(outputText);
+  const protectedTerms = [...item.annotations.keyTerms.map((t) => t.term), ...item.annotations.mustPreserve.map((m) => m.value)];
+  const adj = { source: lix(clean, protectedTerms), output: lix(outputText, protectedTerms) };
   const count = (s: string) => (s.match(/[\p{L}\p{N}]+/gu) ?? []).length;
 
   const content = out.sentences.filter((x) => x.kind !== "heading" && x.kind !== "added-help");
@@ -108,7 +140,8 @@ export function runChecks(
     unlinkedSentences: out.sentences.filter((s) => s.sources.length === 0 || s.sources.some((id) => !ids.has(id))).length,
     lixSource,
     lixOutput,
-    lixPass: level === "lettere" && lixSource !== null && lixOutput !== null ? lixOutput <= Math.max(lixSource - 10, 35) : null,
+    lixPass: level === "lettere" && adj.source !== null && adj.output !== null ? adj.output <= Math.max(adj.source - 10, LIX_FLOOR) : null,
+    lixAdjusted: adj,
     wrongVariantWords: wrongVariantWords(text, item.language),
     words: { source: count(clean), output: count(text) },
     lengthRatio: count(content.map((x) => x.text).join(" ")) / Math.max(1, count(clean)),

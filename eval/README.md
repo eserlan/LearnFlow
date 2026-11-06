@@ -69,7 +69,7 @@ character for character, so the validator can find it. Line breaks, list dashes 
 
 | Field | What it is | How many |
 | --- | --- | --- |
-| `keyFacts` | The claims a pupil should be able to learn from the text. `statement` is the fact in plain words; `sourceQuote` is the shortest exact quote that supports it. Mark the main points `core: true`: what every pupil must take away even from the shortest version. Only core facts must survive at "lettere"; at "naermere" all must. | 3–12, by importance; 2–6 core |
+| `keyFacts` | The claims a pupil should be able to learn from the text. `statement` is the fact in plain words; `sourceQuote` is the shortest exact quote that supports it. Mark the main points `core: true`: what every pupil must take away even from the shortest version, and give each a `gist`: the point in one short sentence without its details. Only core facts must survive at "lettere", judged by their gist; at "naermere" all must, judged by the full statement. | 3–12, by importance; 2–6 core |
 | `keyTerms` | Subject words the simplified text must keep (and may explain), not replace. `sourceDefinition` is an exact quote where the source defines it, if it does. | 3–10 |
 | `mustPreserve` | Exact strings that must appear unchanged: numbers, dates, names, units, formulas, terms. Kind is `number`, `date`, `name`, `unit`, `formula` or `term`. | all that matter |
 | `qualifiers` | Hedges, limits and analogies that change the meaning if dropped ("direkte eller indirekte", "I våre områder", "nesten som"). `note` says what goes wrong without it. | all you find |
@@ -141,7 +141,8 @@ grade it, then `bun run report <run>` writes `runs/<run>/report.md`. Runs are gi
 `gemini-flash-low`, `gpt-luna-low`, `muse-wonder-low`. Three pseudo-configs make no simplification call
 and test the harness itself:
 
-- `identity` returns the source unchanged: it must keep every fact and value, and fail LIX.
+- `identity` returns the source unchanged: it must keep every fact and value, and fail LIX (except on
+  sources that already score under the floor without their terms).
 - `empty` returns nothing: it must fail everything.
 - `seeded` is identity with three planted errors (a changed number, a dropped qualifier, an invented
   conclusion). The report shows whether the checks or the judge caught each one. This is the start of
@@ -161,7 +162,7 @@ Run these with `--judge none` for a free check of the plumbing, and with a judge
 | Misleading omissions | judge: something left out makes the rest wrong (one side of a contrast, an exception) | never (FR-017) |
 | Qualifiers, expectations | judge, per annotation | as high as possible |
 | Tasks answered or dropped | judge | never (FR-011, FR-017) |
-| LIX | checks, level `lettere`: output ≤ max(source − 10, 35) | pass (SC-004) |
+| LIX | checks, level `lettere`: output ≤ max(source − 10, 30), not counting the item's key terms and must-preserve values as long words (plain LIX shown too) | pass (SC-004) |
 | Written standard | checks: Bokmål-only words in Nynorsk output and the reverse | none (FR-008) |
 | Length, bite size | checks: output words / source words; words per sentence; most sentences under one heading | shorter is better at "lettere"; prompt asks ≤ 4 per section |
 | Latency | wall clock per call; p90 for 300–500-word texts | ≤ 10 s (SC-008) |

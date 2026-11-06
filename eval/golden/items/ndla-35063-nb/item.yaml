@@ -26,10 +26,12 @@ annotations:
     - id: f1
       core: true
       statement: Første verdenskrig varte fra 1914 til 1918.
+      gist: "Første verdenskrig varte fra 1914 til 1918."
       sourceQuote: Første verdenskrig var en verdensomspennende krig som varte fra 1914 til 1918.
     - id: f2
       core: true
       statement: Historikere skiller mellom bakenforliggende årsaker (som går bakover i tid) og den utløsende årsaken.
+      gist: "Historikere skiller mellom bakenforliggende årsaker og den utløsende årsaken."
       sourceQuote: Bakenforliggende årsaker er årsaker til en hendelse som går bakover i tid.
     - id: f3
       statement: Wienkongressen i 1815 innførte en maktbalanse i Europa, men nasjonalismen utfordret den.
@@ -43,14 +45,17 @@ annotations:
     - id: f6
       core: true
       statement: Det ble et våpenkappløp og et flåtekappløp mellom Tyskland og Storbritannia. Utgiftene til våpen steg med femti prosent de siste årene før krigen.
+      gist: "Før krigen var det et våpenkappløp."
       sourceQuote: De siste årene før krigsutbruddet steg utgiftene til våpenproduksjon med femti prosent for de europeiske stormaktene.
     - id: f7
       core: true
       statement: Tyskland, Østerrike-Ungarn og Italia dannet trippelalliansen.
+      gist: "Tyskland, Østerrike-Ungarn og Italia dannet trippelalliansen."
       sourceQuote: Senere ble også Italia med i alliansen, som fikk navnet trippelalliansen.
     - id: f8
       core: true
       statement: Frankrike, Russland og senere Storbritannia dannet trippelententen.
+      gist: "Frankrike, Russland og Storbritannia dannet trippelententen."
       sourceQuote: Denne forståelsen ble kjent som trippelententen.
     - id: f9
       statement: Russland skulle beskytte Serbia, og Storbritannia garanterte Belgias sikkerhet.
@@ -64,6 +69,7 @@ annotations:
     - id: f12
       core: true
       statement: 28. juni 1914 skjøt Gavrilo Princip, en bosnisk-serbisk nasjonalist, tronfølgeren Franz Ferdinand og kona hans i Sarajevo. Dette var den utløsende årsaken.
+      gist: "Drapet på tronfølgeren Franz Ferdinand i Sarajevo i 1914 var den utløsende årsaken."
       sourceQuote: Her ble han og hans kone skutt og drept av en bosnisk-serbisk nasjonalist ved navn Gavrilo Princip.
     - id: f13
       statement: Østerrike-Ungarn stilte Serbia et ultimatum, og Tyskland lovet full støtte (blankofullmakten).

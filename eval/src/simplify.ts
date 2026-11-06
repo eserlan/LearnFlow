@@ -9,7 +9,7 @@ import { structuredCall, type CallOptions, type Usage } from "./llm.ts";
 import type { GoldenItem, Language } from "./schema.ts";
 
 /** Bump when the prompt or schema changes, so results from different prompts are never mixed. */
-export const PROMPT_VERSION = "simplify-v3";
+export const PROMPT_VERSION = "simplify-v4";
 
 export type Level = "lettere" | "naermere";
 
@@ -34,21 +34,21 @@ Your job is to make the text easy to take in, in small pieces. You may leave thi
 
 Rules:
 1. Say only what the source says. Do not add facts, numbers, names, dates, causes, examples or conclusions, even true ones. If a passage is unclear or incomplete, keep it so rather than guessing.
-2. Whatever you keep stays correct: numbers, units, dates, names, formulas and subject terms exactly as written (CO₂ stays CO₂, 20–25 °C stays 20–25 °C). Do not correct names or spellings you think are wrong.
-3. Keep the hedge or limit on every claim you keep, such as "most", "often", "probably", "about", "in our region", "directly or indirectly", "not … in any of the cases" and "some historians think". Dropping one turns a partial claim into a universal one. Keep analogies marked as analogies.
-4. Keep beliefs and disputed claims attributed to whoever holds them ("the author thinks…", "in Hindu belief…", "some researchers claim…"). Never state them as facts.
+2. Whatever you keep stays correct: numbers, units, dates, names, formulas and subject terms exactly as written (CO₂ stays CO₂, 20–25 °C stays 20–25 °C). Never make a number vague: if you keep a claim with a number ("rose by fifty percent"), keep the number; otherwise leave the claim out, rather than writing "a lot" or "sharply". Do not correct names or spellings you think are wrong.
+3. Keep the hedge or limit on every claim you keep. Look for words like "most", "often", "usually", "relatively", "probably", "about", "can", "some", "in our region", "directly or indirectly", "not … in any of the cases", and their Norwegian forms ("de fleste", "ofte", "som regel", "relativt", "trolig", "omtrent", "kan", "noen/nokre", "i våre områder"). Dropping one turns a partial claim into a universal one: "relativt kort tid" must not become "kort tid". Keep analogies marked as analogies.
+4. Keep beliefs, opinions and disputed claims attributed to whoever holds them ("the author thinks…", "in Hindu belief…", "some researchers claim…", "Luther meant…", "historikere mener…", "ifølge kyrkja…"). If you keep the claim, keep who holds it, in every sentence that states it, even when you split a long sentence. Never state a belief as a fact.
 5. Do not leave something out if that makes what remains misleading: keep both sides of a contrast or comparison, an exception that limits a rule, and the source's framing of sensitive topics.
 6. Never merge two facts or two list items into one sentence if that mixes them up. Each fact you keep keeps its own content.
 7. Subject terms (the words the pupil is learning, like "fotosyntese", "demokrati", "brøk") stay in the parts you keep. Explain them where that helps, preferring the source's own definition. An explanation that is not in the source is added help: give it its own sentence with kind "added-help", right after the sentence where the term first appears, short, correct and suitable for children.
 8. Tasks and questions (exercises, "Tenk etter", discussion questions) are instructions for the pupil, not things for you to answer. Keep every task, in order, and make the instruction short and easy to understand; you may shorten the text a task builds on. Never answer a task, hint at the answer, or explain a term that the task asks the pupil to explain. Use kind "task".
 9. Copy quotations, poems and other literary text exactly, with kind "quote". You may explain around them.
 10. Write in the same language and written standard as the source: Bokmål stays Bokmål, Nynorsk stays Nynorsk with no Bokmål forms, English stays English.
-11. References to things that are not in the text, such as a video, a link or an image, may be left out. Never describe what they contain.
+11. References to things that are not in the text, such as a video, a link or an image, may be left out, unless a task depends on them: then keep the instruction ("Se videoen", "Watch the video"), shortened, so the task still makes sense. Never describe what they contain.
 12. Follow the source's order. Headings are sentences of kind "heading"; list items are kind "list-item"; everything else is "statement".
 
 Every sentence lists the ids of the source blocks it comes from, usually one. Added help links to the block where the term appears.
 
-Before you answer, compare each sentence you wrote with the source sentence it comes from: the same hedge, the same negation, the same numbers, and the same subject. Fix any that differ.`;
+Before you answer, compare each sentence you wrote with the source sentence it comes from: the same hedge, the same negation, the same numbers, the same subject, and the same "who thinks so". Fix any that differ.`;
 
 const LEVEL_PROMPT: Record<Level, string> = {
   lettere: `Level: much easier ("lettere"). Give the main points in bite-sized pieces.
@@ -164,7 +164,14 @@ function seeded(blocks: SourceBlock[], item: GoldenItem): Required<Pick<Simplify
     target.text = target.text.replace(num.value, changed);
     planted.push({ type: "changed-number", detail: `${num.value} → ${changed}` });
   }
-  const q = item.annotations.qualifiers.find((x) => s.some((y) => y.text.includes(x.quote)));
+  // Only a hedge that appears once and is a small part of its sentence: removing a whole sentence, or one
+  // of two copies, plants nothing the judge could see.
+  const count = (quote: string) => s.reduce((n, y) => n + y.text.split(quote).length - 1, 0);
+  const q = item.annotations.qualifiers.find((x) => {
+    const t = s.find((y) => y.text.includes(x.quote));
+    const sentence = t?.text.split(/(?<=[.!?])\s+/).find((z) => z.includes(x.quote));
+    return sentence && count(x.quote) === 1 && x.quote.length <= sentence.length / 2;
+  });
   if (q) {
     const t = s.find((y) => y.text.includes(q.quote))!;
     t.text = t.text.replace(q.quote, "").replace(/\s{2,}/g, " ").trim();

@@ -158,7 +158,7 @@ async function runCase(c: (typeof cases)[number]) {
   let jr: JudgeResult | null = null;
   if (judgeCfg && status === "ok") {
     try {
-      jr = await judge(judgeCfg, item, blocks, sim.output, callOpts);
+      jr = await judge(judgeCfg, item, blocks, sim.output, level, callOpts);
       if (!jr.output) return fail("judge", new Error(`judge output did not match the schema (stop: ${jr.call.stopReason})`), { usage: jr.call.usage });
     } catch (e) {
       return fail("judge", e);

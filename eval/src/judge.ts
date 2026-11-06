@@ -8,9 +8,9 @@ import { renderBlocks, type SourceBlock } from "./blocks.ts";
 import type { ModelConfig } from "./configs.ts";
 import { structuredCall, type CallOptions, type Usage } from "./llm.ts";
 import type { GoldenItem } from "./schema.ts";
-import type { SimplifiedOutput } from "./simplify.ts";
+import type { Level, SimplifiedOutput } from "./simplify.ts";
 
-export const JUDGE_VERSION = "judge-v2";
+export const JUDGE_VERSION = "judge-v4";
 
 const note = z.string().describe("One short sentence saying what is wrong. Empty when the verdict is the good one.");
 
@@ -47,26 +47,29 @@ Sentences:
 Judge each sentence against the whole source, not only its linked blocks.
 
 Key facts: present (a pupil reading only the simplified text learns this fact correctly), partial (part of it is missing), missing, or distorted (it is there but wrong). Record what you see; whether a missing fact matters is decided elsewhere.
+At level "lettere" the text is meant to leave out detail, and some key facts are marked as a main point with a short gist. Grade those against the gist: present if a pupil learns the gist correctly, even when details in the full statement (names, dates, lengths, examples) are missing; partial only if part of the gist is missing. A wrong detail that is kept is still distorted.
 
 Qualifiers: kept (the hedge or limit is there, in any wording), weakened, dropped, or not-applicable (the whole claim it limits was left out; count that under key facts instead).
 
 Expectations: met, violated, or not-applicable.
 
-Tasks: verdict "answered" if the simplified text answers, hints at the answer to, or explains a term asked about in any task or question addressed to the pupil; "not-answered" if it has tasks and answers none; "no-tasks" if the source has none. Kept: "all" if every task and question in the source is still there (shortened or reworded is fine), "some-dropped" if any is gone, "no-tasks" if the source has none.
+Tasks: verdict "answered" if the simplified text answers, hints at the answer to, or explains a term asked about in any task or question addressed to the pupil, when the source itself does not give that answer. A question the source answers itself (a rhetorical question followed by its answer, such as "Do these words sound familiar?" and then the explanation) is part of the text, not a task: keeping the source's answer is fine. "not-answered" if it has tasks and answers none; "no-tasks" if the source has none. Kept: "all" if every task and question for the pupil in the source is still there (shortened or reworded is fine), "some-dropped" if any is gone, "no-tasks" if the source has none. A question the source answers itself, and "Did you know…?" or "Have you ever…?" openers in fact boxes, are not tasks: dropping them is fine. A question that frames the whole text for the pupil to think about ("Which is more democratic?") is a task.
 
 Omissions: "misleading" if something left out makes what remains wrong or misleading, e.g. one side of a contrast or comparison is gone, an exception that limits a rule is gone, or the framing of a sensitive topic is lost; otherwise "ok".`;
 
-export function judgeMessage(item: GoldenItem, blocks: SourceBlock[], out: SimplifiedOutput): string {
+export function judgeMessage(item: GoldenItem, blocks: SourceBlock[], out: SimplifiedOutput, level: Level): string {
   const a = item.annotations;
   const sentences = out.sentences.length
     ? out.sentences.map((s, i) => `<sentence id="s${i + 1}" kind="${s.kind}" sources="${s.sources.join(",")}">${s.text}</sentence>`).join("\n")
     : "(the simplified text is empty)";
   const list = (xs: string[]) => (xs.length ? xs.join("\n") : "(none)");
   return [
-    `Content type: ${item.contentType}. Language: ${item.language}.`,
+    `Content type: ${item.contentType}. Language: ${item.language}. Level: ${level}.`,
     `<source>\n${renderBlocks(blocks)}\n</source>`,
     `<simplified>\n${sentences}\n</simplified>`,
-    `<key_facts>\n${list(a.keyFacts.map((f) => `${f.id}: ${f.statement} (source: "${f.sourceQuote}")`))}\n</key_facts>`,
+    `<key_facts>\n${list(
+      a.keyFacts.map((f) => `${f.id}: ${f.statement}${level === "lettere" && f.core && f.gist ? ` [main point; gist: ${f.gist}]` : ""} (source: "${f.sourceQuote}")`),
+    )}\n</key_facts>`,
     `<qualifiers>\n${list(a.qualifiers.map((q, i) => `q${i + 1}: "${q.quote}"${q.note ? ` (${q.note})` : ""}`))}\n</qualifiers>`,
     `<expectations>\n${list(a.expectations.map((e, i) => `e${i + 1}: ${e}`))}\n</expectations>`,
   ].join("\n\n");
@@ -93,9 +96,10 @@ export async function judge(
   item: GoldenItem,
   blocks: SourceBlock[],
   out: SimplifiedOutput,
+  level: Level,
   opts: CallOptions,
 ): Promise<JudgeResult> {
-  const user = judgeMessage(item, blocks, out);
+  const user = judgeMessage(item, blocks, out, level);
   const res = await structuredCall(cfg, JUDGE_SYSTEM, user, JudgeOutput, 32000, opts);
   const output = res.output;
   const want = [

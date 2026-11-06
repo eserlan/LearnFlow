@@ -104,12 +104,12 @@ for (const id of configIds) {
 
 out.push("", "## Simplification, speed and cost", "");
 out.push(
-  "Length is output words (without headings and added help) as a share of the source. LIX target at `lettere`: ≤ max(source − 10, 35) (SC-004). Latency target: ≤ 10 s at p90 for 300–500 words (SC-008).",
+  "Length is output words (without headings and added help) as a share of the source. LIX target at `lettere`: ≤ max(source − 10, 30), counted without the item's subject terms and must-preserve values as long words (SC-004); plain LIX is shown for reference. Latency target: ≤ 10 s at p90 for 300–500 words (SC-008).",
   "",
 );
 out.push(
-  "| Config | Length (median) | Words / sentence | Longest section (sentences) | LIX source → output (mean) | LIX pass | Latency p50 / p90 | p90 at 300–500 words | Cost / item |",
-  "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+  "| Config | Length (median) | Words / sentence | Longest section (sentences) | LIX source → output (mean) | LIX without terms | LIX pass | Latency p50 / p90 | p90 at 300–500 words | Cost / item |",
+  "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
 );
 for (const id of configIds) {
   const rs = rows.filter((r) => r.configId === id && r.status === "ok");
@@ -127,7 +127,9 @@ for (const id of configIds) {
   out.push(
     `| ${id} | ${ratio === null ? "–" : `${Math.round(100 * ratio)}%`} | ${mean(cs.map((c) => c.wordsPerSentence))} | ${
       cs.length ? Math.max(...cs.map((c) => c.maxSectionSentences ?? 0)) : "–"
-    } | ${mean(cs.map((c) => c.lixSource))} → ${mean(cs.map((c) => c.lixOutput))} | ${
+    } | ${mean(cs.map((c) => c.lixSource))} → ${mean(cs.map((c) => c.lixOutput))} | ${mean(cs.map((c) => c.lixAdjusted?.source))} → ${mean(
+      cs.map((c) => c.lixAdjusted?.output),
+    )} | ${
       lixRows.length ? `${lixRows.filter((m) => m.lixPass).length}/${lixRows.length}` : "–"
     } | ${lat.length ? `${secs(quantile(lat, 0.5))} / ${secs(quantile(lat, 0.9))}` : "–"} | ${latPage.length ? secs(quantile(latPage, 0.9)) : "–"} | ${
       cost.length ? usd(sum(cost, (x) => x) / cost.length) : "–"

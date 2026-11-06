@@ -25,6 +25,7 @@ annotations:
     - id: f1
       core: true
       statement: Athen i antikken hadde direkte demokrati, mens Noreg i dag har indirekte demokrati.
+      gist: "Athen hadde direkte demokrati; Noreg har i dag indirekte demokrati."
       sourceQuote: I Athen i antikken hadde ein eit direkte demokrati, mens vi i Noreg i dag har eit indirekte demokrati.
     - id: f2
       statement: Noreg har òg brukt direkte demokrati nokre gonger i moderne tid.
@@ -32,10 +33,12 @@ annotations:
     - id: f3
       core: true
       statement: For borgarane i Athen tydde demokrati at dei sjølve var med på å ta avgjerder om sitt eige liv.
+      gist: "I Athen var borgarane sjølve med på å ta avgjerder."
       sourceQuote: For borgarane i Athen i antikken betydde demokrati at dei sjølv var med på å ta avgjerder som påverka deira eige liv.
     - id: f4
       core: true
       statement: Noreg har vore med i krigar i tidlegare Jugoslavia (1999), Afghanistan (2001) og Libya (2011).
+      gist: "Noreg har vore med i fleire krigar i nyare tid."
       sourceQuote: som til dømes i tidlegare Jugoslavia i 1999, i Afghanistan i 2001 og i Libya i 2011
     - id: f5
       statement: I 1999 og 2001 tok både Regjeringa og Stortinget stilling. I 2011 avgjorde Regjeringa åleine, og det er lov etter norsk lov.
@@ -43,14 +46,17 @@ annotations:
     - id: f6
       core: true
       statement: Veljarane blei ikkje spurde direkte i nokon av desse tilfella.
+      gist: "Veljarane blei ikkje spurde direkte om nokon av krigane."
       sourceQuote: Uansett blei ikkje dei norske veljarane spurde direkte i nokon av tilfella.
     - id: f7
       core: true
       statement: Oppgåve 3 ber eleven drøfte påstanden at direkte demokrati er meir demokratisk enn indirekte demokrati.
+      gist: "Oppgåve 3 ber eleven drøfte om direkte demokrati er meir demokratisk enn indirekte."
       sourceQuote: Direkte demokrati er meir demokratisk enn indirekte demokrati.
     - id: f8
       core: true
       statement: Oppgåve 4 ber eleven finne argument for begge synspunkta.
+      gist: "Oppgåve 4 ber eleven finne argument for begge synspunkta."
       sourceQuote: Prøv å finne argument for begge synspunkta.
   keyTerms:
     - term: direkte demokrati
