@@ -1,0 +1,16 @@
+{
+  "name": "@learnflow/worker",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "node --experimental-strip-types --test src/index.test.ts"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "wrangler": "^4.0.0"
+  }
+}
