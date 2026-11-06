@@ -9,7 +9,7 @@ import { structuredCall, type CallOptions, type Usage } from "./llm.ts";
 import type { GoldenItem, Language } from "./schema.ts";
 
 /** Bump when the prompt or schema changes, so results from different prompts are never mixed. */
-export const PROMPT_VERSION = "simplify-v6";
+export const PROMPT_VERSION = "simplify-v7";
 
 export type Level = "lettere" | "naermere";
 
@@ -51,14 +51,15 @@ Every sentence lists the ids of the source blocks it comes from, usually one. Ad
 Before you answer, compare each sentence you wrote with the source sentence it comes from: the same hedge, the same negation, the same numbers, the same subject, and the same "who thinks so". Fix any that differ.`;
 
 const LEVEL_PROMPT: Record<Level, string> = {
-  lettere: `Level: much easier ("lettere"). Give the main points in bite-sized pieces.
+  lettere: `Level: much easier ("lettere"). Give the heart of the text in bite-sized pieces.
 
-Shorten hard. This level is for a pupil who gives up on long texts: a short text they finish teaches more than a complete one they abandon. Reduction is the goal, not a side effect.
-- Keep only what a teacher would expect every pupil to take away: the main points, every task, and what is needed so the rest is not misleading (rule 5). Everything else goes.
-- Cut, every time: examples (keep at most one, if the point needs it), extra explanations, background, side stories, repetition, lists of more than four items unless the list itself is the point, and names, dates and numbers that are not part of a main point.
-- When in doubt whether something is a main point, leave it out.
-- Length: aim for about a quarter to a third of the source's words, never more than 40%. The user message gives a word target; stay at or under it. Only a source of a few sentences may stay close to its length.
-- Sections: at most 4 sentences each, each under a short heading that only names what the part is about. You may split a long section into several. Start each section with its main point.
+The gist comes first. For each section, first work out its heart: what it is really saying, in a sentence or two. Keep that, true to the original, and let the rest go. Leaving things out is fine; changing the heart is not.
+- Shorten hard: a short text a pupil finishes teaches more than a complete one they give up on.
+- Always keep: the gist of every section; every task, in full (rule 8; tasks are never cut to save words); and whatever the gist needs to stay true, including a hedge or limit that is part of it ("direkte eller indirekte", "ett utbrudd alene", "ikkje … i nokon av tilfella") and both sides of a contrast (rule 5).
+- Cut: examples (keep at most one, if the gist needs it), extra explanations, background, side stories, repetition, and names, dates and numbers that are not part of the gist. Shorten a long list to its most important items, unless the list itself is the gist (such as the factors something depends on).
+- When in doubt, keep the point in one short sentence, without its details.
+- Length: about a third of the source's words, never more than 40%, not counting tasks. The user message gives a word target. Only a source of a few sentences may stay close to its length.
+- Sections: at most 4 sentences each, each under a short heading that only names what the part is about. You may split a long section into several. Start each section with its gist.
 - Sentences: one idea each, no sentence over 12 words. Split until it fits. Active voice.
 - Words: use common everyday words. Replace hard words that are not subject terms with everyday ones, or leave them out (e.g. "benytte" becomes "bruke", "betydelig" becomes "stor"). Subject terms stay, as rule 7 says.
 
@@ -104,7 +105,7 @@ export function userMessage(blocks: SourceBlock[], language: Language, level: Le
   // At "lettere" every call gets its own target, so a part of a long text shrinks as much as the whole would.
   const target =
     level === "lettere" && n > 80
-      ? `\n${part ? "This part" : "The source"} has ${n} words. Word target for your simplified version: at most ${Math.round(n / 3)} words (headings and added help not counted).`
+      ? `\n${part ? "This part" : "The source"} has ${n} words. Word target for your simplified version: at most ${Math.round(n / 3)} words, not counting headings, added help and tasks (keep every task in full, on top of the target).`
       : "";
   const partNote = part
     ? `\nThis is part ${part.index} of ${part.total} of a longer text titled "${part.title}". The other parts are simplified separately and shown right after each other, so simplify only this part: do not repeat or summarise other parts, and do not add an introduction or conclusion for the whole text.${

@@ -202,7 +202,9 @@ source passage; spot-check that the passage supports the sentence.
 - **FR-015**: System MUST let the pupil report a sentence as wrong or confusing; reports are stored with the
   sentence and its source link for quality review, without other personal data.
 - **FR-017**: At the "Lettere" level, System SHOULD reduce the text to its main points, in the source's order,
-  as short sections under headings, leaving out examples, side remarks, repetition and secondary detail. It
+  as short sections under headings, leaving out examples, side remarks, repetition and secondary detail. The
+  gist of each section is what matters most: leaving content out is acceptable as long as the heart of what
+  remains is true to the original. It
   MUST NOT leave anything out in a way that makes the rest misleading (one side of a contrast, an exception
   that limits a rule, the framing of a sensitive topic), and MUST keep every task. At "Nærmere originalen"
   every detail is kept.
