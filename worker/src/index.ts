@@ -1,4 +1,4 @@
-import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify';
+import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify.ts';
 
 /**
  * LearnFlow's stateless Cloudflare API. No content, lesson or audio persistence.
