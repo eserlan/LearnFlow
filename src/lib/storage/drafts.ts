@@ -40,7 +40,7 @@ export async function saveDraftVersion(
   updates: Pick<SourceDraft, 'title' | 'origin'> & Partial<Pick<SourceDraft, 'plainText' | 'html'>>
 ): Promise<number> {
   assertSelectableDocument(document.blocks);
-  return db.transaction('rw', db.drafts, db.documents, async () => {
+  return db.transaction('rw', db.drafts, db.documents, db.lessons, async () => {
     const draft = await db.drafts.get(draftId);
     if (!draft || draft.version !== expectedVersion) throw new Error('Stale source version');
     const version = expectedVersion + 1;
@@ -51,6 +51,7 @@ export async function saveDraftVersion(
       status: 'pending',
       lastActivityAt: Date.now()
     });
+    await db.lessons.where('draftId').equals(draftId).delete();
     return version;
   });
 }
@@ -78,7 +79,7 @@ export async function putDocument(document: StoredDocument): Promise<void> {
 
 export async function updateSelection(draftId: string, selectedBlockIds: string[], wordCount: number): Promise<StoredDocument> {
   if (!selectedBlockIds.length) throw new Error('Select at least one section');
-  return db.transaction('rw', db.drafts, db.documents, async () => {
+  return db.transaction('rw', db.drafts, db.documents, db.lessons, async () => {
     const draft = await db.drafts.get(draftId);
     if (!draft) throw new Error('Draft not found');
     const current = await db.documents.get(`${draftId}:${draft.version}`);
@@ -92,6 +93,7 @@ export async function updateSelection(draftId: string, selectedBlockIds: string[
     assertSelectableDocument(next.blocks);
     await db.documents.add(next);
     await db.drafts.update(draftId, { version: nextVersion, status: 'pending', lastActivityAt: Date.now() });
+    await db.lessons.where('draftId').equals(draftId).delete();
     return next;
   });
 }
