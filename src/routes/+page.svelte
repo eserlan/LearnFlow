@@ -27,9 +27,6 @@
   let selectedBlocks = $state<SourceBlock[]>([]);
   let resumeId = $state<string | null>(null);
   let pendingReplacement = $state<{blocks:SourceBlock[];wordCount:number;title:string}|null>(null);
-  let pendingConsentId = $state<string | null>(null);
-  let ageBand = $state<'unknown'|'under13'|'13plus'>('unknown');
-  let consentChecked = $state(false);
   let language = $state<'nb'|'nn'>('nb');
   let theme = $state<'light'|'dark'>('light');
   const copy = $derived(getCopy(language));
@@ -93,7 +90,7 @@
         return;
       }
       const id = await persist(prepared.blocks,prepared.wordCount,prepared.title);
-      if (id) await openConsent(id);
+      if (id) await runSimplification(id);
     } catch { error = copy.empty; }
   }
   async function applyReplacement(replace:boolean) {
@@ -102,18 +99,13 @@
     if (replace && drafts.length) { await deleteDraft(drafts[0].id); await refresh(); }
     pendingReplacement = null;
     const id = await persist(pending.blocks,pending.wordCount,pending.title);
-    if (id) await openConsent(id);
+    if (id) await runSimplification(id);
   }
-  async function openConsent(draftId:string) {
-    pendingConsentId = draftId;
-    ageBand = 'unknown'; consentChecked = false; error = '';
-    await tick();
-    document.getElementById('consent-title')?.scrollIntoView({block:'start'});
-  }
-  async function sendForSimplification() {
-    const id = pendingConsentId;
-    if (!id || busy) return;
-    if (ageBand !== '13plus' || !consentChecked) { error = copy.consentRequired; return; }
+  /** Called only by an explicit Forenkle button click (or its save-and-send continuation).
+   * The visible notice explains that this sends plain text to Gemini.
+   * The Worker independently enforces the production release gate. */
+  async function runSimplification(id:string) {
+    if (busy) return;
     busy = true; error = ''; status = copy.checkingService;
     try {
       const api = import.meta.env.VITE_LEARNFLOW_API_URL;
@@ -127,11 +119,9 @@
       if (!availability.ok || (await availability.json())?.simplify !== true) throw new Error('not-enabled');
       status = copy.simplifying;
       const response = await simplifyDraft(id,
-        {canProcess:async () => consentChecked && ageBand === '13plus'},
-        createWorkerProcessor(api));
+        {canProcess:async () => true}, createWorkerProcessor(api));
       const lesson = await saveVerifiedLesson(id,response);
       await showLesson(lesson);
-      pendingConsentId = null;
       status = copy.completed;
       await refresh();
       await tick();
@@ -157,7 +147,7 @@
     const document = await getCurrentDocument(draft.id);
     text = draft.plainText; html = draft.html; origin = draft.origin ?? ''; resumeId = draft.id;
     selectedBlocks = document?.blocks ?? prepareSource({plainText:draft.plainText,html:draft.html}).blocks;
-    selectedDraft = null; pendingConsentId = null; error = ''; status = copy.restored;
+    selectedDraft = null; error = ''; status = copy.restored;
     await touchDraft(draft.id); await tick();
     sourceElement?.scrollIntoView({block:'start'}); sourceElement?.focus({preventScroll:true});
   }
@@ -180,7 +170,6 @@
     if (busy) return;
     await deleteDraft(id);
     if (selectedLesson?.draftId===id) {selectedLesson = null;selectedLessonSource='';}
-    if (pendingConsentId===id) pendingConsentId = null;
     await refresh();
   }
 </script>
@@ -200,15 +189,13 @@
     <label for="source">{copy.prompt}</label>
     <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9" placeholder={copy.placeholder}></textarea>
     <label for="origin">{copy.origin}</label><input id="origin" bind:value={origin} maxlength="120"/>
+    <p class="note">{copy.processingNotice}</p>
     <div class="composer-footer">
       <span class="word-count">{inputWordCount} {copy.count}</span>
       <button onclick={prepareAndSave} disabled={busy}>{copy.start}</button>
     </div>
-    <p class="note">{copy.processingUnavailable}</p>
-    {#if !pendingConsentId}
-      {#if error}<p role="alert">{error}</p>{/if}
-      {#if status}<p role="status">{status}</p>{/if}
-    {/if}
+    {#if error}<p role="alert">{error}</p>{/if}
+    {#if status}<p role="status">{status}</p>{/if}
   </section>
 
   {#if pendingReplacement}
@@ -220,30 +207,6 @@
     </section>
   {/if}
 
-  {#if pendingConsentId}
-    <section aria-labelledby="consent-title" class="step">
-      <h2 id="consent-title">{copy.consentTitle}</h2>
-      <p>{copy.privacyNotice}</p>
-      <label for="age">{copy.ageLabel}</label>
-      <select id="age" bind:value={ageBand}>
-        <option value="unknown">{copy.ageChoose}</option>
-        <option value="under13">{copy.under13}</option>
-        <option value="13plus">{copy.age13plus}</option>
-      </select>
-      {#if error}<p role="alert">{error}</p>{/if}
-      {#if status}<p role="status">{status}</p>{/if}
-      {#if ageBand === 'under13'}
-        <p role="alert">{copy.guardianRequired}</p>
-      {:else if ageBand === '13plus'}
-        <label class="checkbox"><input type="checkbox" bind:checked={consentChecked}/> {copy.consentLabel}</label>
-      {/if}
-      <button onclick={sendForSimplification} disabled={busy || ageBand !== '13plus' || !consentChecked}>
-        {busy ? copy.simplifying : copy.sendToAi}
-      </button>
-      <button class="secondary" onclick={() => pendingConsentId=null} disabled={busy}>{copy.cancel}</button>
-    </section>
-  {/if}
-
   {#if drafts.length}
     <section aria-labelledby="unfinished-title">
       <h2 id="unfinished-title">{copy.unfinished}</h2>
@@ -252,7 +215,7 @@
           <strong>{draft.title}</strong> — {daysUntilExpiry(draft.lastActivityAt)} {copy.days}
           {#if shouldWarnExpiry(draft.lastActivityAt)} <span>{copy.deleteSoon}</span>{/if}
           <div class="actions">
-            <button onclick={() => openConsent(draft.id)} disabled={busy}>{copy.simplify}</button>
+            <button onclick={() => runSimplification(draft.id)} disabled={busy}>{copy.simplify}</button>
             <button class="secondary" onclick={() => editDraft(draft)} disabled={busy}>{copy.edit}</button>
             <button class="secondary" onclick={() => showOriginal(draft)}>{copy.original}</button>
             <button class="secondary" onclick={() => discard(draft.id)} disabled={busy}>{copy.discard}</button>
