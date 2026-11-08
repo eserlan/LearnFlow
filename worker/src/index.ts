@@ -86,8 +86,16 @@ async function mockSimplify(request: Request, origin: string, env: Env): Promise
  * No manual feature flag or approval flag gates normal requests.
  * CORS is not authentication; public access also requires abuse/cost controls.
  */
+type CapabilityReason = 'missing_api_key' | 'missing_model' | 'missing_rate_limiter';
+function capabilityReason(env:Env): CapabilityReason | null {
+  if (!env.GEMINI_API_KEY) return 'missing_api_key';
+  if (!env.GEMINI_MODEL) return 'missing_model';
+  if (!env.RATE_LIMITER) return 'missing_rate_limiter';
+  return null;
+}
+
 function processingEnabled(env:Env): boolean {
-  return !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL;
+  return capabilityReason(env) === null;
 }
 
 async function liveSimplify(request: Request, origin: string, env: Env,
@@ -137,7 +145,8 @@ async function liveSimplify(request: Request, origin: string, env: Env,
     return json({sourceVersion:input.sourceVersion,verified:true,result},200,origin,env);
   }catch(error){
     if(error instanceof AiError){
-      const status=error.code==='invalid-output'?502:503;
+      const status=error.code==='invalid-output' || error.code==='provider_bad_request' ? 502 :
+        error.code==='provider_quota' ? 429 : 503;
       return json({error:error.code},status,origin,env);
     }
     return json({error:'processing_failed'},503,origin,env);
@@ -164,7 +173,8 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
     return json({ status: 'ok' }, 200, origin, env);
   }
   if (pathname === '/capabilities' && request.method === 'GET') {
-    return json({simplify:processingEnabled(env)},200,origin,env);
+    const reason = capabilityReason(env);
+    return json(reason === null ? {simplify:true} : {simplify:false,reason},200,origin,env);
   }
   if (API_PATHS.has(pathname) && request.method === 'POST') {
     // Origin is not authentication; proper abuse controls remain a release gate.
