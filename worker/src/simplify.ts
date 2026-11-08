@@ -47,7 +47,9 @@ async function call(fetcher: Fetcher, url: string, headers: Record<string,string
   let res: Response;
   try {
     res = await fetcher(url, {method:'POST',headers:{...headers,'Content-Type':'application/json'},
-      body:JSON.stringify(body),cache:'no-store',redirect:'error',signal:AbortSignal.timeout(35000)});
+      // Cloudflare Workers does not support redirect:'error' in fetch RequestInit.
+      // Use manual, and reject any 3xx response below without following it.
+      body:JSON.stringify(body),cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(35000)});
   } catch { throw new AiError('unavailable'); }
   // Only return a categorised HTTP status; never expose Google's response text,
   // credentials, source content, or any upstream request/response body.
