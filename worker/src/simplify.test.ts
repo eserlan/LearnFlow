@@ -37,6 +37,20 @@ describe('real AI adapter (synthetic content only)',()=>{
     assert.equal(result.sentences[0].text,lesson.sentences[0].text);
     assert.equal(p.calls.length,1);
   });
+  it('uses a Cloudflare-supported manual redirect mode and never follows provider redirects',async()=>{
+    let redirectMode: RequestInit['redirect'] | undefined;
+    const output=await simplifyWithAi(input,configured,async(_url,init)=>{
+      redirectMode=init.redirect;
+      if (init.redirect === 'error') throw new TypeError('Cloudflare Workers reject redirect:error');
+      return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(lesson)}]}}]});
+    });
+    assert.equal(redirectMode,'manual');
+    assert.equal(output.kind,'simplified-lesson');
+    await assert.rejects(simplifyWithAi(input,configured,async(_url,init)=>{
+      assert.equal(init.redirect,'manual');
+      return new Response(null,{status:302,headers:{Location:'https://example.invalid'}});
+    }),{code:'unavailable'});
+  });
   it('rejects numbers that were not in the original text',async()=>{
     const p=provider({sentences:[{text:'Humler flyr 900 kilometer.',kind:'statement',sources:['original']}]});
     await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output'});
