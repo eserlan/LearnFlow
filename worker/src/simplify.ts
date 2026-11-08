@@ -14,9 +14,11 @@ const MODEL = /^[a-z0-9._-]{1,100}$/i;
 const KINDS = new Set(['heading', 'statement', 'list-item', 'task', 'quote']);
 const record = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x);
 
+export type AiErrorCode = 'unavailable' | 'invalid-output' | 'provider_bad_request' |
+  'provider_credentials' | 'provider_model_not_found' | 'provider_quota';
 export class AiError extends Error {
-  readonly code: 'unavailable' | 'invalid-output';
-  constructor(code: 'unavailable' | 'invalid-output') { super(code); this.code=code; }
+  readonly code: AiErrorCode;
+  constructor(code: AiErrorCode) { super(code); this.code = code; }
 }
 export function validatePayload(x: unknown): SimplifyPayload | null {
   if (!record(x) || typeof x.draftId !== 'string' || !x.draftId || x.draftId.length > 100 ||
@@ -47,7 +49,15 @@ async function call(fetcher: Fetcher, url: string, headers: Record<string,string
     res = await fetcher(url, {method:'POST',headers:{...headers,'Content-Type':'application/json'},
       body:JSON.stringify(body),cache:'no-store',redirect:'error',signal:AbortSignal.timeout(35000)});
   } catch { throw new AiError('unavailable'); }
-  if (!res.ok) throw new AiError('unavailable');
+  // Only return a categorised HTTP status; never expose Google's response text,
+  // credentials, source content, or any upstream request/response body.
+  if (!res.ok) {
+    if (res.status === 400) throw new AiError('provider_bad_request');
+    if (res.status === 401 || res.status === 403) throw new AiError('provider_credentials');
+    if (res.status === 402 || res.status === 429) throw new AiError('provider_quota');
+    if (res.status === 404) throw new AiError('provider_model_not_found');
+    throw new AiError('unavailable');
+  }
   try { const x: unknown = await res.json(); if (record(x)) return x; }
   catch { /* Never surface provider body. */ }
   throw new AiError('invalid-output');
@@ -63,7 +73,8 @@ const SYSTEM = [
   'Kinds: heading, statement, list-item, task, quote. Keep original order. Before responding, compare each sentence to its source. Do not drop caveats, negation, attribution or exercises.'
 ].join('\n');
 async function generate(input: SimplifyPayload, env: AiEnv, fetcher: Fetcher): Promise<LessonOutput> {
-  if (!env.GEMINI_API_KEY || !env.GEMINI_MODEL || !MODEL.test(env.GEMINI_MODEL)) throw new AiError('unavailable');
+  if (!env.GEMINI_API_KEY || !env.GEMINI_MODEL) throw new AiError('unavailable');
+  if (!MODEL.test(env.GEMINI_MODEL)) throw new AiError('provider_model_not_found');
   const r = await call(fetcher,
     'https://generativelanguage.googleapis.com/v1beta/models/' + env.GEMINI_MODEL + ':generateContent',
     {'x-goog-api-key':env.GEMINI_API_KEY},{
