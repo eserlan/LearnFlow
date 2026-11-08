@@ -12,7 +12,7 @@
 
 - GET /health → JSON { "status": "ok" }.
 - GET /capabilities → `{ "simplify": false }` until API secrets, release approval flags and rate limiting are configured. The frontend checks this **before transmitting source text**.
-- POST /api/simplify → HTTP 501 with default flags; after explicit release approval, Gemini generation followed by independent Anthropic verification and strict payload validation. Only verified results are returned.
+- POST /api/simplify → HTTP 501 with default flags; after explicit release approval, Gemini-only generation with schema, source-ID and numeric guardrails. The returned result is **not independently fact-checked** and the learner can compare it with the original.
 - POST /api/speak → HTTP 501.
 - The only successful simplification response is **test-only**: APP_ENV=test and ENABLE_MOCK_PROCESSING=true, both required; it accepts only the fixed synthetic SMOKE_FIXTURE declared in worker/src/index.ts, echoes it unchanged, and marks it forLearning:false. **Never enable this mode on a public deployment or show it as a real lesson.**
 
