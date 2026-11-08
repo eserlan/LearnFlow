@@ -17,7 +17,8 @@ const KINDS = new Set(['heading', 'statement', 'list-item', 'task', 'quote']);
 const record = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x);
 
 export class AiError extends Error {
-  constructor(readonly code: 'unavailable' | 'invalid-output' | 'verification-failed') { super(code); }
+  readonly code: 'unavailable' | 'invalid-output' | 'verification-failed';
+  constructor(code: 'unavailable' | 'invalid-output' | 'verification-failed') { super(code); this.code=code; }
 }
 export function validatePayload(x: unknown): SimplifyPayload | null {
   if (!record(x) || typeof x.draftId !== 'string' || !x.draftId || x.draftId.length > 100 ||
