@@ -116,17 +116,22 @@
         method:'GET',credentials:'omit',cache:'no-store',redirect:'error'
       });
       if (!availability.ok || (await availability.json())?.simplify !== true) throw new Error('not-enabled');
-      pendingConsentId = null;
       status = copy.simplifying;
       const response = await simplifyDraft(id,
         {canProcess:async () => consentChecked && ageBand === '13plus'}, createWorkerProcessor(api));
       const lesson = await saveVerifiedLesson(id,response);
       selectedLesson = lesson;
+      pendingConsentId = null;
       status = copy.completed;
       await refresh();
       await tick();
       document.getElementById('lesson-title')?.scrollIntoView({block:'start'});
     } catch {
+      // A malformed or unpersistable response must remain retryable, never a completed ghost lesson.
+      const draft = await db.drafts.get(id);
+      if (draft?.status === 'processed' && !(await db.lessons.get(draft.id+':'+draft.version))) {
+        await touchDraft(id,'failed');
+      }
       error = copy.unavailable;
       status = '';
       await refresh();
@@ -176,8 +181,10 @@
     <label for="origin">{copy.origin}</label><input id="origin" bind:value={origin} maxlength="120"/>
     <button onclick={prepareAndSave} disabled={busy}>{copy.start}</button>
     <p class="note">{copy.processingUnavailable}</p>
-    {#if error}<p role="alert">{error}</p>{/if}
-    {#if status}<p role="status">{status}</p>{/if}
+    {#if !pendingConsentId}
+      {#if error}<p role="alert">{error}</p>{/if}
+      {#if status}<p role="status">{status}</p>{/if}
+    {/if}
   </section>
 
   {#if pendingReplacement}
@@ -199,6 +206,8 @@
         <option value="under13">{copy.under13}</option>
         <option value="13plus">{copy.age13plus}</option>
       </select>
+      {#if error}<p role="alert">{error}</p>{/if}
+      {#if status}<p role="status">{status}</p>{/if}
       {#if ageBand === 'under13'}
         <p role="alert">{copy.guardianRequired}</p>
       {:else if ageBand === '13plus'}
