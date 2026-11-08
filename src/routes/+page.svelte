@@ -10,6 +10,8 @@
   import { simplifyDraft } from '../lib/lesson/handoff';
   import { createWorkerProcessor, WorkerProcessorError } from '../lib/lesson/worker-processor';
   import { saveVerifiedLesson } from '../lib/lesson/saved-lesson';
+  import { narratedText, speakLesson } from '../lib/lesson/speak';
+  import { getLessonAudio, storeLessonAudio } from '../lib/storage/audio';
   import type { SourceBlock, SourceDraft } from '../lib/import/types';
 
   let text = $state('');
@@ -23,6 +25,10 @@
   let lessons = $state<StoredLesson[]>([]);
   let selectedLesson = $state<StoredLesson | null>(null);
   let selectedLessonSource = $state('');
+  let audioUrl = $state<string | null>(null);
+  let audioBusy = $state(false);
+  let audioError = $state('');
+  let audioStatus = $state('');
   let selectedDraft = $state<SourceDraft | null>(null);
   let selectedBlocks = $state<SourceBlock[]>([]);
   let resumeId = $state<string | null>(null);
@@ -41,7 +47,7 @@
     try { if (localStorage.getItem('learnflow-theme') === 'dark') theme = 'dark'; } catch { /* storage disabled */ }
     void (async () => { await purgeExpiredDrafts(); await refresh(); })();
     const timer = setInterval(async () => { await purgeExpiredDrafts(); await refresh(); }, 60_000);
-    return () => clearInterval(timer);
+    return () => { clearInterval(timer); if (audioUrl) URL.revokeObjectURL(audioUrl); };
   });
   async function refresh() {
     drafts = (await db.drafts.where('status').anyOf('pending','failed','processing').toArray())
@@ -172,11 +178,52 @@
       await refresh();
     } finally { busy = false; }
   }
+  function clearAudioPlayer() {
+    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    audioUrl = null;
+    audioError = '';
+    audioStatus = '';
+  }
+  function closeLesson() {
+    selectedLesson = null;
+    selectedLessonSource = '';
+    clearAudioPlayer();
+  }
   async function showLesson(lesson:StoredLesson) {
+    if (audioBusy) return;
     const source=await db.drafts.get(lesson.draftId);
     if (!source || source.version !== lesson.sourceVersion) { error=copy.unavailable; return; }
+    clearAudioPlayer();
     selectedLessonSource=source.plainText;
     selectedLesson=lesson;
+    const wav=await getLessonAudio(lesson.id);
+    if (wav && selectedLesson?.id===lesson.id) audioUrl=URL.createObjectURL(wav);
+  }
+  async function makeAudio(lesson:StoredLesson) {
+    if (audioBusy || audioUrl || selectedLesson?.id!==lesson.id) return;
+    audioError='';
+    const source=narratedText(lesson);
+    if (source.length > 12_000) { audioError=copy.audioTooLong; return; }
+    const api=import.meta.env.VITE_LEARNFLOW_API_URL;
+    if (typeof api!=='string' || !api) { audioError=copy.apiUrlError; return; }
+    audioBusy=true;
+    audioStatus=copy.makingAudio;
+    let storing=false;
+    try {
+      const wav=await speakLesson(lesson,api);
+      storing=true;
+      await storeLessonAudio(lesson,wav);
+      if (selectedLesson?.id===lesson.id) {
+        clearAudioPlayer();
+        audioUrl=URL.createObjectURL(wav);
+        audioStatus=copy.audioReady;
+      }
+    } catch (cause) {
+      audioError=storing ? copy.audioStorageFailed : readableSimplificationError(cause,false);
+      if (!(cause instanceof WorkerProcessorError) && !storing) audioError=copy.audioNotAvailable;
+      if (cause instanceof WorkerProcessorError && cause.code==='invalid-response') audioError=copy.audioNotAvailable;
+      audioStatus='';
+    } finally { audioBusy=false; }
   }
   async function editDraft(draft:SourceDraft) {
     const document = await getCurrentDocument(draft.id);
@@ -204,7 +251,7 @@
   async function discard(id:string) {
     if (busy) return;
     await deleteDraft(id);
-    if (selectedLesson?.draftId===id) {selectedLesson = null;selectedLessonSource='';}
+    if (selectedLesson?.draftId===id) closeLesson();
     await refresh();
   }
 </script>
@@ -288,6 +335,19 @@
     <article aria-labelledby="lesson-title" class="lesson">
       <h2 id="lesson-title">{selectedLesson.title}</h2>
       <p class="note" role="note">{copy.aiCaution}</p>
+      <div class="audio-panel">
+        {#if audioUrl}
+          <audio controls preload="metadata" src={audioUrl} aria-label={copy.playAudio}></audio>
+          <a href={audioUrl} download="LearnFlow-leksjon.wav">{copy.downloadAudio}</a>
+        {:else}
+          <p class="note">{copy.audioNotice}</p>
+          <button type="button" onclick={() => makeAudio(selectedLesson!)} disabled={audioBusy}>
+            {audioBusy ? copy.makingAudio : copy.makeAudio}
+          </button>
+        {/if}
+        {#if audioStatus}<p role="status">{audioStatus}</p>{/if}
+        {#if audioError}<p role="alert">{audioError}</p>{/if}
+      </div>
       {#each selectedLesson.sentences as sentence, i (i)}
         {#if sentence.kind === 'heading'}<h3>{sentence.text}</h3>
         {:else if sentence.kind === 'task'}<p class="task">{sentence.text}</p>
@@ -295,7 +355,7 @@
         {:else}<p>{sentence.text}</p>{/if}
       {/each}
       <details><summary>{copy.showSource}</summary><p class="source-text">{selectedLessonSource}</p></details>
-      <button class="secondary" onclick={() => selectedLesson=null}>{copy.close}</button>
+      <button class="secondary" onclick={closeLesson} disabled={audioBusy}>{copy.close}</button>
     </article>
   {/if}
 </div>

@@ -1,4 +1,5 @@
 import { db, type StoredDocument } from './db';
+import { deleteAudioForDraft } from './audio';
 import type { ProcessingAttempt, SourceDraft } from '../import/types';
 
 function assertSelectableDocument(blocks: StoredDocument['blocks']): void {
@@ -53,7 +54,7 @@ export async function saveDraftVersion(
     });
     await db.lessons.where('draftId').equals(draftId).delete();
     return version;
-  });
+  }).then(async (version) => { await deleteAudioForDraft(draftId); return version; });
 }
 
 export async function touchDraft(draftId: string, status: SourceDraft['status'] = 'pending'): Promise<void> {
@@ -67,6 +68,7 @@ export async function deleteDraft(id: string): Promise<void> {
     await db.attempts.where('draftId').equals(id).delete();
     await db.lessons.where('draftId').equals(id).delete();
   });
+  await deleteAudioForDraft(id);
 }
 
 export async function putDocument(document: StoredDocument): Promise<void> {
@@ -95,5 +97,5 @@ export async function updateSelection(draftId: string, selectedBlockIds: string[
     await db.drafts.update(draftId, { version: nextVersion, status: 'pending', lastActivityAt: Date.now() });
     await db.lessons.where('draftId').equals(draftId).delete();
     return next;
-  });
+  }).then(async (next) => { await deleteAudioForDraft(draftId); return next; });
 }
