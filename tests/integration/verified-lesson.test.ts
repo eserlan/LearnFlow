@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it } from 'vitest';
 import { db } from '../../src/lib/storage/db';
-import { createDraft, deleteDraft } from '../../src/lib/storage/drafts';
+import { createDraft, deleteDraft, saveDraftVersion } from '../../src/lib/storage/drafts';
 import { getVerifiedSentences, saveVerifiedLesson } from '../../src/lib/lesson/saved-lesson';
 
 const real = {sourceVersion:1,verified:true,result:{
@@ -32,6 +32,15 @@ describe('verified lessons stay on device',()=>{
     await deleteDraft('lesson-1');
     expect(await db.lessons.count()).toBe(0);
     expect(await db.documents.count()).toBe(0);
+  });
+  it('invalidates old lessons when source content changes',async()=>{
+    await makeDraft();
+    await saveVerifiedLesson('lesson-1',real);
+    await saveDraftVersion('lesson-1',1,
+      {blocks:[{id:'source-1',type:'paragraph',text:'Andre opplysninger.',language:'nb',
+        spans:[{representation:'text/plain',start:0,end:19}],included:true}],wordCount:2,language:'nb'},
+      {title:'Oppdatert',origin:undefined,plainText:'Andre opplysninger.'});
+    expect(await db.lessons.count()).toBe(0);
   });
   it('rejects result from a different source version',async()=>{
     await makeDraft();
