@@ -86,61 +86,26 @@ describe('real AI adapter (synthetic content only)',()=>{
     assert.equal(body.result.kind,'simplified-lesson');
     assert.equal(p.calls.length,1);
   });
-  it('keeps universal private testing disabled without a valid per-request secret', async()=>{
-    const secret='fictitious-private-testing-secret-0123456789';
-    const env: Env={...configured, ENABLE_AI_PROCESSING:'false',PRIVACY_REVIEW_APPROVED:'false',
-      ENABLE_PRIVATE_TESTING:'true', PRIVATE_TEST_TOKEN:secret};
-    const bad=new Request('https://api.example.test/api/simplify',{
-      method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json',
-        'X-LearnFlow-Test-Token':'invalid','CF-Connecting-IP':'198.51.100.42'},body:JSON.stringify(input)
+  it('rejects unapproved public AI without reading request bodies or using Gemini',async()=>{
+    const restricted={...configured,ENABLE_AI_PROCESSING:'true',PRIVACY_REVIEW_APPROVED:'false'};
+    const req=new Request('https://api.example.test/api/simplify',{
+      method:'POST',headers:{Origin:'https://preview.example.test',
+        'Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
+      body:JSON.stringify(input)
     });
     const p=provider();
-    const denied=await handleRequest(bad,env,p.fetcher);
+    const denied=await handleRequest(req,restricted,p.fetcher);
     assert.equal(denied.status,503);
-    assert.equal(bad.bodyUsed,false);
+    assert.equal(req.bodyUsed,false);
     assert.equal(p.calls.length,0);
-    const cap=await handleRequest(new Request('https://api.example.test/capabilities',{
-      headers:{Origin:'https://preview.example.test'}
-    }),env);
-    assert.deepEqual(await cap.json(),{simplify:false});
-    const rejected=await handleRequest(new Request('https://api.example.test/capabilities',{
-      headers:{Origin:'https://preview.example.test','X-LearnFlow-Test-Token':'not-the-secret'}
-    }),env);
-    assert.deepEqual(await rejected.json(),{simplify:false});
   });
-
-  it('accepts arbitrary synthetic test inputs with private authorization while public mode stays closed',async()=>{
-    const secret='fictitious-private-testing-secret-0123456789';
-    const env: Env={...configured, ENABLE_AI_PROCESSING:'false',PRIVACY_REVIEW_APPROVED:'false',
-      ENABLE_PRIVATE_TESTING:'true',PRIVATE_TEST_TOKEN:secret};
-    const synthetic={draftId:'fictional-draft-17',sourceVersion:3,
-      idempotencyKey:'fictional-draft-17:3',
-      plainText:'I den oppdiktede byen Solvik vokser plantene når det kommer regn.'};
-    const p=provider({sentences:[{text:'I Solvik vokser plantene når det regner.',
-      kind:'statement',sources:['original']}]});
+  it('does not allow private token header in CORS preflight',async()=>{
     const preflight=await handleRequest(new Request('https://api.example.test/capabilities',{
       method:'OPTIONS',headers:{Origin:'https://preview.example.test',
         'Access-Control-Request-Method':'GET',
         'Access-Control-Request-Headers':'X-LearnFlow-Test-Token'}
-    }),env,p.fetcher);
-    assert.equal(preflight.status,204);
-    const cap=await handleRequest(new Request('https://api.example.test/capabilities',{
-      headers:{Origin:'https://preview.example.test','X-LearnFlow-Test-Token':secret}
-    }),env);
-    assert.deepEqual(await cap.json(),{simplify:true});
-    const send=await handleRequest(new Request('https://api.example.test/api/simplify',{
-      method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json',
-        'X-LearnFlow-Test-Token':secret,'CF-Connecting-IP':'198.51.100.42'},
-      body:JSON.stringify(synthetic)
-    }),env,p.fetcher);
-    assert.equal(send.status,200);
-    const result=await send.json() as {result:{sentences:{text:string}[]}};
-    assert.equal(result.result.sentences[0].text,'I Solvik vokser plantene når det regner.');
-    assert.equal(p.calls.length,1);
-    const publicCap=await handleRequest(new Request('https://api.example.test/capabilities',{
-      headers:{Origin:'https://preview.example.test'}
-    }),env);
-    assert.deepEqual(await publicCap.json(),{simplify:false});
+    }),configured);
+    assert.equal(preflight.status,403);
   });
 
 });

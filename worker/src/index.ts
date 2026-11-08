@@ -7,8 +7,6 @@ import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify
 export interface Env extends AiEnv {
   ENABLE_AI_PROCESSING?: string;
   PRIVACY_REVIEW_APPROVED?: string;
-  ENABLE_PRIVATE_TESTING?: string;
-  PRIVATE_TEST_TOKEN?: string;
   RATE_LIMITER?: { limit(input: { key: string }): Promise<{ success: boolean }> };
   ALLOWED_ORIGINS?: string;
   APP_ENV?: string;
@@ -39,7 +37,7 @@ function headersFor(origin: string | null, env: Env): Headers {
   if (origin && allowedOrigins(env).has(origin)) {
     headers.set('Access-Control-Allow-Origin', origin);
     headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    headers.set('Access-Control-Allow-Headers', 'Content-Type, X-LearnFlow-Test-Token');
+    headers.set('Access-Control-Allow-Headers', 'Content-Type');
     headers.set('Access-Control-Max-Age', '600');
   }
   return headers;
@@ -89,17 +87,6 @@ async function mockSimplify(request: Request, origin: string, env: Env): Promise
  * Fail closed unless the privacy/DPIA approval and platform rate limit have
  * been explicitly supplied. CORS is not authentication.
  */
-/** Test access is explicitly opt-in, per-request, and never persists test credentials.
- * A random 32+-character Worker secret protects test calls on the public workers.dev URL. */
-function privateTestAuthorized(request: Request, env: Env): boolean {
-  const actual = request.headers.get('X-LearnFlow-Test-Token');
-  const expected = env.PRIVATE_TEST_TOKEN;
-  return env.ENABLE_PRIVATE_TESTING === 'true' && !!env.RATE_LIMITER &&
-    !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL &&
-    typeof expected === 'string' && expected.length >= 32 && expected.length <= 256 &&
-    typeof actual === 'string' && actual.length === expected.length && actual === expected;
-}
-
 function processingEnabled(env:Env): boolean {
   return env.ENABLE_AI_PROCESSING === 'true' && env.PRIVACY_REVIEW_APPROVED === 'true' &&
     !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL;
@@ -107,7 +94,7 @@ function processingEnabled(env:Env): boolean {
 
 async function liveSimplify(request: Request, origin: string, env: Env,
   fetcher: (url:string, init:RequestInit)=>Promise<Response>): Promise<Response> {
-  if (!processingEnabled(env) && !privateTestAuthorized(request, env)) {
+  if (!processingEnabled(env)) {
     return json({error:'processing_not_enabled'}, 503, origin, env);
   }
   if (!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
@@ -168,7 +155,7 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
     if (!ROUTES.has(pathname) || !approved ||
         request.headers.get('Access-Control-Request-Method') !== (pathname === '/health' || pathname === '/capabilities' ? 'GET' : 'POST') ||
         (request.headers.get('Access-Control-Request-Headers') ?? '').toLowerCase().split(',').some(
-          (h) => h.trim() !== '' && h.trim() !== 'content-type' && h.trim() !== 'x-learnflow-test-token')) {
+          (h) => h.trim() !== '' && h.trim() !== 'content-type')) {
       return json({ error: 'preflight_not_allowed' }, 403, null, env);
     }
     return new Response(null, { status: 204, headers: headersFor(origin, env) });
@@ -179,13 +166,13 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
     return json({ status: 'ok' }, 200, origin, env);
   }
   if (pathname === '/capabilities' && request.method === 'GET') {
-    return json({simplify:processingEnabled(env) || privateTestAuthorized(request,env)},200,origin,env);
+    return json({simplify:processingEnabled(env)},200,origin,env);
   }
   if (API_PATHS.has(pathname) && request.method === 'POST') {
     // Origin is not authentication; proper abuse controls remain a release gate.
     if (!approved) return json({ error: 'origin_required' }, 403, null, env);
     if (pathname === '/api/simplify' && demoEnabled(env)) return mockSimplify(request, origin!, env);
-    if (pathname === '/api/simplify' && (env.ENABLE_AI_PROCESSING === 'true' || env.ENABLE_PRIVATE_TESTING === 'true')) return liveSimplify(request, origin!, env, fetcher);
+    if (pathname === '/api/simplify' && env.ENABLE_AI_PROCESSING === 'true') return liveSimplify(request, origin!, env, fetcher);
     return json({ error: 'not_implemented', message: 'AI provider and privacy checks pending.' }, 501, origin, env);
   }
   return json({ error: 'not_found' }, 404, origin, env);
