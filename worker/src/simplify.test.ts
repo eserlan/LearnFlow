@@ -50,7 +50,7 @@ describe('real AI adapter (synthetic content only)',()=>{
   it('returns only capability metadata when backend is disabled',async()=>{
     const r=await handleRequest(new Request('https://api.example.test/capabilities',
       {headers:{Origin:'https://preview.example.test'}}),{ALLOWED_ORIGINS:'https://preview.example.test'});
-    assert.deepEqual(await r.json(),{simplify:false});
+    assert.deepEqual(await r.json(),{simplify:false,reason:'missing_api_key'});
   });
   it('blocks requests missing model configuration before reading input or calling Gemini',async()=>{
     const req=new Request('https://api.example.test/api/simplify',
@@ -98,11 +98,39 @@ describe('real AI adapter (synthetic content only)',()=>{
     const noKey=await handleRequest(new Request('https://api.example.test/capabilities',{
       headers:{Origin:'https://preview.example.test'}
     }), {...configured, GEMINI_API_KEY:undefined});
-    assert.deepEqual(await noKey.json(), { simplify:false });
+    assert.deepEqual(await noKey.json(), { simplify:false, reason:'missing_api_key' });
     const noLimiter=await handleRequest(new Request('https://api.example.test/capabilities',{
       headers:{Origin:'https://preview.example.test'}
     }), {...configured, RATE_LIMITER:undefined});
-    assert.deepEqual(await noLimiter.json(), { simplify:false });
+    assert.deepEqual(await noLimiter.json(), { simplify:false, reason:'missing_rate_limiter' });
+  });
+  it('reports missing model separately from missing key', async()=>{
+    const response=await handleRequest(new Request('https://api.example.test/capabilities'),{
+      ...configured,GEMINI_MODEL:undefined
+    });
+    assert.deepEqual(await response.json(),{simplify:false,reason:'missing_model'});
+  });
+  it('categorises Gemini HTTP errors without exposing upstream content',async()=>{
+    const cases = [
+      {status:400,code:'provider_bad_request',workerStatus:502},
+      {status:401,code:'provider_credentials',workerStatus:503},
+      {status:403,code:'provider_credentials',workerStatus:503},
+      {status:404,code:'provider_model_not_found',workerStatus:503},
+      {status:429,code:'provider_quota',workerStatus:429},
+      {status:503,code:'unavailable',workerStatus:503}
+    ] as const;
+    for (const testcase of cases) {
+      const request = new Request('https://api.example.test/api/simplify',{
+        method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json',
+          'CF-Connecting-IP':'198.51.100.42'},body:JSON.stringify(input)
+      });
+      const response=await handleRequest(request,configured,async()=>new Response(
+        JSON.stringify({error:{message:'Do not echo upstream user text or API key'}}),{status:testcase.status}
+      ));
+      assert.equal(response.status,testcase.workerStatus);
+      const body=await response.json();
+      assert.deepEqual(body,{error:testcase.code});
+    }
   });
   it('does not allow private token header in CORS preflight',async()=>{
     const preflight=await handleRequest(new Request('https://api.example.test/capabilities',{
