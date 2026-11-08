@@ -3,13 +3,15 @@ import type { SimplificationProcessor, SimplificationRequest, SimplificationResu
 export class WorkerProcessorError extends Error {
   readonly code: 'unavailable' | 'http-error' | 'invalid-response';
   readonly status?: number;
-  constructor(code: 'unavailable' | 'http-error' | 'invalid-response', status?: number) {
+  readonly backendCode?: string;
+  constructor(code: 'unavailable' | 'http-error' | 'invalid-response', status?: number, backendCode?: string) {
     super(code === 'unavailable' ? 'The processing service is not available. Try again later.' :
       code === 'invalid-response' ? 'The processing service returned an invalid response.' :
       status === 501 ? 'Simplification is not available yet.' : 'The processing service could not complete the request.');
     this.name = 'WorkerProcessorError';
     this.code = code;
     this.status = status;
+    this.backendCode = backendCode;
   }
 }
 
@@ -41,7 +43,20 @@ export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fet
         // Never embed source content, raw fetch errors, or service response bodies in messages.
         throw new WorkerProcessorError('unavailable');
       }
-      if (!response.ok) throw new WorkerProcessorError('http-error', response.status);
+      if (!response.ok) {
+        // Read only a short machine-readable error code, never the raw provider response.
+        let backendCode: string | undefined;
+        if (response.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
+          try {
+            const body: unknown = await response.json();
+            if (body && typeof body === 'object' && !Array.isArray(body)) {
+              const code = (body as Record<string, unknown>).error;
+              if (typeof code === 'string' && /^[a-z_]{1,64}$/.test(code)) backendCode = code;
+            }
+          } catch { /* optional diagnostics only */ }
+        }
+        throw new WorkerProcessorError('http-error', response.status, backendCode);
+      }
       if (!response.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
         throw new WorkerProcessorError('invalid-response');
       }
