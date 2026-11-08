@@ -1,0 +1,200 @@
+/* LearnFlow: quiet, age-respectful surfaces with one purposeful accent colour. */
+body { margin: 0; }
+.learnflow-shell {
+  --page: #f5f6fa;
+  --surface: #ffffff;
+  --surface-soft: #f8f9fc;
+  --ink: #20283b;
+  --muted: #58647a;
+  --border: #dce2ed;
+  --accent: #5262dc;
+  --accent-hover: #3f4fc5;
+  --accent-tint: #edf0ff;
+  --focus: #546cf4;
+  --danger: #a12137;
+  --success: #1c6a4b;
+  min-height: 100svh;
+  padding: 0 max(1rem, env(safe-area-inset-right)) 4rem max(1rem, env(safe-area-inset-left));
+  background: var(--page);
+  color: var(--ink);
+  font: 1rem/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: light;
+  transition: background-color .2s ease, color .2s ease;
+}
+.learnflow-shell[data-theme="dark"] {
+  --page: #111522;
+  --surface: #1c2232;
+  --surface-soft: #262d3f;
+  --ink: #f2f5ff;
+  --muted: #b7c2d8;
+  --border: #3a445a;
+  --accent: #9ba7ff;
+  --accent-hover: #b7beff;
+  --accent-tint: #313b63;
+  --focus: #a8b1ff;
+  --danger: #ff9dad;
+  --success: #9de6c1;
+  color-scheme: dark;
+}
+.learnflow-shell * { box-sizing: border-box; }
+.learnflow-shell .topbar,
+.learnflow-shell .content {
+  width: min(100%, 48rem);
+  margin-inline: auto;
+}
+.learnflow-shell .topbar {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1.3rem 0 1.2rem;
+}
+.learnflow-shell .brand { display: flex; align-items: center; gap: .65rem; margin-right: auto; }
+.learnflow-shell .brand-mark {
+  display: grid; place-items: center;
+  width: 2.35rem; height: 2.35rem;
+  border-radius: .72rem;
+  color: #fff;
+  background: #5262dc;
+  font-weight: 850;
+  letter-spacing: -.06em;
+  font-size: 1.25rem;
+}
+.learnflow-shell .brand h1 { margin: 0; font-size: 1.3rem; font-weight: 760; letter-spacing: -.05em; }
+.learnflow-shell .language-control { display: flex; gap: .55rem; align-items: center; }
+.learnflow-shell .language-control label { margin: 0; font-size: .875rem; color: var(--muted); }
+.learnflow-shell select {
+  width: auto; min-width: 6.4rem;
+  padding: .5rem 1.8rem .5rem .7rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: .7rem;
+  font: inherit;
+  font-size: .9rem;
+}
+.learnflow-shell button.theme-toggle {
+  display: grid; place-items: center;
+  width: 2.75rem; min-width: 2.75rem; height: 2.75rem;
+  padding: 0; margin: 0;
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 1.2rem;
+}
+.learnflow-shell .hero { padding: 1.3rem 0 1.4rem; }
+.learnflow-shell .hero h2 {
+  font-size: clamp(1.85rem, 6vw, 2.65rem);
+  line-height: 1.12;
+  letter-spacing: -.055em;
+  margin: 0 0 .6rem;
+  font-weight: 760;
+}
+.learnflow-shell .hero p { margin: 0; color: var(--muted); font-size: 1rem; }
+.learnflow-shell section,
+.learnflow-shell article {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  padding: clamp(1rem, 4vw, 1.75rem);
+  margin: 0 0 1.15rem;
+  box-shadow: 0 8px 32px rgba(20, 32, 68, .035);
+}
+.learnflow-shell .composer { border-color: var(--border); }
+.learnflow-shell h2 { margin: 0 0 1rem; font-size: 1.25rem; letter-spacing: -.025em; }
+.learnflow-shell section > h2 + p { color: var(--muted); }
+.learnflow-shell label { display: block; margin: .9rem 0 .4rem; font-weight: 590; font-size: .95rem; }
+.learnflow-shell textarea,
+.learnflow-shell input:not([type="checkbox"]) {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: .8rem;
+  background: var(--surface-soft);
+  color: var(--ink);
+  padding: .85rem .95rem;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.learnflow-shell textarea { min-height: 12rem; resize: vertical; }
+.learnflow-shell textarea::placeholder,
+.learnflow-shell input::placeholder { color: var(--muted); opacity: .8; }
+.learnflow-shell input:not([type="checkbox"]) { min-height: 2.9rem; }
+.learnflow-shell .composer-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: .85rem;
+  margin-top: 1.3rem;
+}
+.learnflow-shell .word-count { color: var(--muted); font-size: .875rem; }
+.learnflow-shell button {
+  min-height: 2.8rem;
+  padding: .65rem 1.15rem;
+  margin: .4rem .5rem .4rem 0;
+  border: 1px solid transparent;
+  border-radius: .75rem;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 650;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: background-color .15s ease, transform .15s ease;
+}
+.learnflow-shell[data-theme="dark"] button:not(.secondary):not(.theme-toggle) { color: #10162a; }
+.learnflow-shell button:hover:not(:disabled):not(.secondary):not(.theme-toggle) { background: var(--accent-hover); }
+.learnflow-shell button:active:not(:disabled) { transform: translateY(1px); }
+.learnflow-shell button:disabled { opacity: .6; cursor: not-allowed; }
+.learnflow-shell button.secondary {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-color: var(--border);
+}
+.learnflow-shell button.secondary:hover:not(:disabled),
+.learnflow-shell button.theme-toggle:hover { background: var(--accent-tint); }
+.learnflow-shell .composer-footer button { margin: 0; }
+.learnflow-shell .note { margin: .85rem 0 0; color: var(--muted); font-size: .83rem; line-height: 1.5; }
+.learnflow-shell .step { border-color: var(--accent); }
+.learnflow-shell .step select { display: block; margin-bottom: .85rem; }
+.learnflow-shell .checkbox { display: flex; align-items: flex-start; gap: .75rem; line-height: 1.5; font-weight: 450; }
+.learnflow-shell input[type="checkbox"] {
+  width: 1.2rem; height: 1.2rem;
+  margin: .15rem 0 0; flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.learnflow-shell ul { list-style: none; padding: 0; margin: 0; }
+.learnflow-shell li { padding: .95rem 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.learnflow-shell li:first-child { padding-top: .15rem; }
+.learnflow-shell li:last-child { border-bottom: 0; padding-bottom: 0; }
+.learnflow-shell li strong { font-weight: 650; }
+.learnflow-shell .actions { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .7rem; }
+.learnflow-shell .actions button { margin: .2rem .25rem .2rem 0; }
+.learnflow-shell .lesson { font-size: 1.125rem; line-height: 1.8; }
+.learnflow-shell .lesson h2 { font-size: 1.5rem; line-height: 1.3; }
+.learnflow-shell .lesson h3 { margin: 1.6rem 0 .5rem; font-size: 1.15rem; }
+.learnflow-shell .lesson p { margin: .75rem 0; }
+.learnflow-shell .lesson blockquote { margin: .9rem 0; padding-left: 1rem; border-left: 3px solid var(--accent); color: var(--muted); }
+.learnflow-shell .lesson .task { border-left: 3px solid var(--accent); padding-left: .85rem; }
+.learnflow-shell [role="alert"] { color: var(--danger); }
+.learnflow-shell [role="status"] { color: var(--success); }
+.learnflow-shell button:focus-visible,
+.learnflow-shell textarea:focus-visible,
+.learnflow-shell input:focus-visible,
+.learnflow-shell select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .learnflow-shell .topbar { padding-top: 1rem; }
+  .learnflow-shell .brand h1 { font-size: 1.14rem; }
+  .learnflow-shell .language-control { gap: .25rem; }
+  .learnflow-shell .language-control label { font-size: .8rem; }
+  .learnflow-shell select { min-width: 5.9rem; }
+  .learnflow-shell .hero { padding-top: .9rem; }
+  .learnflow-shell .composer-footer button { flex: 1 0 100%; }
+  .learnflow-shell .actions button { flex-grow: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .learnflow-shell, .learnflow-shell button { transition: none; }
+  .learnflow-shell button:active { transform: none; }
+}
