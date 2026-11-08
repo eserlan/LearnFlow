@@ -22,7 +22,7 @@ export const SMOKE_FIXTURE = {
 
 const JSON_TYPE = 'application/json; charset=utf-8';
 const API_PATHS = new Set(['/api/simplify', '/api/speak']);
-const ROUTES = new Set(['/health', ...API_PATHS]);
+const ROUTES = new Set(['/health', '/capabilities', ...API_PATHS]);
 
 function allowedOrigins(env: Env): Set<string> {
   return new Set((env.ALLOWED_ORIGINS ?? '').split(',').map((value) => value.trim()).filter(Boolean));
@@ -87,11 +87,15 @@ async function mockSimplify(request: Request, origin: string, env: Env): Promise
  * Fail closed unless the privacy/DPIA approval and platform rate limit have
  * been explicitly supplied. CORS is not authentication.
  */
+function processingEnabled(env:Env): boolean {
+  return env.ENABLE_AI_PROCESSING === 'true' && env.PRIVACY_REVIEW_APPROVED === 'true' &&
+    !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL &&
+    !!env.ANTHROPIC_API_KEY && !!env.ANTHROPIC_MODEL;
+}
+
 async function liveSimplify(request: Request, origin: string, env: Env,
   fetcher: (url:string, init:RequestInit)=>Promise<Response>): Promise<Response> {
-  if (env.ENABLE_AI_PROCESSING !== 'true' || env.PRIVACY_REVIEW_APPROVED !== 'true' ||
-      !env.RATE_LIMITER || !env.GEMINI_API_KEY || !env.GEMINI_MODEL ||
-      !env.ANTHROPIC_API_KEY || !env.ANTHROPIC_MODEL) {
+  if (!processingEnabled(env)) {
     return json({error:'processing_not_enabled'}, 503, origin, env);
   }
   if (!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
@@ -146,7 +150,7 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
 
   if (request.method === 'OPTIONS') {
     if (!ROUTES.has(pathname) || !approved ||
-        request.headers.get('Access-Control-Request-Method') !== (pathname === '/health' ? 'GET' : 'POST') ||
+        request.headers.get('Access-Control-Request-Method') !== (pathname === '/health' || pathname === '/capabilities' ? 'GET' : 'POST') ||
         (request.headers.get('Access-Control-Request-Headers') ?? '').toLowerCase().split(',').some(
           (h) => h.trim() !== '' && h.trim() !== 'content-type')) {
       return json({ error: 'preflight_not_allowed' }, 403, null, env);
@@ -157,6 +161,9 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
   if (origin !== null && !approved) return json({ error: 'origin_not_allowed' }, 403, null, env);
   if (pathname === '/health' && request.method === 'GET') {
     return json({ status: 'ok' }, 200, origin, env);
+  }
+  if (pathname === '/capabilities' && request.method === 'GET') {
+    return json({simplify:processingEnabled(env)},200,origin,env);
   }
   if (API_PATHS.has(pathname) && request.method === 'POST') {
     // Origin is not authentication; proper abuse controls remain a release gate.
