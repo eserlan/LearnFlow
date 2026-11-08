@@ -11,7 +11,8 @@
 ## API today
 
 - GET /health → JSON { "status": "ok" }.
-- POST /api/simplify → HTTP 501 by default, until production processing and its guardrails are implemented.
+- GET /capabilities → `{ "simplify": false }` until API secrets, release approval flags and rate limiting are configured. The frontend checks this **before transmitting source text**.
+- POST /api/simplify → HTTP 501 with default flags; after explicit release approval, Gemini-only generation with schema, source-ID and numeric guardrails. The returned result is **not independently fact-checked** and the learner can compare it with the original.
 - POST /api/speak → HTTP 501.
 - The only successful simplification response is **test-only**: APP_ENV=test and ENABLE_MOCK_PROCESSING=true, both required; it accepts only the fixed synthetic SMOKE_FIXTURE declared in worker/src/index.ts, echoes it unchanged, and marks it forLearning:false. **Never enable this mode on a public deployment or show it as a real lesson.**
 
@@ -24,7 +25,7 @@
 5. In tests, the browser request is modelled by tests/integration/worker-handoff.test.ts, calling the existing simplifyDraft consent boundary and createWorkerProcessor HTTP adapter.
 6. Run npm run check and npm run test in worker/; from root run bun run check, bun run test:unit, bun run test:integration.
 
-The user-facing page intentionally does **not** invoke the Worker with real material, because the guardian/privacy consent implementation is not yet complete. The integration test uses a synthetic source and a simulated approval explicitly limited to the test.
+The user-facing page now offers an explicit age/consent step, but does **not** send source material when `/capabilities` reports unavailable. Under-13 processing remains blocked pending a verifiable guardian flow. This is not a substitute for spec 006's legal/DPIA/provider approvals.
 
 ## Deployment
 
@@ -32,8 +33,8 @@ The connected tools cannot currently deploy to your Cloudflare account. A manual
 
 1. Merge the PR after CI passes.
 2. In GitHub repository Settings → Secrets and variables → Actions, configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (prefer the production environment's secrets with approval).
-3. In Cloudflare, configure the learnflow-api Worker environment variable ALLOWED_ORIGINS with the **exact** Vercel production and selected preview origins; leave test toggles unset.
-4. Run Actions → Deploy Cloudflare Worker → Run workflow on main. Verify the resulting Worker URL and GET /health.
+3. In Cloudflare, configure the existing `learnflow` Worker environment variable ALLOWED_ORIGINS with the **exact** Vercel production origin; leave test toggles unset. Set AI secrets and enable flags only after reviewing worker/README.md and issue #8.
+4. Run Actions → Deploy Cloudflare Worker → Run workflow on main. Verify the existing `learnflow.espen-erlandsen.workers.dev` Worker URL, GET /health and GET /capabilities (false until all release conditions are met).
 5. Create/connect the Vercel project from the repository root with framework SvelteKit; configure its public Worker origin when the real consent-backed UI integration is enabled.
 
 Avoid exposing broad *.vercel.app wildcard origins. If ephemeral preview URLs need live API access, prefer an approved proxy strategy or explicit preview origin registration with the Worker. CORS alone is not authentication or rate limiting.

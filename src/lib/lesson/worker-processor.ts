@@ -31,7 +31,8 @@ export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fet
         response = await fetcher(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(request),
+          body: JSON.stringify({ draftId: request.draftId, sourceVersion: request.sourceVersion,
+            idempotencyKey: request.idempotencyKey, plainText: request.plainText }),
           cache: 'no-store',
           credentials: 'omit',
           redirect: 'error'

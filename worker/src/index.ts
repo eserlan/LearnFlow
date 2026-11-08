@@ -1,8 +1,13 @@
+import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify.ts';
+
 /**
  * LearnFlow's stateless Cloudflare API. No content, lesson or audio persistence.
  * Mock mode accepts one fixed, non-personal fixture and is disabled in production.
  */
-export interface Env {
+export interface Env extends AiEnv {
+  ENABLE_AI_PROCESSING?: string;
+  PRIVACY_REVIEW_APPROVED?: string;
+  RATE_LIMITER?: { limit(input: { key: string }): Promise<{ success: boolean }> };
   ALLOWED_ORIGINS?: string;
   APP_ENV?: string;
   ENABLE_MOCK_PROCESSING?: string;
@@ -17,7 +22,7 @@ export const SMOKE_FIXTURE = {
 
 const JSON_TYPE = 'application/json; charset=utf-8';
 const API_PATHS = new Set(['/api/simplify', '/api/speak']);
-const ROUTES = new Set(['/health', ...API_PATHS]);
+const ROUTES = new Set(['/health', '/capabilities', ...API_PATHS]);
 
 function allowedOrigins(env: Env): Set<string> {
   return new Set((env.ALLOWED_ORIGINS ?? '').split(',').map((value) => value.trim()).filter(Boolean));
@@ -78,14 +83,77 @@ async function mockSimplify(request: Request, origin: string, env: Env): Promise
   }, 200, origin, env);
 }
 
-export async function handleRequest(request: Request, env: Env): Promise<Response> {
+/**
+ * Fail closed unless the privacy/DPIA approval and platform rate limit have
+ * been explicitly supplied. CORS is not authentication.
+ */
+function processingEnabled(env:Env): boolean {
+  return env.ENABLE_AI_PROCESSING === 'true' && env.PRIVACY_REVIEW_APPROVED === 'true' &&
+    !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL;
+}
+
+async function liveSimplify(request: Request, origin: string, env: Env,
+  fetcher: (url:string, init:RequestInit)=>Promise<Response>): Promise<Response> {
+  if (!processingEnabled(env)) {
+    return json({error:'processing_not_enabled'}, 503, origin, env);
+  }
+  if (!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
+    return json({error:'unsupported_media_type'},415,origin,env);
+  }
+  const ip = request.headers.get('CF-Connecting-IP');
+  if (!ip) return json({error:'rate_limit_unavailable'},503,origin,env);
+  const limiter = env.RATE_LIMITER;
+  if (!limiter) return json({error:'rate_limit_unavailable'},503,origin,env);
+  try {
+    const limit = await limiter.limit({key: ip});
+    if (!limit.success) return json({error:'rate_limited'},429,origin,env);
+  } catch { return json({error:'rate_limit_unavailable'},503,origin,env); }
+  // Cap request bytes before parsing. No storage or request body logging.
+  if (Number(request.headers.get('Content-Length') ?? 0) > 40_000) {
+    return json({error:'invalid_request'},413,origin,env);
+  }
+  const reader = request.body?.getReader();
+  if (!reader) return json({error:'invalid_request'},400,origin,env);
+  const chunks: Uint8Array[] = [];
+  let size=0;
+  try {
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      size+=value.byteLength;
+      if(size>40_000){await reader.cancel();return json({error:'invalid_request'},413,origin,env);}
+      chunks.push(value);
+    }
+  } catch { return json({error:'invalid_request'},400,origin,env); }
+  const bytes = new Uint8Array(size);
+  let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+  let raw: unknown;
+  try { raw=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes)); }
+  catch { return json({error:'invalid_request'},400,origin,env); }
+  const input=validatePayload(raw);
+  if(!input)return json({error:'invalid_request'},422,origin,env);
+  try {
+    const result=await simplifyWithAi(input,env,fetcher);
+    // 'verified' is a legacy client contract flag meaning basic validation passed.
+    // It must NOT be presented to pupils as independent factual verification.
+    return json({sourceVersion:input.sourceVersion,verified:true,result},200,origin,env);
+  }catch(error){
+    if(error instanceof AiError){
+      const status=error.code==='invalid-output'?502:503;
+      return json({error:error.code},status,origin,env);
+    }
+    return json({error:'processing_failed'},503,origin,env);
+  }
+}
+
+export async function handleRequest(request: Request, env: Env, fetcher: (url:string, init:RequestInit)=>Promise<Response> = fetch): Promise<Response> {
   const { pathname } = new URL(request.url);
   const origin = request.headers.get('Origin');
   const approved = origin !== null && allowedOrigins(env).has(origin);
 
   if (request.method === 'OPTIONS') {
     if (!ROUTES.has(pathname) || !approved ||
-        request.headers.get('Access-Control-Request-Method') !== (pathname === '/health' ? 'GET' : 'POST') ||
+        request.headers.get('Access-Control-Request-Method') !== (pathname === '/health' || pathname === '/capabilities' ? 'GET' : 'POST') ||
         (request.headers.get('Access-Control-Request-Headers') ?? '').toLowerCase().split(',').some(
           (h) => h.trim() !== '' && h.trim() !== 'content-type')) {
       return json({ error: 'preflight_not_allowed' }, 403, null, env);
@@ -97,10 +165,14 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   if (pathname === '/health' && request.method === 'GET') {
     return json({ status: 'ok' }, 200, origin, env);
   }
+  if (pathname === '/capabilities' && request.method === 'GET') {
+    return json({simplify:processingEnabled(env)},200,origin,env);
+  }
   if (API_PATHS.has(pathname) && request.method === 'POST') {
     // Origin is not authentication; proper abuse controls remain a release gate.
     if (!approved) return json({ error: 'origin_required' }, 403, null, env);
     if (pathname === '/api/simplify' && demoEnabled(env)) return mockSimplify(request, origin!, env);
+    if (pathname === '/api/simplify' && env.ENABLE_AI_PROCESSING === 'true') return liveSimplify(request, origin!, env, fetcher);
     return json({ error: 'not_implemented', message: 'AI provider and privacy checks pending.' }, 501, origin, env);
   }
   return json({ error: 'not_found' }, 404, origin, env);

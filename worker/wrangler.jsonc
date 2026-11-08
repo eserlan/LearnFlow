@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "learnflow-api",
+  "name": "learnflow",
   "main": "src/index.ts",
   "compatibility_date": "2026-11-06",
-  "workers_dev": true
+  "workers_dev": true,
+  "ratelimits": [{ "name": "RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 8, "period": 60 } }]
 }
