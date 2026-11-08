@@ -37,7 +37,7 @@ export async function saveDraftVersion(
   draftId: string,
   expectedVersion: number,
   document: Omit<StoredDocument, 'id' | 'draftId' | 'version'>,
-  updates: Pick<SourceDraft, 'title' | 'origin'>
+  updates: Pick<SourceDraft, 'title' | 'origin'> & Partial<Pick<SourceDraft, 'plainText' | 'html'>>
 ): Promise<number> {
   assertSelectableDocument(document.blocks);
   return db.transaction('rw', db.drafts, db.documents, async () => {
