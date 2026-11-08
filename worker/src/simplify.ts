@@ -69,7 +69,7 @@ async function generate(input: SimplifyPayload, env: AiEnv, fetcher: Fetcher): P
     {'x-goog-api-key':env.GEMINI_API_KEY},{
       systemInstruction:{parts:[{text:SYSTEM}]},
       contents:[{role:'user',parts:[{text:'<source id="original">\n'+input.plainText+'\n</source>'}]}],
-      generationConfig:{temperature:0.2,maxOutputTokens:4096,responseMimeType:'application/json',
+      generationConfig:{maxOutputTokens:4096,responseMimeType:'application/json',
         responseSchema:{type:'OBJECT',properties:{sentences:{type:'ARRAY',items:{type:'OBJECT',
           properties:{text:{type:'STRING'},kind:{type:'STRING'},sources:{type:'ARRAY',items:{type:'STRING'}}},
           required:['text','kind','sources']}}},required:['sentences']}
