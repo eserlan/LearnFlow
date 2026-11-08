@@ -103,8 +103,10 @@ async function liveSimplify(request: Request, origin: string, env: Env,
   }
   const ip = request.headers.get('CF-Connecting-IP');
   if (!ip) return json({error:'rate_limit_unavailable'},503,origin,env);
+  const limiter = env.RATE_LIMITER;
+  if (!limiter) return json({error:'rate_limit_unavailable'},503,origin,env);
   try {
-    const limit = await env.RATE_LIMITER.limit({key: ip});
+    const limit = await limiter.limit({key: ip});
     if (!limit.success) return json({error:'rate_limited'},429,origin,env);
   } catch { return json({error:'rate_limit_unavailable'},503,origin,env); }
   // Cap request bytes before parsing. No storage or request body logging.
