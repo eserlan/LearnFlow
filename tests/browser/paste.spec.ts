@@ -44,3 +44,19 @@ test('Nynorsk labels main action and consent correctly', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Gjer teksten lettare' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Forenkl tekst' })).toBeVisible();
 });
+
+test('modern editor keeps the same flow and remembers the chosen theme', async ({ page }) => {
+  await page.goto('/');
+  const shell = page.locator('main.learnflow-shell');
+  await expect(shell).toHaveAttribute('data-theme', 'light');
+  await expect(page.getByRole('heading', { name: 'Gjør teksten enklere' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Forenkle tekst' })).toBeVisible();
+  await page.getByRole('button', { name: 'Bytt til mørk modus' }).click();
+  await expect(shell).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(shell).toHaveAttribute('data-theme', 'dark');
+  await page.getByLabel('Språk').selectOption('nn');
+  await expect(page.getByRole('button', { name: 'Byt til lys modus' })).toBeVisible();
+  await page.getByRole('button', { name: 'Byt til lys modus' }).click();
+  await expect(shell).toHaveAttribute('data-theme', 'light');
+});
