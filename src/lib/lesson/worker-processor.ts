@@ -16,7 +16,7 @@ export class WorkerProcessorError extends Error {
 type Fetcher = (input: string, init: RequestInit) => Promise<Response>;
 
 /** Only call this adapter through simplifyDraft(), which enforces the spec 006 consent gate. */
-export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fetch): SimplificationProcessor {
+export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fetch, privateTestToken?: string): SimplificationProcessor {
   const base = new URL(apiBaseUrl);
   if ((base.protocol !== 'https:' && !(base.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(base.hostname))) ||
       base.username || base.password || base.search || base.hash || base.pathname !== '/') {
@@ -30,7 +30,7 @@ export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fet
       try {
         response = await fetcher(endpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...(privateTestToken ? { 'X-LearnFlow-Test-Token': privateTestToken } : {}) },
           body: JSON.stringify({ draftId: request.draftId, sourceVersion: request.sourceVersion,
             idempotencyKey: request.idempotencyKey, plainText: request.plainText }),
           cache: 'no-store',
