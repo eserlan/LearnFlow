@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { simplifyWithAi, validatePayload, type SimplifyPayload } from './simplify.ts';
-import { handleRequest, type Env } from './index.ts';
+import worker, { handleRequest, type Env } from './index.ts';
 
 const input: SimplifyPayload = {
   draftId:'unit-test',sourceVersion:1,idempotencyKey:'unit-test:1',
@@ -76,6 +76,34 @@ describe('real AI adapter (synthetic content only)',()=>{
     assert.equal(req.bodyUsed,false);
     assert.equal(p.calls.length,0);
   });
+  it('passes a real Cloudflare ExecutionContext without treating it as the provider fetcher', async()=>{
+    // Cloudflare supplies a third (ctx) argument. The HTTP request must still
+    // call the global fetch function for Gemini, not invoke ctx as a function.
+    const originalFetch=globalThis.fetch;
+    let calls=0;
+    globalThis.fetch=async (_url, init)=>{
+      calls++;
+      assert.equal(init?.method,'POST');
+      assert.equal(init?.redirect,'manual');
+      return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(lesson)}]}}]});
+    };
+    try {
+      const request=new Request('https://api.example.test/api/simplify',{
+        method:'POST',headers:{Origin:'https://preview.example.test',
+          'Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
+        body:JSON.stringify(input)
+      });
+      // Model the exact 3-argument invocation used by Cloudflare Workers.
+      const invoke=worker.fetch as unknown as (req:Request,env:Env,ctx:object)=>Promise<Response>;
+      const response=await invoke(request,configured,{waitUntil:()=>undefined});
+      assert.equal(response.status,200);
+      assert.equal((await response.json() as {result:{kind:string}}).result.kind,'simplified-lesson');
+      assert.equal(calls,1);
+    } finally {
+      globalThis.fetch=originalFetch;
+    }
+  });
+
   it('enforces rate limiting before reading sensitive content',async()=>{
     const req=new Request('https://api.example.test/api/simplify',
       {method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
