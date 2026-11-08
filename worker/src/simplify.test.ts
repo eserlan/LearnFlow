@@ -12,18 +12,14 @@ const lesson = {sentences:[{text:'De fleste humler kan fly langt.',kind:'stateme
 const configured: Env = {ALLOWED_ORIGINS:'https://preview.example.test',
   ENABLE_AI_PROCESSING:'true',PRIVACY_REVIEW_APPROVED:'true',
   GEMINI_API_KEY:'unit-test-secret',GEMINI_MODEL:'fake-gemini',
-  ANTHROPIC_API_KEY:'unit-test-secret',ANTHROPIC_MODEL:'fake-judge',
   RATE_LIMITER:{limit:async()=>({success:true})}};
 
-function providers(approved=true, output:unknown=lesson) {
+function provider(output:unknown=lesson) {
   const calls: string[] = [];
   const fetcher = async (url:string, _init:RequestInit):Promise<Response> => {
     calls.push(url);
-    if(url.includes('generativelanguage.googleapis.com')) {
-      return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(output)}]}}]});
-    }
-    return Response.json({content:[{type:'text',text:JSON.stringify({
-      supported:approved,essentialsPreserved:approved})}]});
+    if(!url.includes('generativelanguage.googleapis.com')) throw new Error('Unexpected non-Gemini provider call');
+    return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(output)}]}}]});
   };
   return {fetcher,calls};
 }
@@ -35,22 +31,22 @@ describe('real AI adapter (synthetic content only)',()=>{
     assert.equal(validatePayload({...input,html:'<p>private</p>'}),null);
     assert.notEqual(validatePayload(input),null);
   });
-  it('returns a verified output after independent provider verdict',async()=>{
-    const p=providers();
+  it('generates one structurally validated Gemini output without Claude',async()=>{
+    const p=provider();
     const result=await simplifyWithAi(input,configured,p.fetcher);
     assert.equal(result.kind,'simplified-lesson');
     assert.equal(result.sentences[0].text,lesson.sentences[0].text);
-    assert.equal(p.calls.length,2);
+    assert.equal(p.calls.length,1);
   });
-  it('rejects new numbers even when verifier would have approved',async()=>{
-    const p=providers(true,{sentences:[{text:'Humler flyr 900 kilometer.',kind:'statement',sources:['original']}]});
+  it('rejects numbers that were not in the original text',async()=>{
+    const p=provider({sentences:[{text:'Humler flyr 900 kilometer.',kind:'statement',sources:['original']}]});
     await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output'});
     assert.equal(p.calls.length,1);
   });
-  it('does not expose unverifiable output after a bounded retry',async()=>{
-    const p=providers(false);
-    await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'verification-failed'});
-    assert.equal(p.calls.length,4);
+  it('rejects incorrect source references without further model calls',async()=>{
+    const p=provider({sentences:[{text:'Noen humler flyr.',kind:'statement',sources:['unknown']}]});
+    await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output'});
+    assert.equal(p.calls.length,1);
   });
   it('returns only capability metadata when backend is disabled',async()=>{
     const r=await handleRequest(new Request('https://api.example.test/capabilities',
@@ -61,7 +57,7 @@ describe('real AI adapter (synthetic content only)',()=>{
     const req=new Request('https://api.example.test/api/simplify',
       {method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
         body:JSON.stringify(input)});
-    const p=providers();
+    const p=provider();
     const response=await handleRequest(req,{...configured,PRIVACY_REVIEW_APPROVED:'false'},p.fetcher);
     assert.equal(response.status,503);
     assert.equal(req.bodyUsed,false);
@@ -71,14 +67,14 @@ describe('real AI adapter (synthetic content only)',()=>{
     const req=new Request('https://api.example.test/api/simplify',
       {method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
         body:JSON.stringify(input)});
-    const p=providers();
+    const p=provider();
     const response=await handleRequest(req,{...configured,RATE_LIMITER:{limit:async()=>({success:false})}},p.fetcher);
     assert.equal(response.status,429);
     assert.equal(req.bodyUsed,false);
     assert.equal(p.calls.length,0);
   });
-  it('the stateless Worker returns a verified lesson after two provider calls',async()=>{
-    const p=providers();
+  it('the stateless Worker accepts a checked Gemini result after one provider call',async()=>{
+    const p=provider();
     const req=new Request('https://api.example.test/api/simplify',
       {method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
         body:JSON.stringify(input)});
@@ -88,6 +84,6 @@ describe('real AI adapter (synthetic content only)',()=>{
     const body=await response.json() as {verified:boolean;result:{kind:string}};
     assert.equal(body.verified,true);
     assert.equal(body.result.kind,'simplified-lesson');
-    assert.equal(p.calls.length,2);
+    assert.equal(p.calls.length,1);
   });
 });
