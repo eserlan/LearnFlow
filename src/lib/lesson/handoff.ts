@@ -25,8 +25,8 @@ export async function simplifyDraft(draftId: string, consent: ConsentGate, proce
       draftId,
       sourceVersion: draft.version,
       idempotencyKey,
-      plainText: draft.plainText,
-      ...(draft.html ? { html: draft.html } : {})
+      // Pasted HTML stays on-device; the Worker accepts plain text only.
+      plainText: draft.plainText
     });
     const current = await db.drafts.get(draftId);
     if (!current || current.version !== result.sourceVersion || current.version !== draft.version) throw new HandoffError('stale-source', 'The source changed while it was processing.');
