@@ -4,6 +4,10 @@ const messages = {
 	nb: {
 		title: 'LearnFlow',
 		action: 'Gjør teksten enklere',
+		tagline: 'Vanskelig tekst? Vi gjør den enklere.',
+		placeholder: 'Lim inn skoleteksten din her …',
+		darkMode: 'Bytt til mørk modus',
+		lightMode: 'Bytt til lys modus',
 		prompt: 'Lim inn teksten du vil lære',
 		origin: 'Hvor kommer teksten fra? (valgfritt)',
 		empty: 'Kopier tekst først, og lim den inn her.',
@@ -64,6 +68,10 @@ const messages = {
 	nn: {
 		title: 'LearnFlow',
 		action: 'Gjer teksten lettare',
+		tagline: 'Vanskeleg tekst? Vi gjer han enklare.',
+		placeholder: 'Lim inn skuleteksten din her …',
+		darkMode: 'Byt til mørk modus',
+		lightMode: 'Byt til lys modus',
 		prompt: 'Lim inn teksten du vil lære',
 		origin: 'Kvar kjem teksten frå? (valfritt)',
 		empty: 'Kopier tekst fyrst, og lim han inn her.',
