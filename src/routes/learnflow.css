@@ -206,6 +206,23 @@ body { margin: 0; }
   outline: 3px solid var(--focus);
   outline-offset: 3px;
 }
+/* Use the screen, not a card inside two mobile gutters. */
+@media (max-width: 600px) {
+  .learnflow-shell { padding-inline: 0; }
+  .learnflow-shell .topbar,
+  .learnflow-shell .hero {
+    padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+  }
+  .learnflow-shell section,
+  .learnflow-shell article {
+    border-left: 0;
+    border-right: 0;
+    border-radius: 0;
+    padding-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+    box-shadow: none;
+  }
+}
+
 @media (max-width: 480px) {
   .learnflow-shell .topbar { padding-top: 1rem; }
   .learnflow-shell .brand h1 { font-size: 1.14rem; }
