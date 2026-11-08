@@ -32,7 +32,7 @@ test('edited draft survives reload and resume focuses the editor', async ({ page
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toBeFocused();
   await source.fill('Oppdatert versjon av teksten.');
-  await page.getByRole('button',{name:'Forenkle tekst'}).click();
+  await page.locator('section.composer').getByRole('button',{name:'Forenkle med AI'}).click();
   await page.reload();
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toHaveValue('Oppdatert versjon av teksten.');
