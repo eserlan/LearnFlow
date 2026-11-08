@@ -35,7 +35,7 @@ describe('simplification handoff boundary', () => {
 		expect(await db.attempts.count()).toBe(0);
 	});
 
-	it('sends the unchanged clipboard representations after consent and records verified success', async () => {
+	it('sends unmodified plain text while retaining rich HTML locally', async () => {
 		const draft = sourceDraft('allowed');
 		draft.plainText = 'A source\r\nwith exact line breaks';
 		draft.html = '<h1>A source</h1><p>with <strong>exact</strong> line breaks</p>';
@@ -44,9 +44,11 @@ describe('simplification handoff boundary', () => {
 		const result = await simplifyDraft('allowed', { canProcess: async () => true }, processor);
 		expect(result.result).toBe('lesson');
 		expect(processor.simplify).toHaveBeenCalledWith(expect.objectContaining({
-			plainText: 'A source\r\nwith exact line breaks',
-			html: '<h1>A source</h1><p>with <strong>exact</strong> line breaks</p>'
+			plainText: 'A source\r\nwith exact line breaks'
 		}));
+		expect(processor.simplify.mock.calls[0][0]).not.toHaveProperty('html');
+		expect((await db.drafts.get('allowed'))?.html)
+			.toBe('<h1>A source</h1><p>with <strong>exact</strong> line breaks</p>');
 		expect((await db.drafts.get('allowed'))?.status).toBe('processed');
 		await expect(simplifyDraft('allowed', { canProcess: async () => true }, processor))
 			.rejects.toMatchObject({ code: 'duplicate-attempt' });
