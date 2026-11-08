@@ -57,6 +57,30 @@ describe('stateless Cloudflare Worker API', () => {
     assert.equal(other.status, 403);
   });
 
+  it('accepts Cloudflare Pages production, without opening CORS to other pages.dev sites', async () => {
+    const production='https://learnflow-web.pages.dev';
+    const health=await handleRequest(new Request(api+'/health',{headers:{Origin:production}}),{});
+    assert.equal(health.status,200);
+    assert.equal(health.headers.get('Access-Control-Allow-Origin'),production);
+
+    for (const pathname of ['/api/simplify','/api/speak']) {
+      const preflight=await handleRequest(new Request(api+pathname,{
+        method:'OPTIONS',headers:{Origin:production,'Access-Control-Request-Method':'POST',
+          'Access-Control-Request-Headers':'content-type'}
+      }),{});
+      assert.equal(preflight.status,204);
+      assert.equal(preflight.headers.get('Access-Control-Allow-Origin'),production);
+    }
+    const unknown=await handleRequest(new Request(api+'/health',{
+      headers:{Origin:'https://unrelated.pages.dev'}
+    }),{});
+    assert.equal(unknown.status,403);
+    const preview=await handleRequest(new Request(api+'/health',{
+      headers:{Origin:'https://some-pr.learnflow-web.pages.dev'}
+    }),{});
+    assert.equal(preview.status,403);
+  });
+
   it('handles only valid CORS preflight', async () => {
     const ok = await handleRequest(new Request(api + '/api/simplify', {
       method: 'OPTIONS', headers: { Origin: 'https://preview.example.test', 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'Content-Type' }

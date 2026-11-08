@@ -1,56 +1,34 @@
-# sv
+# LearnFlow
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+LearnFlow helps learners turn long school texts into shorter lessons and spoken audio.
 
-## Creating a project
+- **Frontend:** static SvelteKit 3 site deployed to Cloudflare Pages.
+- **AI API:** separate stateless Cloudflare Worker (Gemini simplification and TTS).
+- **Storage:** lesson drafts and generated audio live only in the browser's IndexedDB/OPFS.
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+## Local development
 
 ```sh
-# recreate this project
-bun x sv@1.3.0 create --template minimal --types ts --add vitest="usages:unit" --no-download-check --install bun .
+bun install --frozen-lockfile
+bun run dev
 ```
 
-## Adding features
-
-Add features to your project with `sv add`:
+## Checks and production build
 
 ```sh
-npx sv add
+bun run check
+bun run test
+bun run build
 ```
 
-For example, to add Tailwind CSS:
+The static site is generated into `build/`. The production `VITE_LEARNFLOW_API_URL`
+is public and defined in `.env.production`. There are **no Google API secrets in the frontend**.
 
-```sh
-npx sv add tailwindcss
-```
+## Deployment
 
-## Developing
+See [Cloudflare Pages setup](docs/cloudflare-pages-static-deployment.md). The intended
+production domain is `https://learnflow-web.pages.dev`; the AI Worker stays at
+`https://learnflow.espen-erlandsen.workers.dev`.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Do not retire the old Vercel origin before providing an export/import path for
+locally stored lessons and audio.
