@@ -89,8 +89,7 @@ async function mockSimplify(request: Request, origin: string, env: Env): Promise
  */
 function processingEnabled(env:Env): boolean {
   return env.ENABLE_AI_PROCESSING === 'true' && env.PRIVACY_REVIEW_APPROVED === 'true' &&
-    !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL &&
-    !!env.ANTHROPIC_API_KEY && !!env.ANTHROPIC_MODEL;
+    !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL;
 }
 
 async function liveSimplify(request: Request, origin: string, env: Env,
@@ -135,10 +134,12 @@ async function liveSimplify(request: Request, origin: string, env: Env,
   if(!input)return json({error:'invalid_request'},422,origin,env);
   try {
     const result=await simplifyWithAi(input,env,fetcher);
+    // 'verified' is a legacy client contract flag meaning basic validation passed.
+    // It must NOT be presented to pupils as independent factual verification.
     return json({sourceVersion:input.sourceVersion,verified:true,result},200,origin,env);
   }catch(error){
     if(error instanceof AiError){
-      const status=error.code==='verification-failed'?422:error.code==='invalid-output'?502:503;
+      const status=error.code==='invalid-output'?502:503;
       return json({error:error.code},status,origin,env);
     }
     return json({error:'processing_failed'},503,origin,env);
