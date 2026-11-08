@@ -60,10 +60,11 @@ export async function touchDraft(draftId: string, status: SourceDraft['status'] 
 }
 
 export async function deleteDraft(id: string): Promise<void> {
-  await db.transaction('rw', db.drafts, db.documents, db.attempts, async () => {
+  await db.transaction('rw', db.drafts, db.documents, db.attempts, db.lessons, async () => {
     await db.drafts.delete(id);
     await db.documents.where('draftId').equals(id).delete();
     await db.attempts.where('draftId').equals(id).delete();
+    await db.lessons.where('draftId').equals(id).delete();
   });
 }
 
