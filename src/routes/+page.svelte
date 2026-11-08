@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
+  import './learnflow.css';
   import { readClipboardEvent } from '../lib/import/clipboard';
   import { prepareSource } from '../lib/import/prepare';
   import { createDraft, deleteDraft, getCurrentDocument, saveDraftVersion, updateSelection, touchDraft } from '../lib/storage/drafts';
@@ -30,10 +31,17 @@
   let ageBand = $state<'unknown'|'under13'|'13plus'>('unknown');
   let consentChecked = $state(false);
   let language = $state<'nb'|'nn'>('nb');
+  let theme = $state<'light'|'dark'>('light');
   const copy = $derived(getCopy(language));
+  const inputWordCount = $derived((text.match(/[\p{L}\p{N}]+/gu) ?? []).length);
+  function toggleTheme() {
+    theme = theme === 'light' ? 'dark' : 'light';
+    try { localStorage.setItem('learnflow-theme',theme); } catch { /* storage disabled */ }
+  }
 
   $effect(() => { document.documentElement.lang = language; });
   onMount(() => {
+    try { if (localStorage.getItem('learnflow-theme') === 'dark') theme = 'dark'; } catch { /* storage disabled */ }
     void (async () => { await purgeExpiredDrafts(); await refresh(); })();
     const timer = setInterval(async () => { await purgeExpiredDrafts(); await refresh(); }, 60_000);
     return () => clearInterval(timer);
@@ -177,16 +185,24 @@
 </script>
 
 <svelte:head><title>{copy.title}</title><meta name="description" content={copy.description}/></svelte:head>
-<main>
-  <header><h1>LearnFlow</h1><label for="lang">{copy.languageLabel}</label>
-    <select id="lang" bind:value={language}><option value="nb">{copy.bokmal}</option><option value="nn">{copy.nynorsk}</option></select></header>
+<main class="learnflow-shell" data-theme={theme}>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><h1>LearnFlow</h1></div>
+    <div class="language-control"><label for="lang">{copy.languageLabel}</label>
+      <select id="lang" bind:value={language}><option value="nb">{copy.bokmal}</option><option value="nn">{copy.nynorsk}</option></select></div>
+    <button type="button" class="theme-toggle" onclick={toggleTheme} aria-label={theme === 'light' ? copy.darkMode : copy.lightMode} title={theme === 'light' ? copy.darkMode : copy.lightMode}>{theme === 'light' ? '☾' : '☀'}</button>
+  </header>
 
-  <section aria-labelledby="paste-title">
-    <h2 id="paste-title">{copy.action}</h2>
+  <div class="content">
+  <div class="hero"><h2 id="paste-title">{copy.action}</h2><p>{copy.tagline}</p></div>
+  <section class="composer" aria-labelledby="paste-title">
     <label for="source">{copy.prompt}</label>
-    <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9"></textarea>
+    <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9" placeholder={copy.placeholder}></textarea>
     <label for="origin">{copy.origin}</label><input id="origin" bind:value={origin} maxlength="120"/>
-    <button onclick={prepareAndSave} disabled={busy}>{copy.start}</button>
+    <div class="composer-footer">
+      <span class="word-count">{inputWordCount} {copy.count}</span>
+      <button onclick={prepareAndSave} disabled={busy}>{copy.start}</button>
+    </div>
     <p class="note">{copy.processingUnavailable}</p>
     {#if !pendingConsentId}
       {#if error}<p role="alert">{error}</p>{/if}
@@ -282,29 +298,5 @@
       <button class="secondary" onclick={() => selectedLesson=null}>{copy.close}</button>
     </article>
   {/if}
+</div>
 </main>
-
-<style>
-  main{max-width:44rem;margin:0 auto;padding:1.25rem;font:1.1rem/1.6 system-ui,sans-serif}
-  header{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
-  h1{margin-right:auto}
-  section,article{margin-block:2rem}
-  label{display:block;margin:.75rem 0 .25rem}
-  textarea,input:not([type=checkbox]),select{box-sizing:border-box;width:100%;padding:.75rem;font:inherit}
-  button{margin:.6rem .4rem .4rem 0;padding:.65rem 1.05rem;min-height:44px;font:inherit;cursor:pointer}
-  button:disabled{opacity:.6;cursor:default}
-  button.secondary{border:1px solid #666;border-radius:.35rem;background:transparent;color:inherit}
-  .actions{display:flex;flex-wrap:wrap;gap:.2rem}
-  .note{font-size:.9rem;color:inherit;opacity:.75}
-  .step,.lesson{padding:1rem;border:1px solid #999;border-radius:.75rem}
-  .checkbox{display:flex;align-items:start;gap:.6rem}
-  .checkbox input{width:auto;margin-top:.45rem}
-  ul{list-style:none;padding:0}
-  li{margin-block:1rem;padding-bottom:.75rem;border-bottom:1px solid #aaa}
-  .lesson p{margin:.6rem 0}
-  .source-text{white-space:pre-wrap;overflow-wrap:anywhere}
-  .lesson h3{margin:1.4rem 0 .5rem}
-  .task{border-left:3px solid #777;padding-left:.8rem}
-  [role=alert]{color:#b91c1c}
-  button:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #175cd3;outline-offset:2px}
-</style>
