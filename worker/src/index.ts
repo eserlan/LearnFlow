@@ -193,4 +193,11 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
   return json({ error: 'not_found' }, 404, origin, env);
 }
 
-export default { fetch: handleRequest };
+// Cloudflare invokes the exported fetch handler as (request, env, ctx).
+// Do not expose handleRequest directly: its optional third argument is a
+// test-only fetcher injection, not Cloudflare's ExecutionContext.
+export default {
+  fetch(request: Request, env: Env): Promise<Response> {
+    return handleRequest(request, env);
+  }
+};
