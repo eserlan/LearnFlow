@@ -179,7 +179,7 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
     return json({ status: 'ok' }, 200, origin, env);
   }
   if (pathname === '/capabilities' && request.method === 'GET') {
-    return json({simplify:processingEnabled(env) || privateTestAuthorized(request,env), privateTest:!processingEnabled(env) && privateTestAuthorized(request,env)},200,origin,env);
+    return json({simplify:processingEnabled(env) || privateTestAuthorized(request,env)},200,origin,env);
   }
   if (API_PATHS.has(pathname) && request.method === 'POST') {
     // Origin is not authentication; proper abuse controls remain a release gate.
