@@ -90,6 +90,11 @@ describe('real AI adapter (synthetic content only)',()=>{
       headers:{Origin:'https://preview.example.test'}
     }), configured);
     assert.deepEqual(await capability.json(), { simplify:true });
+    // Legacy dashboard variables do not control real Gemini availability.
+    const legacyFalse=await handleRequest(new Request('https://api.example.test/capabilities',{
+      headers:{Origin:'https://preview.example.test'}
+    }), {...configured,ENABLE_AI_PROCESSING:'false',PRIVACY_REVIEW_APPROVED:'false'});
+    assert.deepEqual(await legacyFalse.json(), { simplify:true });
     const noKey=await handleRequest(new Request('https://api.example.test/capabilities',{
       headers:{Origin:'https://preview.example.test'}
     }), {...configured, GEMINI_API_KEY:undefined});
