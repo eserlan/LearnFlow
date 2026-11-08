@@ -17,7 +17,8 @@ const record = (x: unknown): x is Record<string, unknown> => !!x && typeof x ===
 export type AiErrorCode = 'unavailable' | 'invalid-output' | 'provider_bad_request' |
   'provider_credentials' | 'provider_model_not_found' | 'provider_quota';
 export class AiError extends Error {
-  constructor(readonly code: AiErrorCode) { super(code); }
+  readonly code: AiErrorCode;
+  constructor(code: AiErrorCode) { super(code); this.code = code; }
 }
 export function validatePayload(x: unknown): SimplifyPayload | null {
   if (!record(x) || typeof x.draftId !== 'string' || !x.draftId || x.draftId.length > 100 ||
