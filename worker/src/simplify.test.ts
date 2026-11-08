@@ -10,7 +10,6 @@ const input: SimplifyPayload = {
 const lesson = {sentences:[{text:'De fleste humler kan fly langt.',kind:'statement',sources:['original']},
   {text:'Noen arter flyr opptil 20 kilometer.',kind:'statement',sources:['original']}]};
 const configured: Env = {ALLOWED_ORIGINS:'https://preview.example.test',
-  ENABLE_AI_PROCESSING:'true',PRIVACY_REVIEW_APPROVED:'true',
   GEMINI_API_KEY:'unit-test-secret',GEMINI_MODEL:'fake-gemini',
   RATE_LIMITER:{limit:async()=>({success:true})}};
 
@@ -53,12 +52,12 @@ describe('real AI adapter (synthetic content only)',()=>{
       {headers:{Origin:'https://preview.example.test'}}),{ALLOWED_ORIGINS:'https://preview.example.test'});
     assert.deepEqual(await r.json(),{simplify:false});
   });
-  it('blocks unapproved release without consuming the request body or calling providers',async()=>{
+  it('blocks requests missing model configuration before reading input or calling Gemini',async()=>{
     const req=new Request('https://api.example.test/api/simplify',
       {method:'POST',headers:{Origin:'https://preview.example.test','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
         body:JSON.stringify(input)});
     const p=provider();
-    const response=await handleRequest(req,{...configured,PRIVACY_REVIEW_APPROVED:'false'},p.fetcher);
+    const response=await handleRequest(req,{...configured,GEMINI_MODEL:undefined},p.fetcher);
     assert.equal(response.status,503);
     assert.equal(req.bodyUsed,false);
     assert.equal(p.calls.length,0);
@@ -86,18 +85,19 @@ describe('real AI adapter (synthetic content only)',()=>{
     assert.equal(body.result.kind,'simplified-lesson');
     assert.equal(p.calls.length,1);
   });
-  it('rejects unapproved public AI without reading request bodies or using Gemini',async()=>{
-    const restricted={...configured,ENABLE_AI_PROCESSING:'true',PRIVACY_REVIEW_APPROVED:'false'};
-    const req=new Request('https://api.example.test/api/simplify',{
-      method:'POST',headers:{Origin:'https://preview.example.test',
-        'Content-Type':'application/json','CF-Connecting-IP':'198.51.100.42'},
-      body:JSON.stringify(input)
-    });
-    const p=provider();
-    const denied=await handleRequest(req,restricted,p.fetcher);
-    assert.equal(denied.status,503);
-    assert.equal(req.bodyUsed,false);
-    assert.equal(p.calls.length,0);
+  it('reports availability with valid infrastructure and no artificial enablement flags', async () => {
+    const capability=await handleRequest(new Request('https://api.example.test/capabilities',{
+      headers:{Origin:'https://preview.example.test'}
+    }), configured);
+    assert.deepEqual(await capability.json(), { simplify:true });
+    const noKey=await handleRequest(new Request('https://api.example.test/capabilities',{
+      headers:{Origin:'https://preview.example.test'}
+    }), {...configured, GEMINI_API_KEY:undefined});
+    assert.deepEqual(await noKey.json(), { simplify:false });
+    const noLimiter=await handleRequest(new Request('https://api.example.test/capabilities',{
+      headers:{Origin:'https://preview.example.test'}
+    }), {...configured, RATE_LIMITER:undefined});
+    assert.deepEqual(await noLimiter.json(), { simplify:false });
   });
   it('does not allow private token header in CORS preflight',async()=>{
     const preflight=await handleRequest(new Request('https://api.example.test/capabilities',{
