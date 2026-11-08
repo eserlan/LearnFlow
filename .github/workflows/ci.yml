@@ -32,3 +32,40 @@ jobs:
       - run: npm install --no-package-lock
       - run: npm run check
       - run: npm run test
+
+  live-tts-smoke:
+    name: Real Gemini TTS synthetic smoke (temporary)
+    if: github.head_ref == 'ci/verify-live-gemini-tts'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise public Cloudflare Worker with fictional content
+        run: |
+          node --input-type=module <<'NODE'
+          const base='https://learnflow.espen-erlandsen.workers.dev';
+          const capabilities=await (await fetch(base + '/capabilities')).json();
+          console.log('gemini_simplify_ready=' + capabilities.simplify);
+          const payload={lessonId:'live-audio-smoke:1',
+            text:'Dette er et lite eventyr om en blomst. Blomsten trenger sol og vann.'};
+          const started=Date.now();
+          const res=await fetch(base + '/api/speak',{
+            method:'POST',
+            headers:{Origin:'https://learnflow-nine-pied.vercel.app','Content-Type':'application/json'},
+            body:JSON.stringify(payload),signal:AbortSignal.timeout(110000)
+          });
+          const buf=new Uint8Array(await res.arrayBuffer());
+          const prefix=new TextDecoder().decode(buf.slice(0,12));
+          let code='none';
+          if (!res.ok) {
+            try { const parsed=JSON.parse(new TextDecoder().decode(buf)); code=parsed.error ?? 'unclassified'; }
+            catch { code='non_json'; }
+          }
+          console.log('tts_http=' + res.status,'content_type=' + res.headers.get('content-type'),
+            'bytes=' + buf.byteLength,'wav_header=' + (prefix.startsWith('RIFF') && prefix.slice(8)==='WAVE'),
+            'error_code=' + code,'elapsed_ms=' + (Date.now()-started));
+          if (res.status !== 200 || prefix.slice(0,4) !== 'RIFF' || prefix.slice(8)!=='WAVE') {
+            process.exitCode=1;
+          }
+          NODE
