@@ -18,7 +18,7 @@ In Cloudflare Workers → learnflow → Settings → Variables and Secrets, conf
 
 | Variable | Purpose |
 | --- | --- |
-| ALLOWED_ORIGINS | Text: exact allowed production origin e.g. https://learnflow-nine-pied.vercel.app |
+| ALLOWED_ORIGINS | Optional Text: additional exact frontend origins (preview/local). The production URL https://learnflow-nine-pied.vercel.app is allowed by default. |
 | GEMINI_API_KEY | **Secret**: paid-tier Gemini API key (not an AI Studio free-tier key) |
 | GEMINI_MODEL | Text: actual Gemini **API** model ID; CLI aliases from the evaluation harness are not necessarily valid API names |
 
@@ -34,7 +34,7 @@ The Vercel site and Cloudflare API are publicly reachable. Availability is deriv
 
 The standard UI has **one explicit Forenkle med AI action** for everyone: it shows a clear transfer notice beside the action, saves the source locally, checks API capabilities **without sending source text**, then calls Gemini when processing is enabled. There is no age selector or separate consent checkbox. The button itself is the user's deliberate action; it is not proof of parental authority. No private token is required once production is properly approved.
 
-To enable Gemini for all visitors, deploy the Worker with `GEMINI_API_KEY` Secret, a supported `GEMINI_MODEL` (for example `gemini-3.8-flash`) Text, `RATE_LIMITER` binding, and an exact `ALLOWED_ORIGINS` list. There is no additional manual enablement flag. Refer to Google’s model documentation for supported IDs.
+To enable Gemini for all visitors, deploy the Worker with `GEMINI_API_KEY` Secret, a supported `GEMINI_MODEL` (for example `gemini-3.8-flash`) Text, `RATE_LIMITER` binding, plus any extra exact `ALLOWED_ORIGINS` entries for preview/local URLs. There is no additional manual enablement flag. Refer to Google’s model documentation for supported IDs.
 
 **Public deployment caution:** Cloudflare rate limiting is 8 requests per 60 seconds per IP/location, not a global spending cap. Configure provider-level spend alerts/quotas and appropriate abuse controls. Review Google’s actual data-handling, training/retention status and transfer terms before accepting real pupil material.
 
