@@ -25,7 +25,7 @@
 5. In tests, the browser request is modelled by tests/integration/worker-handoff.test.ts, calling the existing simplifyDraft consent boundary and createWorkerProcessor HTTP adapter.
 6. Run npm run check and npm run test in worker/; from root run bun run check, bun run test:unit, bun run test:integration.
 
-The user-facing page now offers an explicit age/consent step, but does **not** send source material when `/capabilities` reports unavailable. Under-13 processing remains blocked pending a verifiable guardian flow. This is not a substitute for spec 006's legal/DPIA/provider approvals.
+The user-facing page has a single explicit **Forenkle med AI** action, with transfer information displayed beside the button and no age selector or checkbox. It does **not** send source material when `/capabilities` reports unavailable. It also cannot verify guardian consent: processing real children's content remains a release blocker until the appropriate requirements are implemented and approved. This UI simplification is not a substitute for spec 006's legal/DPIA/provider approvals.
 
 ## Deployment
 
