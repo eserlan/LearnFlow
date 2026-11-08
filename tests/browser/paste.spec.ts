@@ -17,7 +17,7 @@ test('pasting offers one-click AI simplification with no age selection or checkb
   });
   await expect(source).toHaveValue('Dette er en testtekst som skal lagres lokalt.');
   await expect(page.locator('section.composer .note')).toContainText('Google Gemini');
-  await page.getByRole('button', { name: 'Forenkle med AI' }).click();
+  await page.locator('section.composer').getByRole('button', { name: 'Forenkle med AI' }).click();
   await expect(page.getByRole('heading', { name: 'Uferdige tekster' })).toBeVisible();
   await expect(page.getByRole('alert')).toContainText('AI-forenkling er ikke aktivert');
   await expect(page.getByLabel('Aldersgruppe')).toHaveCount(0);
@@ -28,7 +28,7 @@ test('edited draft survives reload and resume focuses the editor', async ({ page
   await page.goto('/');
   const source=page.getByLabel('Lim inn teksten du vil lære');
   await source.fill('Første versjon av teksten.');
-  await page.getByRole('button',{name:'Forenkle med AI'}).click();
+  await page.locator('section.composer').getByRole('button',{name:'Forenkle med AI'}).click();
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toBeFocused();
   await source.fill('Oppdatert versjon av teksten.');
@@ -51,7 +51,7 @@ test('modern editor keeps the same flow and remembers the chosen theme', async (
   const shell = page.locator('main.learnflow-shell');
   await expect(shell).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('heading', { name: 'Gjør teksten enklere' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Forenkle med AI' })).toBeVisible();
+  await expect(page.locator('section.composer').getByRole('button', { name: 'Forenkle med AI' })).toBeVisible();
   await page.getByRole('button', { name: 'Bytt til mørk modus' }).click();
   await expect(shell).toHaveAttribute('data-theme', 'dark');
   await page.reload();
