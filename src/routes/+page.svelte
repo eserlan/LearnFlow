@@ -21,6 +21,7 @@
   let drafts = $state<SourceDraft[]>([]);
   let lessons = $state<StoredLesson[]>([]);
   let selectedLesson = $state<StoredLesson | null>(null);
+  let selectedLessonSource = $state('');
   let selectedDraft = $state<SourceDraft | null>(null);
   let selectedBlocks = $state<SourceBlock[]>([]);
   let resumeId = $state<string | null>(null);
@@ -120,7 +121,7 @@
       const response = await simplifyDraft(id,
         {canProcess:async () => consentChecked && ageBand === '13plus'}, createWorkerProcessor(api));
       const lesson = await saveVerifiedLesson(id,response);
-      selectedLesson = lesson;
+      await showLesson(lesson);
       pendingConsentId = null;
       status = copy.completed;
       await refresh();
@@ -136,6 +137,12 @@
       status = '';
       await refresh();
     } finally { busy = false; }
+  }
+  async function showLesson(lesson:StoredLesson) {
+    const source=await db.drafts.get(lesson.draftId);
+    if (!source || source.version !== lesson.sourceVersion) { error=copy.unavailable; return; }
+    selectedLessonSource=source.plainText;
+    selectedLesson=lesson;
   }
   async function editDraft(draft:SourceDraft) {
     const document = await getCurrentDocument(draft.id);
@@ -163,7 +170,7 @@
   async function discard(id:string) {
     if (busy) return;
     await deleteDraft(id);
-    if (selectedLesson?.draftId===id) selectedLesson = null;
+    if (selectedLesson?.draftId===id) {selectedLesson = null;selectedLessonSource='';}
     if (pendingConsentId===id) pendingConsentId = null;
     await refresh();
   }
@@ -254,7 +261,7 @@
       <h2 id="lessons-title">{copy.myLessons}</h2>
       <ul>{#each lessons as lesson (lesson.id)}
         <li><strong>{lesson.title}</strong>
-          <button class="secondary" onclick={() => selectedLesson=lesson}>{copy.showLesson}</button>
+          <button class="secondary" onclick={() => void showLesson(lesson)}>{copy.showLesson}</button>
           <button class="secondary" onclick={() => discard(lesson.draftId)}>{copy.discard}</button>
         </li>
       {/each}</ul>
@@ -264,12 +271,14 @@
   {#if selectedLesson}
     <article aria-labelledby="lesson-title" class="lesson">
       <h2 id="lesson-title">{selectedLesson.title}</h2>
+      <p class="note" role="note">{copy.aiCaution}</p>
       {#each selectedLesson.sentences as sentence, i (i)}
         {#if sentence.kind === 'heading'}<h3>{sentence.text}</h3>
         {:else if sentence.kind === 'task'}<p class="task">{sentence.text}</p>
         {:else if sentence.kind === 'quote'}<blockquote>{sentence.text}</blockquote>
         {:else}<p>{sentence.text}</p>{/if}
       {/each}
+      <details><summary>{copy.showSource}</summary><p class="source-text">{selectedLessonSource}</p></details>
       <button class="secondary" onclick={() => selectedLesson=null}>{copy.close}</button>
     </article>
   {/if}
@@ -293,6 +302,7 @@
   ul{list-style:none;padding:0}
   li{margin-block:1rem;padding-bottom:.75rem;border-bottom:1px solid #aaa}
   .lesson p{margin:.6rem 0}
+  .source-text{white-space:pre-wrap;overflow-wrap:anywhere}
   .lesson h3{margin:1.4rem 0 .5rem}
   .task{border-left:3px solid #777;padding-left:.8rem}
   [role=alert]{color:#b91c1c}
