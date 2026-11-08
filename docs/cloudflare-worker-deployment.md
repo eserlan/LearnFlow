@@ -33,7 +33,7 @@ The connected tools cannot currently deploy to your Cloudflare account. A manual
 
 1. Merge the PR after CI passes.
 2. In GitHub repository Settings → Secrets and variables → Actions, configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (prefer the production environment's secrets with approval).
-3. In Cloudflare, configure `ALLOWED_ORIGINS` with the **exact** Vercel production origin, `GEMINI_API_KEY` Secret and supported `GEMINI_MODEL` Text. Retain the Wrangler `RATE_LIMITER` binding; leave mock-test toggles unset. Legacy `ENABLE_AI_PROCESSING` and `PRIVACY_REVIEW_APPROVED` variables are not read. Review worker/README.md and issue #8 before using real pupil content.
+3. In Cloudflare, configure `GEMINI_API_KEY` Secret and supported `GEMINI_MODEL` Text. The canonical Vercel production origin is allowed by default; use `ALLOWED_ORIGINS` only for additional exact preview/local origins. Retain the Wrangler `RATE_LIMITER` binding; leave mock-test toggles unset. Legacy `ENABLE_AI_PROCESSING` and `PRIVACY_REVIEW_APPROVED` variables are not read. Review worker/README.md and issue #8 before using real pupil content.
 4. Run Actions → Deploy Cloudflare Worker → Run workflow on main (or use connected Cloudflare builds). Verify `learnflow.espen-erlandsen.workers.dev`, GET /health and GET /capabilities (true only when Gemini key/model/rate limiter are present).
 5. Create/connect the Vercel project from the repository root with framework SvelteKit; configure its public Worker origin when the real consent-backed UI integration is enabled.
 
