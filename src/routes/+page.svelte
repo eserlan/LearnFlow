@@ -30,6 +30,9 @@
   let pendingConsentId = $state<string | null>(null);
   let ageBand = $state<'unknown'|'under13'|'13plus'>('unknown');
   let consentChecked = $state(false);
+  let privateTestMode = $state(false);
+  let privateTestToken = $state('');
+  let syntheticConfirmed = $state(false);
   let language = $state<'nb'|'nn'>('nb');
   let theme = $state<'light'|'dark'>('light');
   const copy = $derived(getCopy(language));
@@ -106,7 +109,7 @@
   }
   async function openConsent(draftId:string) {
     pendingConsentId = draftId;
-    ageBand = 'unknown'; consentChecked = false; error = '';
+    ageBand = 'unknown'; consentChecked = false; syntheticConfirmed = false; error = '';
     await tick();
     document.getElementById('consent-title')?.scrollIntoView({block:'start'});
   }
@@ -114,6 +117,10 @@
     const id = pendingConsentId;
     if (!id || busy) return;
     if (ageBand !== '13plus' || !consentChecked) { error = copy.consentRequired; return; }
+    const testToken = privateTestMode ? privateTestToken.trim() : undefined;
+    if (privateTestMode && (!testToken || testToken.length < 32 || !syntheticConfirmed)) {
+      error = copy.privateTestRequired; return;
+    }
     busy = true; error = ''; status = copy.checkingService;
     try {
       const api = import.meta.env.VITE_LEARNFLOW_API_URL;
@@ -122,12 +129,14 @@
       if (url.protocol !== 'https:' || url.pathname !== '/') throw new Error('invalid-url');
       // Check WITHOUT sending source text. Fail closed if backend is not yet approved/enabled.
       const availability = await fetch(new URL('/capabilities',url), {
-        method:'GET',credentials:'omit',cache:'no-store',redirect:'error'
+        method:'GET',headers:testToken ? {'X-LearnFlow-Test-Token':testToken} : {},
+        credentials:'omit',cache:'no-store',redirect:'error'
       });
       if (!availability.ok || (await availability.json())?.simplify !== true) throw new Error('not-enabled');
       status = copy.simplifying;
       const response = await simplifyDraft(id,
-        {canProcess:async () => consentChecked && ageBand === '13plus'}, createWorkerProcessor(api));
+        {canProcess:async () => consentChecked && ageBand === '13plus' && (!privateTestMode || syntheticConfirmed)},
+        createWorkerProcessor(api, fetch, testToken));
       const lesson = await saveVerifiedLesson(id,response);
       await showLesson(lesson);
       pendingConsentId = null;
@@ -235,8 +244,15 @@
         <p role="alert">{copy.guardianRequired}</p>
       {:else if ageBand === '13plus'}
         <label class="checkbox"><input type="checkbox" bind:checked={consentChecked}/> {copy.consentLabel}</label>
+        <label class="checkbox"><input type="checkbox" bind:checked={privateTestMode}/> {copy.privateTestToggle}</label>
+        {#if privateTestMode}
+          <p class="note">{copy.privateTestNotice}</p>
+          <label for="private-test-token">{copy.privateTestTokenLabel}</label>
+          <input id="private-test-token" type="password" bind:value={privateTestToken} autocomplete="off" spellcheck="false" />
+          <label class="checkbox"><input type="checkbox" bind:checked={syntheticConfirmed}/> {copy.privateTestConfirm}</label>
+        {/if}
       {/if}
-      <button onclick={sendForSimplification} disabled={busy || ageBand !== '13plus' || !consentChecked}>
+      <button onclick={sendForSimplification} disabled={busy || ageBand !== '13plus' || !consentChecked || (privateTestMode && (!syntheticConfirmed || privateTestToken.trim().length < 32))}>
         {busy ? copy.simplifying : copy.sendToAi}
       </button>
       <button class="secondary" onclick={() => pendingConsentId=null} disabled={busy}>{copy.cancel}</button>
