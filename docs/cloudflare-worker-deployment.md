@@ -6,13 +6,13 @@
 - Cloudflare Worker in worker/ is the stateless API for eventual simplification and speech.
 - Student source text, lesson progress and other metadata are stored in IndexedDB/Dexie **on device**.
 - Generated audio is planned for local OPFS. **No R2, D1, Workflows, KV or other server-side pupil-file persistence.**
-- Source content must never be sent until spec 006's privacy/consent gate has approved it. Cloudflare and AI processors will still transiently receive content when real features are enabled, subject to verified contracts and legal transfer grounds.
+- The frontend sends source content only after the user explicitly clicks Forenkle med AI and the Worker reports that required infrastructure is configured. Cloudflare and AI processors will receive that content transiently; provider contracts and cross-border transfer grounds must still be reviewed before processing real pupil material.
 
 ## API today
 
 - GET /health → JSON { "status": "ok" }.
-- GET /capabilities → `{ "simplify": false }` until API secrets, release approval flags and rate limiting are configured. The frontend checks this **before transmitting source text**.
-- POST /api/simplify → HTTP 501 with default flags; after explicit release approval, Gemini-only generation with schema, source-ID and numeric guardrails. The returned result is **not independently fact-checked** and the learner can compare it with the original.
+- GET /capabilities → `{ "simplify": true }` when Gemini key, model and rate limiting are configured; false otherwise. The frontend checks this **before transmitting source text**. No separate approval or AI-enabled variables are used.
+- POST /api/simplify → HTTP 503 if required infrastructure is missing; otherwise Gemini-only generation with schema, source-ID and numeric guardrails. The returned result is **not independently fact-checked** and the learner can compare it with the original.
 - POST /api/speak → HTTP 501.
 - The only successful simplification response is **test-only**: APP_ENV=test and ENABLE_MOCK_PROCESSING=true, both required; it accepts only the fixed synthetic SMOKE_FIXTURE declared in worker/src/index.ts, echoes it unchanged, and marks it forLearning:false. **Never enable this mode on a public deployment or show it as a real lesson.**
 
@@ -33,8 +33,8 @@ The connected tools cannot currently deploy to your Cloudflare account. A manual
 
 1. Merge the PR after CI passes.
 2. In GitHub repository Settings → Secrets and variables → Actions, configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (prefer the production environment's secrets with approval).
-3. In Cloudflare, configure the existing `learnflow` Worker environment variable ALLOWED_ORIGINS with the **exact** Vercel production origin; leave test toggles unset. Set AI secrets and enable flags only after reviewing worker/README.md and issue #8.
-4. Run Actions → Deploy Cloudflare Worker → Run workflow on main. Verify the existing `learnflow.espen-erlandsen.workers.dev` Worker URL, GET /health and GET /capabilities (false until all release conditions are met).
+3. In Cloudflare, configure `ALLOWED_ORIGINS` with the **exact** Vercel production origin, `GEMINI_API_KEY` Secret and supported `GEMINI_MODEL` Text. Retain the Wrangler `RATE_LIMITER` binding; leave mock-test toggles unset. Legacy `ENABLE_AI_PROCESSING` and `PRIVACY_REVIEW_APPROVED` variables are not read. Review worker/README.md and issue #8 before using real pupil content.
+4. Run Actions → Deploy Cloudflare Worker → Run workflow on main (or use connected Cloudflare builds). Verify `learnflow.espen-erlandsen.workers.dev`, GET /health and GET /capabilities (true only when Gemini key/model/rate limiter are present).
 5. Create/connect the Vercel project from the repository root with framework SvelteKit; configure its public Worker origin when the real consent-backed UI integration is enabled.
 
 Avoid exposing broad *.vercel.app wildcard origins. If ephemeral preview URLs need live API access, prefer an approved proxy strategy or explicit preview origin registration with the Worker. CORS alone is not authentication or rate limiting.

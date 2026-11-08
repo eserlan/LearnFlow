@@ -64,11 +64,11 @@ describe('local draft → consent gate → HTTP Worker fixture → local result'
     expect((await db.attempts.get(SMOKE_FIXTURE.idempotencyKey))?.status).toBe('complete');
   });
 
-  it('fails safely when the Worker is not in test mode', async () => {
+  it('fails safely without Gemini configuration when the Worker is not in test mode', async () => {
     await createDraft(createSource(), createDocument());
     const outbound = mockFetch({ ALLOWED_ORIGINS: ORIGIN, APP_ENV: 'production', ENABLE_MOCK_PROCESSING: 'true' });
     await expect(simplifyDraft(SMOKE_FIXTURE.draftId, { canProcess: async () => true },
-      createWorkerProcessor(API, outbound))).rejects.toMatchObject({ code: 'http-error', status: 501 });
+      createWorkerProcessor(API, outbound))).rejects.toMatchObject({ code: 'http-error', status: 503 });
     expect((await db.drafts.get(SMOKE_FIXTURE.draftId))?.status).toBe('failed');
     expect((await db.attempts.get(SMOKE_FIXTURE.idempotencyKey))?.status).toBe('failed');
     expect(await db.documents.get('learnflow-smoke:1')).toBeDefined();

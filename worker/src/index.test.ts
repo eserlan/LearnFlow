@@ -39,19 +39,19 @@ describe('stateless Cloudflare Worker API', () => {
     assert.equal(denied.status, 403);
   });
 
-  it('production never reads or processes text (returns 501)', async () => {
+  it('rejects text before reading its body when Gemini infrastructure is missing (returns 503)', async () => {
     const request = new Request(api + '/api/simplify', {
       method: 'POST', headers: { Origin: 'http://localhost:5173', 'Content-Type': 'application/json' }, body: JSON.stringify({ plainText: 'private pupil text' })
     });
     const response = await handleRequest(request, env);
-    assert.equal(response.status, 501);
+    assert.equal(response.status, 503);
     assert.equal(request.bodyUsed, false);
     assert.equal(response.headers.get('Cache-Control'), 'no-store');
   });
 
   it('test fixture runs only in explicit test mode', async () => {
-    assert.equal((await post(SMOKE_FIXTURE, env)).status, 501);
-    assert.equal((await post(SMOKE_FIXTURE, { ...mockEnv, APP_ENV: 'production' })).status, 501);
+    assert.equal((await post(SMOKE_FIXTURE, env)).status, 503);
+    assert.equal((await post(SMOKE_FIXTURE, { ...mockEnv, APP_ENV: 'production' })).status, 503);
     const response = await post(SMOKE_FIXTURE);
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), {

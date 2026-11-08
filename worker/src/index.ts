@@ -5,8 +5,6 @@ import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify
  * Mock mode accepts one fixed, non-personal fixture and is disabled in production.
  */
 export interface Env extends AiEnv {
-  ENABLE_AI_PROCESSING?: string;
-  PRIVACY_REVIEW_APPROVED?: string;
   RATE_LIMITER?: { limit(input: { key: string }): Promise<{ success: boolean }> };
   ALLOWED_ORIGINS?: string;
   APP_ENV?: string;
@@ -84,12 +82,12 @@ async function mockSimplify(request: Request, origin: string, env: Env): Promise
 }
 
 /**
- * Fail closed unless the privacy/DPIA approval and platform rate limit have
- * been explicitly supplied. CORS is not authentication.
+ * Gemini availability depends only on the actual required infrastructure.
+ * No manual feature flag or approval flag gates normal requests.
+ * CORS is not authentication; public access also requires abuse/cost controls.
  */
 function processingEnabled(env:Env): boolean {
-  return env.ENABLE_AI_PROCESSING === 'true' && env.PRIVACY_REVIEW_APPROVED === 'true' &&
-    !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL;
+  return !!env.RATE_LIMITER && !!env.GEMINI_API_KEY && !!env.GEMINI_MODEL;
 }
 
 async function liveSimplify(request: Request, origin: string, env: Env,
@@ -172,8 +170,8 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
     // Origin is not authentication; proper abuse controls remain a release gate.
     if (!approved) return json({ error: 'origin_required' }, 403, null, env);
     if (pathname === '/api/simplify' && demoEnabled(env)) return mockSimplify(request, origin!, env);
-    if (pathname === '/api/simplify' && env.ENABLE_AI_PROCESSING === 'true') return liveSimplify(request, origin!, env, fetcher);
-    return json({ error: 'not_implemented', message: 'AI provider and privacy checks pending.' }, 501, origin, env);
+    if (pathname === '/api/simplify') return liveSimplify(request, origin!, env, fetcher);
+    return json({ error: 'not_implemented', message: 'This endpoint is not implemented.' }, 501, origin, env);
   }
   return json({ error: 'not_found' }, 404, origin, env);
 }
