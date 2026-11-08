@@ -28,6 +28,35 @@ describe('stateless Cloudflare Worker API', () => {
     assert.equal(denied.headers.get('Access-Control-Allow-Origin'), null);
   });
 
+  it('allows canonical production frontend even when ALLOWED_ORIGINS is unset or stale', async () => {
+    const production = 'https://learnflow-nine-pied.vercel.app';
+    const missingOriginConfig = await handleRequest(new Request(api + '/capabilities', {
+      headers: { Origin: production }
+    }), {});
+    assert.equal(missingOriginConfig.status, 200);
+    assert.equal(missingOriginConfig.headers.get('Access-Control-Allow-Origin'), production);
+
+    const staleConfig = await handleRequest(new Request(api + '/api/simplify', {
+      method: 'POST',
+      headers: { Origin: production, 'Content-Type': 'application/json' },
+      body: JSON.stringify(SMOKE_FIXTURE)
+    }), { ALLOWED_ORIGINS:'https://old-preview.example.test' });
+    assert.equal(staleConfig.status, 503); // infrastructure absent, not 403 from origin rejection
+
+    const preflight = await handleRequest(new Request(api + '/api/simplify', {
+      method: 'OPTIONS',
+      headers: { Origin: production, 'Access-Control-Request-Method':'POST',
+        'Access-Control-Request-Headers':'Content-Type' }
+    }), {});
+    assert.equal(preflight.status, 204);
+    assert.equal(preflight.headers.get('Access-Control-Allow-Origin'), production);
+
+    const other = await handleRequest(new Request(api + '/health', {
+      headers: { Origin:'https://attacker.example.test' }
+    }), {});
+    assert.equal(other.status, 403);
+  });
+
   it('handles only valid CORS preflight', async () => {
     const ok = await handleRequest(new Request(api + '/api/simplify', {
       method: 'OPTIONS', headers: { Origin: 'https://preview.example.test', 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'Content-Type' }
