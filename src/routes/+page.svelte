@@ -210,6 +210,7 @@
   {#if drafts.length}
     <section aria-labelledby="unfinished-title">
       <h2 id="unfinished-title">{copy.unfinished}</h2>
+      <p class="note">{copy.processingNotice}</p>
       <ul>{#each drafts as draft (draft.id)}
         <li>
           <strong>{draft.title}</strong> — {daysUntilExpiry(draft.lastActivityAt)} {copy.days}
