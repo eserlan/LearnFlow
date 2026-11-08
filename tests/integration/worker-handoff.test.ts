@@ -40,6 +40,17 @@ describe('local draft → consent gate → HTTP Worker fixture → local result'
     expect((await db.drafts.get(SMOKE_FIXTURE.draftId))?.status).toBe('pending');
   });
 
+  it('sends plain text but keeps pasted HTML only on the device', async () => {
+    const pastedHtml = '<p><strong>Planter trenger lys for å vokse.</strong></p>';
+    await createDraft({ ...createSource(), html: pastedHtml }, createDocument());
+    const outbound = mockFetch();
+    const result = await simplifyDraft(SMOKE_FIXTURE.draftId, { canProcess: async () => true },
+      createWorkerProcessor(API, outbound));
+    expect(result.verified).toBe(true);
+    expect(JSON.parse(outbound.mock.calls[0][1].body as string)).toEqual(SMOKE_FIXTURE);
+    expect((await db.drafts.get(SMOKE_FIXTURE.draftId))?.html).toBe(pastedHtml);
+  });
+
   it('sends only the synthetic fixture after consent and marks the local draft processed', async () => {
     await createDraft(createSource(), createDocument());
     const outbound = mockFetch();

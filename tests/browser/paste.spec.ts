@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-test('pasting stores a draft and asks for consent before off-device processing', async ({ page }) => {
+test('pasting offers one-click AI simplification with no age selection or checkbox', async ({ page }) => {
+  await page.route('**/capabilities', (route) => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify({ simplify: false })
+  }));
   await page.goto('/', { waitUntil: 'networkidle' });
   const source = page.getByLabel('Lim inn teksten du vil lære');
   await source.focus();
@@ -13,36 +16,34 @@ test('pasting stores a draft and asks for consent before off-device processing',
     }));
   });
   await expect(source).toHaveValue('Dette er en testtekst som skal lagres lokalt.');
-  await page.getByRole('button', { name: 'Forenkle tekst' }).click();
-  await expect(page.getByRole('status')).toContainText('lagret på denne enheten');
-  await expect(page.getByRole('heading', { name: 'Før vi sender tekst til AI' })).toBeVisible();
+  await expect(page.locator('section.composer .note')).toContainText('Google Gemini');
+  await page.locator('section.composer').getByRole('button', { name: 'Forenkle med AI' }).click();
   await expect(page.getByRole('heading', { name: 'Uferdige tekster' })).toBeVisible();
-  await page.getByLabel('Aldersgruppe').selectOption('under13');
-  await expect(page.getByText('kreves verifisert foresattesamtykke', { exact: false })).toBeVisible();
-  await expect(page.getByRole('button', {name:'Send til AI og forenkle'})).toBeDisabled();
+  await expect(page.getByRole('alert')).toContainText('AI-forenkling er ikke aktivert');
+  await expect(page.getByLabel('Aldersgruppe')).toHaveCount(0);
+  await expect(page.locator('input[type="checkbox"]')).toHaveCount(0);
 });
 
 test('edited draft survives reload and resume focuses the editor', async ({ page }) => {
   await page.goto('/');
   const source=page.getByLabel('Lim inn teksten du vil lære');
   await source.fill('Første versjon av teksten.');
-  await page.getByRole('button',{name:'Forenkle tekst'}).click();
-  await page.getByRole('button',{name:'Avbryt'}).click();
+  await page.locator('section.composer').getByRole('button',{name:'Forenkle med AI'}).click();
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toBeFocused();
   await source.fill('Oppdatert versjon av teksten.');
-  await page.getByRole('button',{name:'Forenkle tekst'}).click();
+  await page.locator('section.composer').getByRole('button',{name:'Forenkle med AI'}).click();
   await page.reload();
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toHaveValue('Oppdatert versjon av teksten.');
 });
 
-test('Nynorsk labels main action and consent correctly', async ({ page }) => {
+test('Nynorsk labels main action correctly', async ({ page }) => {
   await page.goto('/');
   await page.getByLabel('Språk').selectOption('nn');
   await expect(page.locator('html')).toHaveAttribute('lang', 'nn');
   await expect(page.getByRole('heading', { name: 'Gjer teksten lettare' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Forenkl tekst' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Forenkl med KI' })).toBeVisible();
 });
 
 test('modern editor keeps the same flow and remembers the chosen theme', async ({ page }) => {
@@ -50,7 +51,7 @@ test('modern editor keeps the same flow and remembers the chosen theme', async (
   const shell = page.locator('main.learnflow-shell');
   await expect(shell).toHaveAttribute('data-theme', 'light');
   await expect(page.getByRole('heading', { name: 'Gjør teksten enklere' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Forenkle tekst' })).toBeVisible();
+  await expect(page.locator('section.composer').getByRole('button', { name: 'Forenkle med AI' })).toBeVisible();
   await page.getByRole('button', { name: 'Bytt til mørk modus' }).click();
   await expect(shell).toHaveAttribute('data-theme', 'dark');
   await page.reload();

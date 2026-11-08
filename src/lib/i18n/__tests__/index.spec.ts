@@ -7,7 +7,7 @@ describe('interface copy', () => {
 	});
 
 	it('keeps the primary action distinct across the two written standards', () => {
-		expect(getCopy('nb').start).toBe('Forenkle tekst');
-		expect(getCopy('nn').start).toBe('Forenkl tekst');
+		expect(getCopy('nb').start).toBe('Forenkle med AI');
+		expect(getCopy('nn').start).toBe('Forenkl med KI');
 	});
 });
