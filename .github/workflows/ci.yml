@@ -32,3 +32,18 @@ jobs:
       - run: npm install --no-package-lock
       - run: npm run check
       - run: npm run test
+
+  pages-lockfile-temp:
+    name: Regenerate Bun static adapter lockfile (temporary)
+    if: github.head_ref == 'feat/cloudflare-pages-static'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - name: Export updated lockfile for review
+        run: |
+          echo 'BUN_LOCK_BEGIN'
+          base64 -w0 bun.lock
+          echo
+          echo 'BUN_LOCK_END'
