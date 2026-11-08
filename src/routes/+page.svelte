@@ -8,7 +8,7 @@
   import { db, type StoredLesson } from '../lib/storage/db';
   import { getCopy } from '../lib/i18n';
   import { simplifyDraft } from '../lib/lesson/handoff';
-  import { createWorkerProcessor } from '../lib/lesson/worker-processor';
+  import { createWorkerProcessor, WorkerProcessorError } from '../lib/lesson/worker-processor';
   import { saveVerifiedLesson } from '../lib/lesson/saved-lesson';
   import type { SourceBlock, SourceDraft } from '../lib/import/types';
 
@@ -104,19 +104,54 @@
   /** Called only by an explicit Forenkle button click (or its save-and-send continuation).
    * The visible notice explains that this sends plain text to Gemini.
    * The Worker independently enforces the production release gate. */
+  function readableSimplificationError(cause: unknown, checkingCapabilities: boolean): string {
+    if (cause instanceof WorkerProcessorError) {
+      if (cause.code === 'unavailable') return copy.workerConnectionError;
+      if (cause.code === 'invalid-response') return copy.invalidAiResponse;
+      switch (cause.backendCode) {
+        case 'provider_credentials': return copy.geminiCredentialsError;
+        case 'provider_model_not_found': return copy.geminiModelError;
+        case 'provider_bad_request': return copy.geminiRequestError;
+        case 'provider_quota': return copy.geminiQuotaError;
+        case 'invalid-output': return copy.invalidAiResponse;
+        case 'rate_limited': return copy.rateLimitedError;
+        case 'rate_limit_unavailable': return copy.rateLimiterError;
+        case 'invalid_request': return copy.invalidSourceError;
+        case 'processing_not_enabled': return copy.workerNotReady;
+        case 'unavailable': return copy.geminiUnavailableError;
+      }
+      if (cause.status === 429) return copy.rateLimitedError;
+      return copy.geminiUnavailableError;
+    }
+    if (cause instanceof Error) {
+      switch (cause.message) {
+        case 'not-configured': case 'invalid-url': return copy.apiUrlError;
+        case 'missing_api_key': return copy.apiKeyError;
+        case 'missing_model': return copy.modelConfigError;
+        case 'missing_rate_limiter': return copy.rateLimiterError;
+        case 'not-enabled': return copy.workerNotReady;
+      }
+    }
+    return checkingCapabilities ? copy.workerConnectionError : copy.unavailable;
+  }
+
   async function runSimplification(id:string) {
     if (busy) return;
     busy = true; error = ''; status = copy.checkingService;
+    let checkingCapabilities = true;
     try {
       const api = import.meta.env.VITE_LEARNFLOW_API_URL;
       if (typeof api !== 'string' || !api) throw new Error('not-configured');
       const url = new URL(api);
       if (url.protocol !== 'https:' || url.pathname !== '/') throw new Error('invalid-url');
-      // Check WITHOUT sending source text. Fail closed if backend is not yet approved/enabled.
+      // Check availability without sending source text.
       const availability = await fetch(new URL('/capabilities',url), {
         method:'GET',credentials:'omit',cache:'no-store',redirect:'error'
       });
-      if (!availability.ok || (await availability.json())?.simplify !== true) throw new Error('not-enabled');
+      if (!availability.ok) throw new Error('capabilities-unreachable');
+      const capabilities: {simplify?:boolean;reason?:string} = await availability.json();
+      if (capabilities?.simplify !== true) throw new Error(capabilities?.reason ?? 'not-enabled');
+      checkingCapabilities = false;
       status = copy.simplifying;
       const response = await simplifyDraft(id,
         {canProcess:async () => true}, createWorkerProcessor(api));
@@ -126,13 +161,13 @@
       await refresh();
       await tick();
       document.getElementById('lesson-title')?.scrollIntoView({block:'start'});
-    } catch {
+    } catch (cause) {
       // A malformed or unpersistable response must remain retryable, never a completed ghost lesson.
       const draft = await db.drafts.get(id);
       if (draft?.status === 'processed' && !(await db.lessons.get(draft.id+':'+draft.version))) {
         await touchDraft(id,'failed');
       }
-      error = copy.unavailable;
+      error = readableSimplificationError(cause, checkingCapabilities);
       status = '';
       await refresh();
     } finally { busy = false; }
