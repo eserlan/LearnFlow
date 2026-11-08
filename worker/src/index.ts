@@ -1,4 +1,5 @@
 import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify.ts';
+import { synthesizeLesson, validateSpeakPayload } from './speak.ts';
 
 /**
  * LearnFlow's stateless Cloudflare API. No content, lesson or audio persistence.
@@ -160,6 +161,66 @@ async function liveSimplify(request: Request, origin: string, env: Env,
   }
 }
 
+/**
+ * Speech uses the same origin and per-IP rate limiter as simplification.
+ * No audio or transcript is persisted on Cloudflare.
+ */
+async function liveSpeak(request: Request, origin: string, env: Env,
+  fetcher: (url: string, init: RequestInit) => Promise<Response>): Promise<Response> {
+  if (!env.GEMINI_API_KEY || !env.RATE_LIMITER) {
+    return json({error:'processing_not_enabled'},503,origin,env);
+  }
+  if (!request.headers.get('Content-Type')?.toLowerCase().startsWith('application/json')) {
+    return json({error:'unsupported_media_type'},415,origin,env);
+  }
+  const ip=request.headers.get('CF-Connecting-IP');
+  if (!ip) return json({error:'rate_limit_unavailable'},503,origin,env);
+  try {
+    const limit=await env.RATE_LIMITER.limit({key:ip});
+    if (!limit.success) return json({error:'rate_limited'},429,origin,env);
+  } catch { return json({error:'rate_limit_unavailable'},503,origin,env); }
+
+  const MAX_BODY=25_000;
+  if (Number(request.headers.get('Content-Length') ?? 0)>MAX_BODY) {
+    return json({error:'invalid_request'},413,origin,env);
+  }
+  const reader=request.body?.getReader();
+  if (!reader) return json({error:'invalid_request'},400,origin,env);
+  const chunks:Uint8Array[]=[];
+  let size=0;
+  try {
+    while (true) {
+      const {done,value}=await reader.read();
+      if (done) break;
+      size+=value.byteLength;
+      if (size>MAX_BODY) { await reader.cancel(); return json({error:'invalid_request'},413,origin,env); }
+      chunks.push(value);
+    }
+  } catch { return json({error:'invalid_request'},400,origin,env); }
+  const bytes=new Uint8Array(size);
+  let offset=0;
+  for (const chunk of chunks) { bytes.set(chunk,offset); offset+=chunk.byteLength; }
+  let parsed:unknown;
+  try { parsed=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes)); }
+  catch { return json({error:'invalid_request'},400,origin,env); }
+  const input=validateSpeakPayload(parsed);
+  if (!input) return json({error:'invalid_request'},422,origin,env);
+  try {
+    const wav=await synthesizeLesson(input,env,fetcher);
+    const headers=headersFor(origin,env);
+    headers.set('Content-Type','audio/wav');
+    headers.set('Content-Disposition','attachment; filename="learnflow-lesson.wav"');
+    return new Response(wav,{status:200,headers});
+  } catch (error) {
+    if (error instanceof AiError) {
+      const status=error.code==='invalid-output' || error.code==='provider_bad_request' ? 502 :
+        error.code==='provider_quota' ? 429 : 503;
+      return json({error:error.code},status,origin,env);
+    }
+    return json({error:'processing_failed'},503,origin,env);
+  }
+}
+
 export async function handleRequest(request: Request, env: Env, fetcher: (url:string, init:RequestInit)=>Promise<Response> = fetch): Promise<Response> {
   const { pathname } = new URL(request.url);
   const origin = request.headers.get('Origin');
@@ -188,7 +249,8 @@ export async function handleRequest(request: Request, env: Env, fetcher: (url:st
     if (!approved) return json({ error: 'origin_required' }, 403, null, env);
     if (pathname === '/api/simplify' && demoEnabled(env)) return mockSimplify(request, origin!, env);
     if (pathname === '/api/simplify') return liveSimplify(request, origin!, env, fetcher);
-    return json({ error: 'not_implemented', message: 'This endpoint is not implemented.' }, 501, origin, env);
+    if (pathname === '/api/speak') return liveSpeak(request, origin!, env, fetcher);
+    return json({ error: 'not_found' }, 404, origin, env);
   }
   return json({ error: 'not_found' }, 404, origin, env);
 }
