@@ -23,15 +23,18 @@ const JSON_TYPE = 'application/json; charset=utf-8';
 const API_PATHS = new Set(['/api/simplify', '/api/speak']);
 const ROUTES = new Set(['/health', '/capabilities', ...API_PATHS]);
 
-// The canonical production frontend must always be able to reach this Worker.
-// Additional exact preview/local origins can be added through ALLOWED_ORIGINS;
-// never accept wildcard origins or reflect arbitrary request Origin values.
-const PRODUCTION_ORIGIN = 'https://learnflow-nine-pied.vercel.app';
+// Permit only exact production origins. Keep the old Vercel origin during
+// the migration so users can retrieve their device-local lessons there.
+// Pages project slug: "learnflow-web"; preview domains are NOT auto-allowed.
+const PRODUCTION_ORIGINS = [
+  'https://learnflow-web.pages.dev',
+  'https://learnflow-nine-pied.vercel.app'
+] as const;
 
 function allowedOrigins(env: Env): Set<string> {
   const extraOrigins = (env.ALLOWED_ORIGINS ?? '').split(',')
     .map((value) => value.trim()).filter(Boolean);
-  return new Set([PRODUCTION_ORIGIN, ...extraOrigins]);
+  return new Set([...PRODUCTION_ORIGINS, ...extraOrigins]);
 }
 
 function headersFor(origin: string | null, env: Env): Headers {
