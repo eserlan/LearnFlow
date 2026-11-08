@@ -22,8 +22,15 @@ const JSON_TYPE = 'application/json; charset=utf-8';
 const API_PATHS = new Set(['/api/simplify', '/api/speak']);
 const ROUTES = new Set(['/health', '/capabilities', ...API_PATHS]);
 
+// The canonical production frontend must always be able to reach this Worker.
+// Additional exact preview/local origins can be added through ALLOWED_ORIGINS;
+// never accept wildcard origins or reflect arbitrary request Origin values.
+const PRODUCTION_ORIGIN = 'https://learnflow-nine-pied.vercel.app';
+
 function allowedOrigins(env: Env): Set<string> {
-  return new Set((env.ALLOWED_ORIGINS ?? '').split(',').map((value) => value.trim()).filter(Boolean));
+  const extraOrigins = (env.ALLOWED_ORIGINS ?? '').split(',')
+    .map((value) => value.trim()).filter(Boolean);
+  return new Set([PRODUCTION_ORIGIN, ...extraOrigins]);
 }
 
 function headersFor(origin: string | null, env: Env): Headers {
