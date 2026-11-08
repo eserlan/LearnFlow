@@ -54,8 +54,10 @@ describe('draft lifecycle', () => {
       blocks: base.blocks,
       wordCount: base.wordCount,
       language: base.language
-    }, { title: 'Updated', origin: undefined })).toBe(2);
+    }, { title: 'Updated', origin: undefined, plainText: 'Edited one two', html: '<p>Edited one two</p>' })).toBe(2);
     expect((await db.drafts.get('d4'))?.title).toBe('Updated');
+    expect((await db.drafts.get('d4'))?.plainText).toBe('Edited one two');
+    expect((await db.drafts.get('d4'))?.html).toBe('<p>Edited one two</p>');
     await expect(saveDraftVersion('d4', 1, {
       blocks: base.blocks,
       wordCount: base.wordCount,
