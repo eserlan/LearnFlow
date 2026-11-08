@@ -32,3 +32,41 @@ jobs:
       - run: npm install --no-package-lock
       - run: npm run check
       - run: npm run test
+
+  live-gemini-smoke:
+    name: Live synthetic Gemini request (temporary diagnostic)
+    if: github.head_ref == 'ci/diagnose-live-gemini-call'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe public Worker without real pupil data
+        run: |
+          node --input-type=module <<'NODE'
+          const base = 'https://learnflow.espen-erlandsen.workers.dev';
+          const origin = 'https://learnflow-nine-pied.vercel.app';
+          const caps = await fetch(base + '/capabilities');
+          const c = await caps.json();
+          console.log('capabilities_http=' + caps.status, 'simplify=' + c.simplify, 'reason=' + (c.reason || 'none'));
+          const payload = {
+            draftId: 'ci-synthetic-20261108',
+            sourceVersion: 1,
+            idempotencyKey: 'ci-synthetic-20261108:1',
+            plainText: 'Planter trenger lys og vann. Noen planter vokser raskere enn andre.'
+          };
+          const response = await fetch(base + '/api/simplify', {
+            method: 'POST',
+            headers: { 'Origin': origin, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const raw = await response.text();
+          let parsed;
+          try { parsed = JSON.parse(raw); } catch { parsed = null; }
+          console.log('simplify_http=' + response.status,
+            'error_code=' + (typeof parsed?.error === 'string' ? parsed.error : 'none'),
+            'lesson_kind=' + (parsed?.result?.kind || 'none'),
+            'sentence_count=' + (Array.isArray(parsed?.result?.sentences) ? parsed.result.sentences.length : 0),
+            'content_type=' + response.headers.get('content-type'));
+          if (!parsed) process.exitCode = 2;
+          NODE
