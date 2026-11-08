@@ -61,3 +61,18 @@ test('modern editor keeps the same flow and remembers the chosen theme', async (
   await page.getByRole('button', { name: 'Byt til lys modus' }).click();
   await expect(shell).toHaveAttribute('data-theme', 'light');
 });
+
+test('mobile cards use the full viewport with readable inner padding', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const composer = page.locator('section.composer');
+  const textarea = page.getByLabel('Lim inn teksten du vil lære');
+  const [cardBox, inputBox] = await Promise.all([composer.boundingBox(), textarea.boundingBox()]);
+  expect(cardBox).not.toBeNull();
+  expect(inputBox).not.toBeNull();
+  expect(cardBox!.x).toBe(0);
+  expect(cardBox!.width).toBe(390);
+  expect(inputBox!.x).toBeGreaterThanOrEqual(12);
+  expect(inputBox!.x).toBeLessThanOrEqual(24);
+  expect(inputBox!.width).toBeGreaterThan(340);
+});
