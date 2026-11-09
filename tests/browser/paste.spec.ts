@@ -16,7 +16,7 @@ test('pasting offers one-click AI simplification with no age selection or checkb
     }));
   });
   await expect(source).toHaveValue('Dette er en testtekst som skal lagres lokalt.');
-  await expect(page.locator('section.composer .note')).toContainText('Google Gemini');
+  await expect(page.locator('section.composer .note').first()).toContainText('Google Gemini');
   await page.locator('section.composer').getByRole('button', { name: 'Forenkle med AI' }).click();
   await expect(page.getByRole('heading', { name: 'Uferdige tekster' })).toBeVisible();
   await expect(page.getByRole('alert')).toContainText('Noe gikk galt hos oss');
@@ -128,4 +128,39 @@ test('deleting a lesson can be undone', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Vis leksjon/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'Angre' }).click();
   await expect(page.getByRole('button', { name: /Vis leksjon: Video/ })).toBeVisible();
+});
+
+test('first visit explains the flow, and the guide goes away once there is a lesson', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await expect(page.getByRole('list', { name: 'Slik fungerer det' }).getByRole('listitem')).toHaveCount(3);
+  await expect(page.locator('section.composer .note').first()).toContainText('lagres bare på denne enheten');
+  await seedLesson(page);
+  await expect(page.getByRole('list', { name: 'Slik fungerer det' })).toHaveCount(0);
+});
+
+test('lesson shows a one-time tip, and the AI caution links to the original', async ({ page }) => {
+  await seedLesson(page);
+  await page.getByRole('button', { name: /Vis leksjon: Video/ }).click();
+  await expect(page.locator('.hint')).toContainText('Lag lyd');
+  await page.getByRole('button', { name: 'Skjønner' }).click();
+  await expect(page.locator('.hint')).toHaveCount(0);
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: /Vis leksjon: Video/ }).click();
+  await expect(page.locator('.hint')).toHaveCount(0);
+  await expect(page.locator('details[open] .source-text')).toHaveCount(0);
+  await page.getByRole('button', { name: 'originalteksten' }).click();
+  await expect(page.locator('.source-text h3')).toBeVisible();
+});
+
+test('About page explains privacy and follows the chosen language', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await page.getByLabel('Språk').selectOption('nn');
+  await page.getByRole('link', { name: 'Om LearnFlow' }).click();
+  await expect(page).toHaveURL(/\/om\/?$/);
+  await expect(page.getByRole('heading', { name: 'Kva skjer med teksten din?' })).toBeVisible();
+  await expect(page.locator('main')).toContainText('Google Gemini');
+  await page.getByRole('link', { name: /Tilbake til LearnFlow/ }).click();
+  await expect(page.getByRole('heading', { name: 'Gjer teksten lettare' })).toBeVisible();
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByLabel('Språk')).toHaveValue('nn');
 });

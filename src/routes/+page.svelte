@@ -52,6 +52,8 @@
   const MAX_WORDS = 2000;
   const title = (value:string) => plainTitle(value) || value;
   let language = $state<'nb'|'nn'>('nb');
+  let hintSeen = $state(true);   // set from storage on mount, so it never flashes for returning users
+  let sourceOpen = $state(false);
   let theme = $state<'light'|'dark'>('light');
   const copy = $derived(getCopy(language));
   const inputWordCount = $derived((text.match(/[\p{L}\p{N}]+/gu) ?? []).length);
@@ -70,8 +72,19 @@
   }
 
   $effect(() => { document.documentElement.lang = language; });
+  // Saved on change only: an effect would overwrite the stored choice with the default before it is read.
+  function saveLanguage() {
+    try { localStorage.setItem('learnflow-lang',language); } catch { /* storage disabled */ }
+  }
+  function dismissHint() {
+    hintSeen = true;
+    try { localStorage.setItem('learnflow-hint-seen','1'); } catch { /* storage disabled */ }
+  }
   onMount(() => {
     try {
+      const lang = localStorage.getItem('learnflow-lang');
+      if (lang === 'nn' || lang === 'nb') language = lang;
+      hintSeen = localStorage.getItem('learnflow-hint-seen') === '1';
       const stored = localStorage.getItem('learnflow-theme');
       if (stored) theme = stored === 'dark' ? 'dark' : 'light';
       else if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) theme = 'dark';
@@ -259,6 +272,7 @@
   }
   function closeLesson() {
     selectedLesson = null;
+    sourceOpen = false;
     selectedLessonSource = '';
     clearAudioPlayer();
     window.scrollTo({top:0});
@@ -357,7 +371,7 @@
   <header class="topbar">
     <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><h1>LearnFlow</h1></div>
     <div class="language-control"><label for="lang">{copy.languageLabel}</label>
-      <select id="lang" bind:value={language}><option value="nb">{copy.bokmal}</option><option value="nn">{copy.nynorsk}</option></select></div>
+      <select id="lang" bind:value={language} onchange={saveLanguage}><option value="nb">{copy.bokmal}</option><option value="nn">{copy.nynorsk}</option></select></div>
     <button type="button" class="theme-toggle" onclick={toggleTheme} aria-label={theme === 'light' ? copy.darkMode : copy.lightMode} title={theme === 'light' ? copy.darkMode : copy.lightMode}>{theme === 'light' ? '☾' : '☀'}</button>
   </header>
 
@@ -371,6 +385,13 @@
 
   {#if !selectedLesson}
   <div class="hero"><h2 id="paste-title">{copy.action}</h2><p>{copy.tagline}</p></div>
+  {#if !lessons.length && !drafts.length && !busy}
+    <ol class="how" aria-label={copy.howTitle}>
+      <li><span class="num" aria-hidden="true">1</span>{copy.howStep1}</li>
+      <li><span class="num" aria-hidden="true">2</span>{copy.howStep2}</li>
+      <li><span class="num" aria-hidden="true">3</span>{copy.howStep3}</li>
+    </ol>
+  {/if}
   <section class="composer" aria-labelledby="paste-title">
     <label for="source">{copy.prompt}</label>
     <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9" placeholder={copy.placeholder}></textarea>
@@ -379,7 +400,8 @@
       <label for="origin" class="visually-hidden">{copy.origin}</label>
       <input id="origin" bind:value={origin} maxlength="120" placeholder={copy.origin}/>
     </details>
-    <p class="note">{copy.processingNotice}</p>
+    <p class="note">{copy.privacyShort}</p>
+    <details class="more"><summary>{copy.privacyMore}</summary><p class="note">{copy.processingNotice}</p></details>
     <div class="composer-footer">
       <span class="word-count" class:near={inputWordCount > MAX_WORDS * 0.9 && inputWordCount <= MAX_WORDS} class:over={inputWordCount > MAX_WORDS}>
         {inputWordCount.toLocaleString('nb-NO')} {copy.wordLimit}
@@ -444,6 +466,7 @@
   {#if visibleDrafts.length}
     <section aria-labelledby="unfinished-title">
       <h2 id="unfinished-title">{copy.unfinished}</h2>
+      <p class="note expiry">{copy.expiryNote}</p>
       <ul>{#each visibleDrafts as draft (draft.id)}
         <li>
           <strong>{title(draft.title)}</strong> — {daysUntilExpiry(draft.lastActivityAt)} {copy.days}
@@ -484,6 +507,10 @@
         </details>
       </div>
       <h2 id="lesson-title" tabindex="-1" bind:this={lessonTitleElement}>{title(selectedLesson.title)}</h2>
+      {#if !hintSeen}
+        <div class="hint" role="note"><strong>{copy.hintTitle}:</strong> {copy.hintBody}
+          <button type="button" class="secondary" onclick={dismissHint}>{copy.hintDismiss}</button></div>
+      {/if}
       <div class="audio-panel">
         {#if audioUrl}
           <audio controls preload="metadata" src={audioUrl} aria-label={copy.playAudio}></audio>
@@ -498,10 +525,12 @@
         {#if audioError}<p role="alert">{audioError}</p>{/if}
       </div>
       {@render blocksView(lessonBlocks)}
-      <p class="note caution" role="note">{copy.aiCaution}</p>
-      <details><summary>{copy.showSource}</summary><div class="source-text md">{@html renderMarkdown(selectedLessonSource)}</div></details>
+      <p class="note caution" role="note">{copy.cautionLead}
+        <button type="button" class="linklike" onclick={() => { sourceOpen = true; }}>{copy.cautionLink}</button>.</p>
+      <details bind:open={sourceOpen}><summary>{copy.showSource}</summary><div class="source-text md">{@html renderMarkdown(selectedLessonSource)}</div></details>
       <button class="secondary" onclick={closeLesson} disabled={audioBusy}>{copy.close}</button>
     </article>
   {/if}
+  <footer class="site-footer"><a href="/om">{copy.aboutLink}</a></footer>
 </div>
 </main>
