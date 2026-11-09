@@ -446,6 +446,7 @@
 <main class="learnflow-shell" data-theme={theme}>
   <header class="topbar">
     <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><h1>LearnFlow</h1></div>
+    <div class="topbar-controls">
     <LanguageSwitch bind:value={language} label={copy.languageLabel} onchange={saveLanguage}
       options={[{value:'nb',text:copy.bokmal},{value:'nn',text:copy.nynorsk}]} />
     <button type="button" class="theme-toggle" onclick={toggleTheme} aria-label={theme === 'light' ? copy.darkMode : copy.lightMode} title={theme === 'light' ? copy.darkMode : copy.lightMode}>
@@ -454,6 +455,7 @@
         {:else}<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>{/if}
       </svg>
     </button>
+    </div>
   </header>
 
   <div class="content">

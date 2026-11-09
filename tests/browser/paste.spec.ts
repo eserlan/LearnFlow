@@ -247,3 +247,20 @@ test('on a phone a long lesson title keeps the full row width and the actions wr
   expect(toggle!.x + toggle!.width).toBeLessThanOrEqual(390);
   await page.locator('.lesson-list').screenshot({ path: 'test-results/lesson-row-mobile.png' });
 });
+
+for (const textScale of ['100%', '130%', '160%']) {
+  test(`top bar keeps the brand intact on a narrow phone at ${textScale} text size`, async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.evaluate((scale) => { document.documentElement.style.fontSize = scale; }, textScale);
+    const mark = await page.locator('.brand-mark').boundingBox();
+    expect(mark!.width).toBeCloseTo(mark!.height, 0);
+    const title = page.locator('.brand h1');
+    expect(await title.evaluate((h) => h.scrollWidth <= h.clientWidth + 1)).toBe(true);
+    for (const control of [page.getByRole('button', { name: /modus/ }), page.getByRole('radio', { name: 'Nynorsk' })]) {
+      const box = await control.boundingBox();
+      expect(box!.x + box!.width).toBeLessThanOrEqual(360);
+    }
+    await page.locator('.topbar').screenshot({ path: `test-results/topbar-${textScale.replace('%', '')}.png` });
+  });
+}
