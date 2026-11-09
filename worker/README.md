@@ -1,6 +1,6 @@
 # LearnFlow Cloudflare Worker
 
-The Vercel app uses this stateless API for text simplification. Lesson text, drafts and progress stay on the pupil's device in Dexie/IndexedDB. **No R2, D1, KV, Workflows or server-side pupil content storage.**
+The static LearnFlow frontend uses this stateless API for text simplification and narration. Lesson text, drafts and progress stay on the pupil's device in Dexie/IndexedDB. **No R2, D1, KV, Workflows or server-side pupil content storage.**
 
 ## Endpoints
 
@@ -12,9 +12,9 @@ The Vercel app uses this stateless API for text simplification. Lesson text, dra
 
 ## Configuration and deployment
 
-Use **the existing Worker named learnflow**, so its public address stays https://learnflow.espen-erlandsen.workers.dev. The Wrangler project root is worker/. The Vercel frontend is configured with public VITE_LEARNFLOW_API_URL to this Worker.
+Use **the existing API Worker renamed to `learnflow-serv`**, at https://learnflow-serv.espen-erlandsen.workers.dev. The Wrangler project root is `worker/` and its Wrangler name must remain `learnflow-serv`. The static frontend is a *different* Worker named `learnflow`, configured through the root `wrangler.jsonc`. The frontend build-time public `VITE_LEARNFLOW_API_URL` points to `learnflow-serv`.
 
-In Cloudflare Workers → learnflow → Settings → Variables and Secrets, configure:
+In Cloudflare Workers → learnflow-serv → Settings → Variables and Secrets, configure:
 
 | Variable | Purpose |
 | --- | --- |
@@ -30,7 +30,7 @@ You can manually deploy from Cloudflare or via the GitHub workflow (which requir
 
 ## Public access
 
-The Vercel site and Cloudflare API are publicly reachable. Availability is derived from required infrastructure only; the code does not gate access on a manual privacy-approval flag. Do not interpret this as completion of any legal/privacy review.
+The Cloudflare static frontend and separate Cloudflare API are publicly reachable. Availability is derived from required infrastructure only; the code does not gate access on a manual privacy-approval flag. Do not interpret this as completion of any legal/privacy review.
 
 The standard UI has **one explicit Forenkle med AI action** for everyone: it shows a clear transfer notice beside the action, saves the source locally, checks API capabilities **without sending source text**, then calls Gemini when processing is enabled. There is no age selector or separate consent checkbox. The button itself is the user's deliberate action; it is not proof of parental authority. No private token is required once production is properly approved.
 
