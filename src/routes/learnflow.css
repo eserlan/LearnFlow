@@ -498,11 +498,13 @@ body { margin: 0; }
   .learnflow-shell .lesson-list button.row { flex: 1 1 100%; }
 }
 
+/* Top bar: the brand never shrinks; when the controls do not fit beside it (narrow phone, large
+   system text), they wrap to their own line instead of squeezing the logo. */
+.learnflow-shell .topbar { flex-wrap: wrap; row-gap: .6rem; }
+.learnflow-shell .brand, .learnflow-shell .brand-mark, .learnflow-shell .brand h1 { flex: none; }
+.learnflow-shell .topbar-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: .5rem; margin-left: auto; flex: 0 1 auto; max-width: 100%; }
+.learnflow-shell button.theme-toggle { flex: none; }
 @media (max-width: 480px) {
   .learnflow-shell .topbar { gap: .5rem; }
-  .learnflow-shell .brand { gap: .45rem; min-width: 0; }
-  .learnflow-shell .brand-mark { width: 2rem; height: 2rem; font-size: 1.1rem; }
-  .learnflow-shell .brand h1 { font-size: 1.05rem; }
-  .learnflow-shell button.segment { padding: .35rem .55rem; font-size: .85rem; }
-  .learnflow-shell button.theme-toggle { flex: none; }
+  .learnflow-shell button.segment { padding: .35rem .6rem; }
 }
