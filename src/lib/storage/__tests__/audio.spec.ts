@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { db, type StoredLesson } from '../../storage/db';
-import { storeLessonAudio, getLessonAudio, deleteAudioForDraft } from '../../storage/audio';
+import { storeLessonAudio, getLessonAudio, deleteAudioForDraft, listLessonIdsWithAudio } from '../../storage/audio';
 import { createDraft, deleteDraft, saveDraftVersion } from '../../storage/drafts';
 import { narratedText, speakLesson } from '../../lesson/speak';
 import type { SourceDraft } from '../../import/types';
@@ -79,5 +79,21 @@ describe('local narration',()=>{
       {status:429,headers:{'Content-Type':'application/json'}}
     ));
     await expect(result).rejects.toMatchObject({code:'http-error',status:429,backendCode:'provider_quota'});
+  });
+});
+
+describe('lessons with audio',()=>{
+  it('lists only existing lessons that have saved audio',async()=>{
+    for (const id of ['a','b']) {
+      await createDraft(draft(id),{id:id+':1',draftId:id,version:1,blocks:[{id:'b-'+id,type:'paragraph',text:'Planter bruker lys.',language:'nb',spans:[],included:true}],wordCount:3,language:'nb'});
+      await db.lessons.put(lesson(id+':1',id));
+    }
+    await storeLessonAudio(lesson('a:1','a'),wav());
+    expect(await listLessonIdsWithAudio()).toEqual(['a:1']);
+    // A leftover audio row for a lesson that no longer exists is not offered.
+    await db.audioAssets.put({id:'ghost:1',draftId:'ghost',createdAt:Date.now(),storage:'indexeddb',blob:wav()});
+    expect(await listLessonIdsWithAudio()).toEqual(['a:1']);
+    await deleteAudioForDraft('a');
+    expect(await listLessonIdsWithAudio()).toEqual([]);
   });
 });

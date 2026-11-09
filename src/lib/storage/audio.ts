@@ -67,6 +67,15 @@ export async function getLessonAudio(lessonId: string): Promise<Blob | null> {
   } catch { return null; }
 }
 
+/** Ids of the lessons that have saved audio, so the lesson list can offer a play button without loading files. */
+export async function listLessonIdsWithAudio(): Promise<string[]> {
+  const [ids, lessons] = await Promise.all([
+    db.audioAssets.toCollection().primaryKeys(), db.lessons.toCollection().primaryKeys()
+  ]);
+  const existing = new Set(lessons.map(String));
+  return ids.map(String).filter((id) => existing.has(id));
+}
+
 /** Also used on editing, explicit deletion, and the seven-day draft expiry. */
 export async function deleteAudioForDraft(draftId: string): Promise<void> {
   const assets=await db.audioAssets.where('draftId').equals(draftId).toArray();

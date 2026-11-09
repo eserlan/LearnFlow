@@ -403,3 +403,20 @@ body { margin: 0; }
   }
   .learnflow-shell .about > p:first-child { margin-bottom: 0; }
 }
+
+/* Play a saved lesson from the list, with a small player pinned to the bottom. */
+.learnflow-shell .lesson-list button.play {
+  flex: none; margin: 0; width: 2.8rem; padding: 0; display: grid; place-items: center; font-size: 1.1rem;
+}
+.learnflow-shell .mini-player {
+  position: fixed; inset: auto 0 0 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .75rem;
+  padding: .6rem max(1rem, env(safe-area-inset-right)) max(.6rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: var(--surface); color: var(--ink); border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 24px rgba(20, 32, 68, .12);
+}
+.learnflow-shell .mini-player .mp-title { flex: 1 1 100%; font-weight: 650; overflow-wrap: anywhere; }
+.learnflow-shell .mini-player .mp-label { color: var(--muted); font-weight: 450; font-size: .85rem; margin-right: .4rem; }
+.learnflow-shell .mini-player audio { flex: 1 1 12rem; min-width: 0; height: 2.6rem; }
+.learnflow-shell .mini-player button { margin: 0; }
+.learnflow-shell:has(.mini-player) { padding-bottom: 9rem; }
