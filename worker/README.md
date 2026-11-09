@@ -18,7 +18,7 @@ In Cloudflare Workers → learnflow-serv → Settings → Variables and Secrets,
 
 | Variable | Purpose |
 | --- | --- |
-| ALLOWED_ORIGINS | Optional Text: additional exact frontend origins (preview/local). The production URL https://learnflow-nine-pied.vercel.app is allowed by default. |
+| ALLOWED_ORIGINS | Optional Text: additional exact frontend origins (preview/local). The production URL https://learnflow.espen-erlandsen.workers.dev is allowed by default. |
 | GEMINI_API_KEY | **Secret**: paid-tier Gemini API key (not an AI Studio free-tier key) |
 | GEMINI_MODEL | Text: actual Gemini **API** model ID; CLI aliases from the evaluation harness are not necessarily valid API names |
 

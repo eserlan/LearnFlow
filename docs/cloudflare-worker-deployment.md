@@ -2,7 +2,7 @@
 
 ## Architecture
 
-- Existing SvelteKit PWA stays at the repository root; Vercel hosts it.
+- Existing SvelteKit PWA stays at the repository root and is served as Cloudflare Workers Static Assets (see cloudflare-workers-static-deployment.md).
 - Cloudflare Worker in worker/ is the stateless API for eventual simplification and speech.
 - Student source text, lesson progress and other metadata are stored in IndexedDB/Dexie **on device**.
 - Generated audio is planned for local OPFS. **No R2, D1, Workflows, KV or other server-side pupil-file persistence.**
@@ -33,11 +33,11 @@ The connected tools cannot currently deploy to your Cloudflare account. A manual
 
 1. Merge the PR after CI passes.
 2. In GitHub repository Settings → Secrets and variables → Actions, configure CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID (prefer the production environment's secrets with approval).
-3. In Cloudflare, configure `GEMINI_API_KEY` Secret and supported `GEMINI_MODEL` Text. The canonical Vercel production origin is allowed by default; use `ALLOWED_ORIGINS` only for additional exact preview/local origins. Retain the Wrangler `RATE_LIMITER` binding; leave mock-test toggles unset. Legacy `ENABLE_AI_PROCESSING` and `PRIVACY_REVIEW_APPROVED` variables are not read. Review worker/README.md and issue #8 before using real pupil content.
+3. In Cloudflare, configure `GEMINI_API_KEY` Secret and supported `GEMINI_MODEL` Text. The production frontend origin (`https://learnflow.espen-erlandsen.workers.dev`) is allowed by default; use `ALLOWED_ORIGINS` only for additional exact preview/local origins. Retain the Wrangler `RATE_LIMITER` binding; leave mock-test toggles unset. Legacy `ENABLE_AI_PROCESSING` and `PRIVACY_REVIEW_APPROVED` variables are not read. Review worker/README.md and issue #8 before using real pupil content.
 4. Run Actions → Deploy Cloudflare Worker → Run workflow on main (or use connected Cloudflare builds). Verify `learnflow.espen-erlandsen.workers.dev`, GET /health and GET /capabilities (true only when Gemini key/model/rate limiter are present).
-5. Create/connect the Vercel project from the repository root with framework SvelteKit; configure its public Worker origin when the real consent-backed UI integration is enabled.
+5. Set `VITE_LEARNFLOW_API_URL` (see `.env.production`) to the public Worker origin for the frontend build.
 
-Avoid exposing broad *.vercel.app wildcard origins. If ephemeral preview URLs need live API access, prefer an approved proxy strategy or explicit preview origin registration with the Worker. CORS alone is not authentication or rate limiting.
+Avoid wildcard origins. If ephemeral preview URLs need live API access, prefer an approved proxy strategy or explicit preview origin registration with the Worker. CORS alone is not authentication or rate limiting.
 
 ## Release gates for real student material
 

@@ -23,13 +23,11 @@ const JSON_TYPE = 'application/json; charset=utf-8';
 const API_PATHS = new Set(['/api/simplify', '/api/speak']);
 const ROUTES = new Set(['/health', '/capabilities', ...API_PATHS]);
 
-// Permit only exact production origins. Keep the old Vercel origin during
-// the migration so users can retrieve their device-local lessons there.
-// Pages project slug: "learnflow-web"; preview domains are NOT auto-allowed.
+// Permit only exact production origins. Preview domains are NOT auto-allowed.
+// Pages project slug: "learnflow-web".
 const PRODUCTION_ORIGINS = [
   'https://learnflow.espen-erlandsen.workers.dev',
-  'https://learnflow-web.pages.dev',
-  'https://learnflow-nine-pied.vercel.app'
+  'https://learnflow-web.pages.dev'
 ] as const;
 
 function allowedOrigins(env: Env): Set<string> {
