@@ -35,6 +35,8 @@ export async function saveVerifiedLesson(draftId: string, response: Simplificati
       sourceVersion: draft.version,
       title: draft.title,
       createdAt: Date.now(),
+      lastAccessedAt: Date.now(),
+      pinned: false,
       sentences
     };
     await db.lessons.put(lesson);

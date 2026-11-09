@@ -76,11 +76,16 @@ export async function listLessonIdsWithAudio(): Promise<string[]> {
   return ids.map(String).filter((id) => existing.has(id));
 }
 
+/** Remove one lesson's audio without affecting other lessons from the same source. */
+export async function deleteAudioForLesson(lessonId: string): Promise<void> {
+  const asset = await db.audioAssets.get(lessonId);
+  if (!asset) return;
+  if (asset.storage === 'opfs') await removeOpfs(lessonId);
+  await db.audioAssets.delete(lessonId);
+}
+
 /** Also used on editing, explicit deletion, and the seven-day draft expiry. */
 export async function deleteAudioForDraft(draftId: string): Promise<void> {
   const assets=await db.audioAssets.where('draftId').equals(draftId).toArray();
-  for (const asset of assets) {
-    if (asset.storage==='opfs') await removeOpfs(asset.id);
-    await db.audioAssets.delete(asset.id);
-  }
+  for (const asset of assets) await deleteAudioForLesson(asset.id);
 }

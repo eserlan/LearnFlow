@@ -5,6 +5,7 @@
   import { prepareSource } from '../lib/import/prepare';
   import { createDraft, deleteDraft, getCurrentDocument, saveDraftVersion, updateSelection, touchDraft } from '../lib/storage/drafts';
   import { purgeExpiredDrafts, daysUntilExpiry, shouldWarnExpiry } from '../lib/storage/expiry';
+  import { purgeExpiredLessons, touchLesson, setLessonPinned } from '../lib/storage/lessons';
   import { db, type StoredLesson } from '../lib/storage/db';
   import { getCopy } from '../lib/i18n';
   import { simplifyDraft } from '../lib/lesson/handoff';
@@ -99,10 +100,20 @@
         clearFont = prefs.clearFont === true; spacious = prefs.spacious === true;
       }
     } catch { /* storage disabled or unreadable */ }
-    void (async () => { await purgeExpiredDrafts(); await refresh(); })();
-    const timer = setInterval(async () => { await purgeExpiredDrafts(); await refresh(); }, 60_000);
+    void cleanupAndRefresh();
+    const timer = setInterval(() => void cleanupAndRefresh(), 60_000);
     return () => { clearInterval(timer); void commitUndo(); stopListPlayback(); if (audioUrl) URL.revokeObjectURL(audioUrl); };
   });
+  async function cleanupAndRefresh() {
+    await purgeExpiredDrafts();
+    const active = [
+      ...(selectedLesson ? [selectedLesson.id] : []),
+      ...(listPlaying ? [listPlaying.id] : []),
+      ...lessons.filter((lesson) => lesson.draftId === undo?.id).map((lesson) => lesson.id)
+    ];
+    await purgeExpiredLessons(Date.now(), active);
+    await refresh();
+  }
   async function refresh() {
     drafts = (await db.drafts.where('status').anyOf('pending','failed','processing').toArray())
       .sort((a,b) => b.lastActivityAt - a.lastActivityAt);
@@ -273,13 +284,18 @@
   /** One tap on the list: play that lesson's saved audio. Starting another lesson stops the first. */
   async function playFromList(lesson:StoredLesson) {
     if (listPlaying?.id === lesson.id) {
-      if (listAudio?.paused) void listAudio.play().catch(() => {}); else listAudio?.pause();
+      if (listAudio?.paused) {
+        await touchLesson(lesson.id);
+        void listAudio.play().catch(() => {});
+      } else listAudio?.pause();
       return;
     }
     stopListPlayback();
     const wav = await getLessonAudio(lesson.id);
     if (!wav) { error = copy.audioUnavailable; await refresh(); return; }
-    listPlaying = {id:lesson.id,title:title(lesson.title),url:URL.createObjectURL(wav)};
+    const accessed = await touchLesson(lesson.id);
+    if (!accessed) { error = copy.unavailable; await refresh(); return; }
+    listPlaying = {id:accessed.id,title:title(accessed.title),url:URL.createObjectURL(wav)};
     await tick();
     if ('mediaSession' in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({title:listPlaying.title,artist:'LearnFlow'});
@@ -313,11 +329,14 @@
     stopListPlayback();
     const source=await db.drafts.get(lesson.draftId);
     if (!source || source.version !== lesson.sourceVersion) { error=copy.unavailable; return; }
+    const accessed = await touchLesson(lesson.id);
+    if (!accessed) { error = copy.unavailable; return; }
     clearAudioPlayer();
     selectedLessonSource=source.plainText;
-    selectedLesson=lesson;
-    const wav=await getLessonAudio(lesson.id);
-    if (wav && selectedLesson?.id===lesson.id) audioUrl=URL.createObjectURL(wav);
+    selectedLesson=accessed;
+    lessons = lessons.map((item) => item.id === accessed.id ? accessed : item);
+    const wav=await getLessonAudio(accessed.id);
+    if (wav && selectedLesson?.id===accessed.id) audioUrl=URL.createObjectURL(wav);
   }
   async function makeAudio(lesson:StoredLesson) {
     if (audioBusy || audioUrl || selectedLesson?.id!==lesson.id) return;
@@ -345,6 +364,12 @@
       if (cause instanceof WorkerProcessorError && cause.code==='invalid-response') audioError=copy.audioNotAvailable;
       audioStatus='';
     } finally { audioBusy=false; }
+  }
+  async function togglePin(lesson: StoredLesson) {
+    const updated = await setLessonPinned(lesson.id, lesson.pinned !== true);
+    if (!updated) { await refresh(); return; }
+    lessons = lessons.map((item) => item.id === updated.id ? updated : item);
+    if (selectedLesson?.id === updated.id) selectedLesson = updated;
   }
   async function editDraft(draft:SourceDraft) {
     const document = await getCurrentDocument(draft.id);
@@ -485,6 +510,7 @@
   {#if visibleLessons.length}
     <section aria-labelledby="lessons-title">
       <h2 id="lessons-title">{copy.myLessons}</h2>
+      <p class="note expiry">{copy.lessonExpiryNote}</p>
       <ul class="lesson-list">{#each visibleLessons as lesson (lesson.id)}
         <li>
           <button class="row" onclick={() => void openLesson(lesson)} aria-label={`${copy.showLesson}: ${title(lesson.title)}`}>
@@ -497,6 +523,10 @@
               aria-label={`${active ? copy.pauseLesson : copy.playLesson}: ${title(lesson.title)}`}
               onclick={() => void playFromList(lesson)}><span aria-hidden="true">{active ? '⏸' : '▶'}</span></button>
           {/if}
+          <button class="pin secondary" type="button" aria-pressed={lesson.pinned === true}
+            aria-label={`${lesson.pinned ? copy.unpinLesson : copy.pinLesson}: ${title(lesson.title)}`}
+            title={lesson.pinned ? copy.unpinLesson : copy.pinLesson}
+            onclick={() => void togglePin(lesson)}><span aria-hidden="true">📌</span></button>
           <button class="danger" onclick={() => discard(lesson.draftId,lesson.title)}>{copy.discard}</button>
         </li>
       {/each}</ul>
