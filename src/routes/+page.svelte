@@ -21,6 +21,11 @@
   let error = $state('');
   let status = $state('');
   let busy = $state(false);
+  // Where a simplification is: not started, request sent, received by the service, sentences arriving.
+  let phase = $state<'idle'|'checking'|'sending'|'received'|'writing'|'saving'>('idle');
+  let live = $state<{text:string;kind:string}[]>([]);
+  const phaseStep = $derived({idle:0,checking:0,sending:1,received:2,writing:3,saving:4}[phase]);
+  let liveElement = $state<HTMLElement | null>(null);
   let drafts = $state<SourceDraft[]>([]);
   let lessons = $state<StoredLesson[]>([]);
   let selectedLesson = $state<StoredLesson | null>(null);
@@ -143,7 +148,7 @@
 
   async function runSimplification(id:string) {
     if (busy) return;
-    busy = true; error = ''; status = copy.checkingService;
+    busy = true; error = ''; status = copy.checkingService; phase = 'checking'; live = [];
     let checkingCapabilities = true;
     try {
       const api = import.meta.env.VITE_LEARNFLOW_API_URL;
@@ -158,10 +163,23 @@
       const capabilities: {simplify?:boolean;reason?:string} = await availability.json();
       if (capabilities?.simplify !== true) throw new Error(capabilities?.reason ?? 'not-enabled');
       checkingCapabilities = false;
-      status = copy.simplifying;
+      status = copy.sending; phase = 'sending';
       const response = await simplifyDraft(id,
-        {canProcess:async () => true}, createWorkerProcessor(api));
+        {canProcess:async () => true}, createWorkerProcessor(api), {
+          onAccepted: () => { phase = 'received'; status = copy.received; },
+          onSentence: (sentence) => {
+            live.push(sentence);
+            if (phase !== 'writing') {
+              phase = 'writing'; status = copy.writing;
+              void tick().then(() => liveElement?.scrollIntoView({block:'nearest',behavior:'smooth'}));
+            }
+          },
+          onReset: () => { live = []; phase = 'received'; status = copy.received; }
+        });
+      phase = 'saving';
       const lesson = await saveVerifiedLesson(id,response);
+      // The streamed draft gives way to the checked lesson, rendered properly from the final result.
+      live = [];
       await showLesson(lesson);
       status = copy.completed;
       await refresh();
@@ -175,8 +193,9 @@
       }
       error = readableSimplificationError(cause, checkingCapabilities);
       status = '';
+      live = [];
       await refresh();
-    } finally { busy = false; }
+    } finally { busy = false; phase = 'idle'; }
   }
   function clearAudioPlayer() {
     if (audioUrl) URL.revokeObjectURL(audioUrl);
@@ -274,11 +293,37 @@
     <p class="note">{copy.processingNotice}</p>
     <div class="composer-footer">
       <span class="word-count">{inputWordCount} {copy.count}</span>
-      <button onclick={prepareAndSave} disabled={busy}>{copy.start}</button>
+      <button onclick={prepareAndSave} disabled={busy} aria-busy={busy}>
+        {#if busy}<span class="spinner" aria-hidden="true"></span>{copy.working}{:else}{copy.start}{/if}
+      </button>
     </div>
     {#if error}<p role="alert">{error}</p>{/if}
+    {#if busy && phase !== 'idle'}
+      <div class="progress" aria-hidden="true">
+        <ol class="steps">
+          <li class:done={phaseStep > 1} class:current={phaseStep === 1}>{copy.stepSending}</li>
+          <li class:done={phaseStep > 2} class:current={phaseStep === 2}>{copy.stepReceived}</li>
+          <li class:done={phaseStep > 3} class:current={phaseStep === 3}>{copy.stepWriting}</li>
+          <li class:done={phaseStep > 4} class:current={phaseStep === 4}>{copy.stepDone}</li>
+        </ol>
+        <div class="bar"><span></span></div>
+      </div>
+    {/if}
     {#if status}<p role="status">{status}</p>{/if}
   </section>
+
+  {#if live.length}
+    <article class="lesson live" bind:this={liveElement} aria-label={copy.draftLabel}>
+      <p class="note">{copy.draftLabel}</p>
+      {#each live as sentence, i (i)}
+        {#if sentence.kind === 'heading'}<h3>{sentence.text}</h3>
+        {:else if sentence.kind === 'task'}<p class="task">{sentence.text}</p>
+        {:else if sentence.kind === 'quote'}<blockquote>{sentence.text}</blockquote>
+        {:else}<p>{sentence.text}</p>{/if}
+      {/each}
+      <span class="caret" aria-hidden="true"></span>
+    </article>
+  {/if}
 
   {#if pendingReplacement}
     <section aria-labelledby="replace-title">

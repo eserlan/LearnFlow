@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { PROMPT_VERSION, simplifyWithAi, userMessage, validatePayload, type SimplifyPayload } from './simplify.ts';
+import { PROMPT_VERSION, completeSentenceObjects, simplifyStream, simplifyWithAi, userMessage, validatePayload, type SimplifyPayload, type StreamEvent } from './simplify.ts';
 import worker, { handleRequest, type Env } from './index.ts';
 
 const input: SimplifyPayload = {
@@ -71,15 +71,77 @@ describe('real AI adapter (synthetic content only)',()=>{
       return new Response(null,{status:302,headers:{Location:'https://example.invalid'}});
     }),{code:'unavailable'});
   });
-  it('rejects numbers that were not in the original text',async()=>{
+  it('rejects numbers that were not in the original text, retrying once, with a safe reason',async()=>{
     const p=provider({sentences:[{text:'Humler flyr 900 kilometer.',kind:'statement',sources:['original']}]});
-    await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output'});
-    assert.equal(p.calls.length,1);
+    await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output',reason:'numbers'});
+    assert.equal(p.calls.length,2);
   });
-  it('rejects incorrect source references without further model calls',async()=>{
+  it('rejects incorrect source references after one retry',async()=>{
     const p=provider({sentences:[{text:'Noen humler flyr.',kind:'statement',sources:['unknown']}]});
-    await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output'});
-    assert.equal(p.calls.length,1);
+    await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output',reason:'sources'});
+    assert.equal(p.calls.length,2);
+  });
+  it('reports a truncated answer, and succeeds when the retry is valid',async()=>{
+    let n=0;
+    const fetcher=async()=>Response.json({candidates:[n++===0
+      ?{finishReason:'MAX_TOKENS',content:{parts:[{text:'{"sentences":[{"text":"De fleste'}]}}
+      :{content:{parts:[{text:JSON.stringify(lesson)}]}}]});
+    assert.equal((await simplifyWithAi(input,configured,fetcher)).sentences.length,2);
+    assert.equal(n,2);
+    await assert.rejects(simplifyWithAi(input,configured,async()=>Response.json({candidates:[{finishReason:'MAX_TOKENS',content:{parts:[{text:'{"sentences":[{"te'}]}}]})),{reason:'truncated'});
+  });
+  it('finds only complete sentence objects in a partial answer, respecting quotes and braces in text',()=>{
+    assert.deepEqual(completeSentenceObjects('{"sentences":[{"text":"A {b} \\"c\\"","kind":"statement","sources":["original"]},{"text":"Ha'),
+      [{text:'A {b} "c"',kind:'statement',sources:['original']}]);
+    assert.deepEqual(completeSentenceObjects('{"sent'),[]);
+    assert.equal(completeSentenceObjects(JSON.stringify(lesson)).length,2);
+  });
+  const sse=(...datas:unknown[])=>new Response(datas.map((d)=>'data: '+JSON.stringify(d)+'\r\n\r\n').join(''),
+    {headers:{'Content-Type':'text/event-stream'}});
+  const chunk=(text:string,finishReason?:string)=>({candidates:[{content:{parts:[{text}]},...(finishReason?{finishReason}:{})}]});
+  async function collect(g:AsyncGenerator<StreamEvent>){const out:StreamEvent[]=[];for await(const e of g)out.push(e);return out;}
+  it('streams checked sentences as they are written, then the complete lesson',async()=>{
+    const full=JSON.stringify(lesson);
+    const cut=full.indexOf('{"text":"Noen');
+    const urls:string[]=[];
+    const events=await collect(simplifyStream(input,configured,async(url)=>{
+      urls.push(url);
+      return sse(chunk(full.slice(0,cut+10)),chunk(full.slice(cut+10),'STOP'));
+    }));
+    assert.ok(urls[0].includes(':streamGenerateContent?alt=sse'));
+    assert.deepEqual(events.map((e)=>e.type),['sentence','sentence','done']);
+    assert.equal((events[0] as {sentence:{text:string}}).sentence.text,lesson.sentences[0].text);
+    assert.equal((events[2] as {lesson:{sentences:unknown[]}}).lesson.sentences.length,2);
+  });
+  it('never streams a sentence with a number that is not in the source',async()=>{
+    const bad=JSON.stringify({sentences:[{text:'Humler flyr 900 kilometer.',kind:'statement',sources:['original']}]});
+    const calls:string[]=[];
+    const g=simplifyStream(input,configured,async(url)=>{calls.push(url);
+      return url.includes('streamGenerate')?sse(chunk(bad)):Response.json({candidates:[{content:{parts:[{text:JSON.stringify(lesson)}]}}]});});
+    const events=await collect(g);
+    assert.deepEqual(events.map((e)=>e.type),['done']);   // nothing invalid shown; the retry is an ordinary request
+    assert.equal(calls.length,2);
+  });
+  it('tells the client to drop what it showed when the stream fails after sentences, then retries once',async()=>{
+    const calls:string[]=[];
+    const events=await collect(simplifyStream(input,configured,async(url)=>{calls.push(url);
+      return url.includes('streamGenerate')
+        ?sse(chunk(JSON.stringify(lesson).slice(0,-2),'MAX_TOKENS'))
+        :Response.json({candidates:[{content:{parts:[{text:JSON.stringify(lesson)}]}}]});}));
+    assert.deepEqual(events.map((e)=>e.type),['sentence','sentence','reset','done']);
+    assert.equal(calls.length,2);
+  });
+  it('serves /api/simplify as server-sent events when asked, starting with accepted',async()=>{
+    const req=new Request('https://api.example.test/api/simplify',{method:'POST',
+      headers:{Origin:'https://preview.example.test','Content-Type':'application/json',Accept:'text/event-stream','CF-Connecting-IP':'198.51.100.42'},
+      body:JSON.stringify(input)});
+    const res=await handleRequest(req,configured,async()=>sse(chunk(JSON.stringify(lesson),'STOP')));
+    assert.equal(res.status,200);
+    assert.match(res.headers.get('Content-Type')!,/text\/event-stream/);
+    const body=await res.text();
+    assert.ok(body.startsWith('event: accepted\n'));
+    assert.match(body,/event: sentence\ndata: \{"index":0/);
+    assert.match(body,/event: done\ndata: \{"sourceVersion":1,"verified":true/);
   });
   it('returns only capability metadata when backend is disabled',async()=>{
     const r=await handleRequest(new Request('https://api.example.test/capabilities',

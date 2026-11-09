@@ -16,9 +16,12 @@ const record = (x: unknown): x is Record<string, unknown> => !!x && typeof x ===
 
 export type AiErrorCode = 'unavailable' | 'invalid-output' | 'provider_bad_request' |
   'provider_credentials' | 'provider_model_not_found' | 'provider_quota';
+/** Why a model answer was rejected. Only a fixed word: never any text from the source or the answer. */
+export type InvalidReason = 'truncated' | 'json' | 'shape' | 'sentences' | 'numbers' | 'quote' | 'sources';
 export class AiError extends Error {
   readonly code: AiErrorCode;
-  constructor(code: AiErrorCode) { super(code); this.code = code; }
+  readonly reason?: InvalidReason;
+  constructor(code: AiErrorCode, reason?: InvalidReason) { super(code); this.code = code; this.reason = reason; }
 }
 export function validatePayload(x: unknown): SimplifyPayload | null {
   if (!record(x) || typeof x.draftId !== 'string' || !x.draftId || x.draftId.length > 100 ||
@@ -30,29 +33,48 @@ export function validatePayload(x: unknown): SimplifyPayload | null {
       x.html !== undefined) return null;
   return x as unknown as SimplifyPayload;
 }
-function parseLesson(value: unknown, original: string): LessonOutput | null {
-  if (!record(value) || !Array.isArray(value.sentences) || !value.sentences.length || value.sentences.length > 180) return null;
-  const sentences: LessonSentence[] = [];
-  for (const x of value.sentences) {
-    if (!record(x) || typeof x.text !== 'string' || !x.text.trim() || x.text.length > 700 ||
-        typeof x.kind !== 'string' || !KINDS.has(x.kind) || !Array.isArray(x.sources) ||
-        x.sources.length !== 1 || x.sources[0] !== 'original') return null;
-    for (const n of x.text.match(/\d+(?:[.,]\d+)*/g) ?? []) if (!original.includes(n)) return null;
-    if (x.kind === 'quote' && !original.includes(x.text)) return null;
-    sentences.push({ text: x.text, kind: x.kind as LessonSentence['kind'], sources: ['original'] });
-  }
-  return { kind: 'simplified-lesson', schemaVersion: 1, sentences };
+/** Validate one sentence from the model against the source: shape, source id, new numbers, exact quotes. */
+function checkSentence(x: unknown, original: string): LessonSentence {
+  if (!record(x) || typeof x.text !== 'string' || !x.text.trim() || x.text.length > 700 ||
+      typeof x.kind !== 'string' || !KINDS.has(x.kind) || !Array.isArray(x.sources)) throw new AiError('invalid-output', 'shape');
+  if (x.sources.length !== 1 || x.sources[0] !== 'original') throw new AiError('invalid-output', 'sources');
+  for (const n of x.text.match(/\d+(?:[.,]\d+)*/g) ?? []) if (!original.includes(n)) throw new AiError('invalid-output', 'numbers');
+  if (x.kind === 'quote' && !original.includes(x.text)) throw new AiError('invalid-output', 'quote');
+  return { text: x.text, kind: x.kind as LessonSentence['kind'], sources: ['original'] };
 }
-async function call(fetcher: Fetcher, url: string, headers: Record<string,string>, body: unknown): Promise<Record<string,unknown>> {
+function parseLesson(value: unknown, original: string): LessonOutput {
+  if (!record(value) || !Array.isArray(value.sentences)) throw new AiError('invalid-output', 'shape');
+  if (!value.sentences.length || value.sentences.length > 180) throw new AiError('invalid-output', 'sentences');
+  return { kind: 'simplified-lesson', schemaVersion: 1, sentences: value.sentences.map((x) => checkSentence(x, original)) };
+}
+/**
+ * The complete sentence objects found so far in a partial `{"sentences":[{...},{...` answer. A scanner that
+ * respects strings and escapes; an object still being written is not returned.
+ */
+export function completeSentenceObjects(partial: string): unknown[] {
+  const key = partial.indexOf('"sentences"');
+  const open = key < 0 ? -1 : partial.indexOf('[', key);
+  if (open < 0) return [];
+  const out: unknown[] = [];
+  let depth = 0, start = -1, inString = false, escaped = false;
+  for (let i = open + 1; i < partial.length; i++) {
+    const ch = partial[i];
+    if (inString) { if (escaped) escaped = false; else if (ch === '\\') escaped = true; else if (ch === '"') inString = false; continue; }
+    if (ch === '"') inString = true;
+    else if (ch === '{') { if (depth++ === 0) start = i; }
+    else if (ch === '}' && --depth === 0) { try { out.push(JSON.parse(partial.slice(start, i + 1))); } catch { return out; } }
+    else if (ch === ']' && depth === 0) break;
+  }
+  return out;
+}
+async function postGemini(fetcher: Fetcher, url: string, headers: Record<string,string>, body: unknown, timeoutMs: number): Promise<Response> {
   let res: Response;
   try {
     res = await fetcher(url, {method:'POST',headers:{...headers,'Content-Type':'application/json'},
       // Cloudflare Workers does not support redirect:'error' in fetch RequestInit.
       // Use manual, and reject any 3xx response below without following it.
-      body:JSON.stringify(body),cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(35000)});
+      body:JSON.stringify(body),cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(timeoutMs)});
   } catch { throw new AiError('unavailable'); }
-  // Only return a categorised HTTP status; never expose Google's response text,
-  // credentials, source content, or any upstream request/response body.
   if (!res.ok) {
     if (res.status === 400) throw new AiError('provider_bad_request');
     if (res.status === 401 || res.status === 403) throw new AiError('provider_credentials');
@@ -60,6 +82,10 @@ async function call(fetcher: Fetcher, url: string, headers: Record<string,string
     if (res.status === 404) throw new AiError('provider_model_not_found');
     throw new AiError('unavailable');
   }
+  return res;
+}
+async function call(fetcher: Fetcher, url: string, headers: Record<string,string>, body: unknown): Promise<Record<string,unknown>> {
+  const res = await postGemini(fetcher, url, headers, body, 35000);
   try { const x: unknown = await res.json(); if (record(x)) return x; }
   catch { /* Never surface provider body. */ }
   throw new AiError('invalid-output');
@@ -141,32 +167,108 @@ export function userMessage(plainText: string): string {
     : '';
   return target + '<source id="original">\n' + plainText + '\n</source>';
 }
-async function generate(input: SimplifyPayload, env: AiEnv, fetcher: Fetcher): Promise<LessonOutput> {
+function geminiRequest(input: SimplifyPayload, env: AiEnv, method: 'generateContent' | 'streamGenerateContent') {
   if (!env.GEMINI_API_KEY || !env.GEMINI_MODEL) throw new AiError('unavailable');
   if (!MODEL.test(env.GEMINI_MODEL)) throw new AiError('provider_model_not_found');
-  const r = await call(fetcher,
-    'https://generativelanguage.googleapis.com/v1beta/models/' + env.GEMINI_MODEL + ':generateContent',
-    {'x-goog-api-key':env.GEMINI_API_KEY},{
+  return {
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/' + env.GEMINI_MODEL + ':' + method +
+      (method === 'streamGenerateContent' ? '?alt=sse' : ''),
+    headers: {'x-goog-api-key':env.GEMINI_API_KEY},
+    body: {
       systemInstruction:{parts:[{text:SYSTEM}]},
       contents:[{role:'user',parts:[{text:userMessage(input.plainText)}]}],
-      generationConfig:{maxOutputTokens:4096,responseMimeType:'application/json',
+      generationConfig:{maxOutputTokens:16384,responseMimeType:'application/json',
         responseSchema:{type:'OBJECT',properties:{sentences:{type:'ARRAY',items:{type:'OBJECT',
           properties:{text:{type:'STRING'},kind:{type:'STRING'},sources:{type:'ARRAY',items:{type:'STRING'}}},
           required:['text','kind','sources']}}},required:['sentences']}
       }
-    });
+    }
+  };
+}
+function answerText(r: Record<string,unknown>): { text: string; finish?: unknown } {
   const c = r.candidates;
   if (!Array.isArray(c) || !c.length || !record(c[0]) ||
-      !record(c[0].content) || !Array.isArray(c[0].content.parts)) throw new AiError('invalid-output');
-  const t = c[0].content.parts.filter(record).map((x:Record<string,unknown>)=>typeof x.text==='string'?x.text:'').join('');
+      !record(c[0].content) || !Array.isArray(c[0].content.parts)) throw new AiError('invalid-output', 'shape');
+  const text = c[0].content.parts.filter(record).map((x:Record<string,unknown>)=>typeof x.text==='string'?x.text:'').join('');
+  return { text, finish: c[0].finishReason };
+}
+async function generate(input: SimplifyPayload, env: AiEnv, fetcher: Fetcher): Promise<LessonOutput> {
+  const q = geminiRequest(input, env, 'generateContent');
+  const { text, finish } = answerText(await call(fetcher, q.url, q.headers, q.body));
   let raw: unknown;
-  try { raw = JSON.parse(t); } catch { throw new AiError('invalid-output'); }
-  const lesson = parseLesson(raw, input.plainText);
-  if (!lesson) throw new AiError('invalid-output');
-  return lesson;
+  try { raw = JSON.parse(text); }
+  catch { throw new AiError('invalid-output', finish === 'MAX_TOKENS' ? 'truncated' : 'json'); }
+  return parseLesson(raw, input.plainText);
 }
 /** Model output is schema-validated and checked for new numbers/exact quotations.
  * The output is NOT independently fact-checked; do not label it as such. */
 export async function simplifyWithAi(input:SimplifyPayload,env:AiEnv,fetcher:Fetcher=fetch):Promise<LessonOutput> {
-  return generate(input,env,fetcher);
+  // Spec 002 FR-006: one automatic retry when the answer fails validation. Other errors are not retried.
+  try { return await generate(input,env,fetcher); }
+  catch (e) {
+    if (e instanceof AiError && e.code === 'invalid-output') return generate(input,env,fetcher);
+    throw e;
+  }
+}
+
+export type StreamEvent =
+  | { type: 'sentence'; index: number; sentence: LessonSentence }
+  | { type: 'reset' }
+  | { type: 'done'; lesson: LessonOutput };
+
+/** Gemini's server-sent events: the `data:` payloads, as parsed JSON objects, as they arrive. */
+async function* geminiEvents(res: Response): AsyncGenerator<Record<string,unknown>> {
+  if (!res.body) throw new AiError('invalid-output', 'shape');
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done });
+      const lines = buffer.split(/\r?\n/);
+      buffer = done ? '' : lines.pop() ?? '';
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        let x: unknown;
+        try { x = JSON.parse(line.slice(5)); } catch { throw new AiError('invalid-output', 'json'); }
+        if (record(x)) yield x;
+      }
+      if (done) return;
+    }
+  } finally { reader.cancel().catch(() => {}); }
+}
+
+/**
+ * Like simplifyWithAi, but yields each sentence as soon as the model has written it and it has passed the
+ * same checks as the final lesson. The sentences are provisional: the last event, `done`, carries the
+ * complete validated lesson, and a `reset` means "discard what you showed" before a retry. A failed stream is
+ * retried once as an ordinary request, as in simplifyWithAi.
+ */
+export async function* simplifyStream(input: SimplifyPayload, env: AiEnv, fetcher: Fetcher = fetch): AsyncGenerator<StreamEvent> {
+  let emitted = 0;
+  try {
+    const q = geminiRequest(input, env, 'streamGenerateContent');
+    const res = await postGemini(fetcher, q.url, q.headers, q.body, 60000);
+    let text = '';
+    let finish: unknown;
+    for await (const chunk of geminiEvents(res)) {
+      const part = answerText(chunk);
+      text += part.text;
+      if (part.finish) finish = part.finish;
+      const found = completeSentenceObjects(text);
+      for (; emitted < found.length && emitted < 180; emitted++) {
+        yield { type: 'sentence', index: emitted, sentence: checkSentence(found[emitted], input.plainText) };
+      }
+    }
+    let raw: unknown;
+    try { raw = JSON.parse(text); }
+    catch { throw new AiError('invalid-output', finish === 'MAX_TOKENS' ? 'truncated' : 'json'); }
+    yield { type: 'done', lesson: parseLesson(raw, input.plainText) };
+    return;
+  } catch (e) {
+    if (!(e instanceof AiError) || e.code !== 'invalid-output') throw e;
+  }
+  if (emitted) yield { type: 'reset' };
+  yield { type: 'done', lesson: await generate(input, env, fetcher) };
 }

@@ -4,12 +4,22 @@ import { saveAttempt, touchDraft } from '../storage/drafts';
 export interface ConsentGate { canProcess(draftId: string): Promise<boolean> }
 export interface SimplificationRequest { draftId: string; sourceVersion: number; idempotencyKey: string; plainText: string; html?: string }
 export interface SimplificationResult { sourceVersion: number; verified: boolean; result: unknown }
-export interface SimplificationProcessor { simplify(request: SimplificationRequest): Promise<SimplificationResult> }
+/** Progress while a streamed simplification runs. Streamed sentences are provisional drafts; the result replaces them. */
+export interface StreamHooks {
+  onAccepted?(): void;
+  onSentence?(sentence: { text: string; kind: string }, index: number): void;
+  /** The service is retrying: drop every sentence shown so far. */
+  onReset?(): void;
+}
+export interface SimplificationProcessor {
+  simplify(request: SimplificationRequest): Promise<SimplificationResult>;
+  simplifyStream?(request: SimplificationRequest, hooks: StreamHooks): Promise<SimplificationResult>;
+}
 export type HandoffErrorCode = 'consent-required' | 'processor-unavailable' | 'stale-source' | 'duplicate-attempt' | 'unverified-result';
 export class HandoffError extends Error { constructor(readonly code: HandoffErrorCode, message: string) { super(message); } }
 
 /** Only this boundary may send pupil text off device. Consent and a real processor are mandatory. */
-export async function simplifyDraft(draftId: string, consent: ConsentGate, processor?: SimplificationProcessor): Promise<SimplificationResult> {
+export async function simplifyDraft(draftId: string, consent: ConsentGate, processor?: SimplificationProcessor, hooks?: StreamHooks): Promise<SimplificationResult> {
   const draft = await db.drafts.get(draftId);
   if (!draft) throw new HandoffError('stale-source', 'This saved text no longer exists.');
   const allowed = await consent.canProcess(draftId).catch(() => false);
@@ -21,13 +31,16 @@ export async function simplifyDraft(draftId: string, consent: ConsentGate, proce
   if (!created) throw new HandoffError('duplicate-attempt', 'This source version has already been submitted.');
   await touchDraft(draftId, 'processing');
   try {
-    const result = await processor.simplify({
+    const request = {
       draftId,
       sourceVersion: draft.version,
       idempotencyKey,
       // Pasted HTML stays on-device; the Worker accepts plain text only.
       plainText: draft.plainText
-    });
+    };
+    const result = processor.simplifyStream && hooks
+      ? await processor.simplifyStream(request, hooks)
+      : await processor.simplify(request);
     const current = await db.drafts.get(draftId);
     if (!current || current.version !== result.sourceVersion || current.version !== draft.version) throw new HandoffError('stale-source', 'The source changed while it was processing.');
     if (!result.verified) throw new HandoffError('unverified-result', 'The result did not pass its faithfulness check.');
