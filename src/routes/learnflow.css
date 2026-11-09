@@ -256,3 +256,27 @@ body { margin: 0; }
   .learnflow-shell, .learnflow-shell button { transition: none; }
   .learnflow-shell button:active { transform: none; }
 }
+
+/* Progress while a simplification runs: the spinner on the button, four steps and an indeterminate bar. */
+.learnflow-shell .spinner {
+  display: inline-block; width: .9em; height: .9em; margin-right: .5em; vertical-align: -.1em;
+  border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%;
+  animation: lf-spin .8s linear infinite;
+}
+.learnflow-shell .progress { margin: 1rem 0 .25rem; }
+.learnflow-shell .steps { display: flex; gap: .5rem; flex-wrap: wrap; list-style: none; margin: 0 0 .6rem; padding: 0; font-size: .85rem; }
+.learnflow-shell .steps li { padding: .2rem .65rem; border-radius: 999px; background: var(--accent-tint); color: var(--muted); }
+.learnflow-shell .steps li.current { background: var(--accent); color: #fff; font-weight: 600; }
+.learnflow-shell .steps li.done { color: var(--accent); }
+.learnflow-shell .steps li.done::before { content: '✓ '; }
+.learnflow-shell .bar { height: 4px; overflow: hidden; border-radius: 4px; background: var(--accent-tint); }
+.learnflow-shell .bar span { display: block; height: 100%; width: 35%; border-radius: 4px; background: var(--accent); animation: lf-slide 1.2s ease-in-out infinite; }
+.learnflow-shell .lesson.live { border-left: 3px dashed var(--accent); padding-left: 1rem; }
+.learnflow-shell .caret { display: inline-block; width: .5em; height: 1.1em; margin-top: .5rem; background: var(--accent); animation: lf-blink 1s steps(2) infinite; }
+@keyframes lf-spin { to { transform: rotate(360deg); } }
+@keyframes lf-slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+@keyframes lf-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .learnflow-shell .spinner, .learnflow-shell .caret { animation: none; }
+  .learnflow-shell .bar span { animation: none; width: 100%; opacity: .5; }
+}

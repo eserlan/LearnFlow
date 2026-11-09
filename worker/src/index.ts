@@ -1,4 +1,4 @@
-import { simplifyWithAi, validatePayload, AiError, type AiEnv } from './simplify.ts';
+import { simplifyStream, simplifyWithAi, validatePayload, AiError, type AiEnv, type SimplifyPayload } from './simplify.ts';
 import { synthesizeLesson, validateSpeakPayload } from './speak.ts';
 
 /**
@@ -110,6 +110,41 @@ function processingEnabled(env:Env): boolean {
   return capabilityReason(env) === null;
 }
 
+/**
+ * Server-sent events for /api/simplify: `accepted` as soon as the request has passed validation, then a
+ * `sentence` per checked sentence, `reset` if a retry makes the client drop them, and finally `done` with the
+ * complete validated lesson (or `error` with a code and a safe reason). Nothing is logged or stored.
+ */
+function simplifyEventStream(input: SimplifyPayload, env: Env,
+  fetcher: (url:string, init:RequestInit)=>Promise<Response>, origin: string): Response {
+  const encoder = new TextEncoder();
+  const frame = (event: string, data: unknown) => encoder.encode('event: ' + event + '\ndata: ' + JSON.stringify(data) + '\n\n');
+  const events = simplifyStream(input, env, fetcher);
+  const body = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      controller.enqueue(frame('accepted', {sourceVersion: input.sourceVersion}));
+      try {
+        for await (const e of events) {
+          if (e.type === 'sentence') controller.enqueue(frame('sentence', {index: e.index, sentence: e.sentence}));
+          else if (e.type === 'reset') controller.enqueue(frame('reset', {}));
+          // 'verified' is the legacy client contract flag; see liveSimplify.
+          else controller.enqueue(frame('done', {sourceVersion: input.sourceVersion, verified: true, result: e.lesson}));
+        }
+      } catch (error) {
+        controller.enqueue(frame('error', error instanceof AiError
+          ? (error.reason ? {error: error.code, reason: error.reason} : {error: error.code})
+          : {error: 'processing_failed'}));
+      }
+      controller.close();
+    },
+    cancel() { void events.return(undefined); }
+  });
+  const headers = headersFor(origin, env);
+  headers.set('Content-Type', 'text/event-stream; charset=utf-8');
+  headers.set('X-Accel-Buffering', 'no');
+  return new Response(body, { status: 200, headers });
+}
+
 async function liveSimplify(request: Request, origin: string, env: Env,
   fetcher: (url:string, init:RequestInit)=>Promise<Response>): Promise<Response> {
   if (!processingEnabled(env)) {
@@ -150,6 +185,10 @@ async function liveSimplify(request: Request, origin: string, env: Env,
   catch { return json({error:'invalid_request'},400,origin,env); }
   const input=validatePayload(raw);
   if(!input)return json({error:'invalid_request'},422,origin,env);
+  // Stream sentences as they are written when the client asks for server-sent events.
+  if (request.headers.get('Accept')?.toLowerCase().includes('text/event-stream')) {
+    return simplifyEventStream(input,env,fetcher,origin);
+  }
   try {
     const result=await simplifyWithAi(input,env,fetcher);
     // 'verified' is a legacy client contract flag meaning basic validation passed.
@@ -159,7 +198,7 @@ async function liveSimplify(request: Request, origin: string, env: Env,
     if(error instanceof AiError){
       const status=error.code==='invalid-output' || error.code==='provider_bad_request' ? 502 :
         error.code==='provider_quota' ? 429 : 503;
-      return json({error:error.code},status,origin,env);
+      return json(error.reason?{error:error.code,reason:error.reason}:{error:error.code},status,origin,env);
     }
     return json({error:'processing_failed'},503,origin,env);
   }
@@ -219,7 +258,7 @@ async function liveSpeak(request: Request, origin: string, env: Env,
     if (error instanceof AiError) {
       const status=error.code==='invalid-output' || error.code==='provider_bad_request' ? 502 :
         error.code==='provider_quota' ? 429 : 503;
-      return json({error:error.code},status,origin,env);
+      return json(error.reason?{error:error.code,reason:error.reason}:{error:error.code},status,origin,env);
     }
     return json({error:'processing_failed'},503,origin,env);
   }
