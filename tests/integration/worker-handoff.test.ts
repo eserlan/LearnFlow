@@ -51,6 +51,14 @@ describe('local draft → consent gate → HTTP Worker fixture → local result'
     expect((await db.drafts.get(SMOKE_FIXTURE.draftId))?.html).toBe(pastedHtml);
   });
 
+  it('adds outputLanguage to the request only when English is chosen', async () => {
+    await createDraft(createSource(), createDocument());
+    const outbound = mockFetch();
+    await simplifyDraft(SMOKE_FIXTURE.draftId, { canProcess: async () => true },
+      createWorkerProcessor(API, outbound), undefined, 'en');
+    expect(JSON.parse(outbound.mock.calls[0][1].body as string)).toEqual({ ...SMOKE_FIXTURE, outputLanguage: 'en' });
+  });
+
   it('sends only the synthetic fixture after consent and marks the local draft processed', async () => {
     await createDraft(createSource(), createDocument());
     const outbound = mockFetch();

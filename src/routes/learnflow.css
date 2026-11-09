@@ -508,3 +508,9 @@ body { margin: 0; }
   .learnflow-shell .topbar { gap: .5rem; }
   .learnflow-shell button.segment { padding: .35rem .6rem; }
 }
+
+/* Choice of the language the lesson is written in. */
+.learnflow-shell .output-choice { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .8rem; margin: 0 0 .4rem; }
+.learnflow-shell .output-label { font-weight: 590; font-size: .95rem; }
+.learnflow-shell .lesson .note.translated { margin-top: 1.5rem; }
+.learnflow-shell .lesson .note.translated + .note.caution { margin-top: .6rem; }

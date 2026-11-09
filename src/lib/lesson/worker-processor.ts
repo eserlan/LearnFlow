@@ -74,7 +74,8 @@ export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fet
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ draftId: request.draftId, sourceVersion: request.sourceVersion,
-            idempotencyKey: request.idempotencyKey, plainText: request.plainText }),
+            idempotencyKey: request.idempotencyKey, plainText: request.plainText,
+            ...(request.outputLanguage ? { outputLanguage: request.outputLanguage } : {}) }),
           cache: 'no-store',
           credentials: 'omit',
           redirect: 'error'
@@ -109,7 +110,8 @@ export function createWorkerProcessor(apiBaseUrl: string, fetcher: Fetcher = fet
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
           body: JSON.stringify({ draftId: request.draftId, sourceVersion: request.sourceVersion,
-            idempotencyKey: request.idempotencyKey, plainText: request.plainText }),
+            idempotencyKey: request.idempotencyKey, plainText: request.plainText,
+            ...(request.outputLanguage ? { outputLanguage: request.outputLanguage } : {}) }),
           cache: 'no-store',
           credentials: 'omit',
           redirect: 'error'

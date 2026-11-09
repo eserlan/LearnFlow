@@ -22,7 +22,7 @@ export function getVerifiedSentences(response: SimplificationResult): Sentence[]
   return result;
 }
 
-export async function saveVerifiedLesson(draftId: string, response: SimplificationResult): Promise<StoredLesson> {
+export async function saveVerifiedLesson(draftId: string, response: SimplificationResult, outputLanguage?: 'en'): Promise<StoredLesson> {
   const sentences = getVerifiedSentences(response);
   if (!sentences) throw new Error('The AI result is not a verified lesson.');
   return db.transaction('rw', db.drafts, db.lessons, async () => {
@@ -37,6 +37,7 @@ export async function saveVerifiedLesson(draftId: string, response: Simplificati
       createdAt: Date.now(),
       lastAccessedAt: Date.now(),
       pinned: false,
+      ...(outputLanguage ? { outputLanguage } : {}),
       sentences
     };
     await db.lessons.put(lesson);

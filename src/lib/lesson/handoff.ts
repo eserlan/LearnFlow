@@ -2,7 +2,9 @@ import { db } from '../storage/db';
 import { saveAttempt, touchDraft } from '../storage/drafts';
 
 export interface ConsentGate { canProcess(draftId: string): Promise<boolean> }
-export interface SimplificationRequest { draftId: string; sourceVersion: number; idempotencyKey: string; plainText: string; html?: string }
+/** Absent: write in the language of the source. English is the only alternative. */
+export type OutputLanguage = 'en';
+export interface SimplificationRequest { draftId: string; sourceVersion: number; idempotencyKey: string; plainText: string; html?: string; outputLanguage?: OutputLanguage }
 export interface SimplificationResult { sourceVersion: number; verified: boolean; result: unknown }
 /** Progress while a streamed simplification runs. Streamed sentences are provisional drafts; the result replaces them. */
 export interface StreamHooks {
@@ -19,7 +21,7 @@ export type HandoffErrorCode = 'consent-required' | 'processor-unavailable' | 's
 export class HandoffError extends Error { constructor(readonly code: HandoffErrorCode, message: string) { super(message); } }
 
 /** Only this boundary may send pupil text off device. Consent and a real processor are mandatory. */
-export async function simplifyDraft(draftId: string, consent: ConsentGate, processor?: SimplificationProcessor, hooks?: StreamHooks): Promise<SimplificationResult> {
+export async function simplifyDraft(draftId: string, consent: ConsentGate, processor?: SimplificationProcessor, hooks?: StreamHooks, outputLanguage?: OutputLanguage): Promise<SimplificationResult> {
   const draft = await db.drafts.get(draftId);
   if (!draft) throw new HandoffError('stale-source', 'This saved text no longer exists.');
   const allowed = await consent.canProcess(draftId).catch(() => false);
@@ -36,7 +38,8 @@ export async function simplifyDraft(draftId: string, consent: ConsentGate, proce
       sourceVersion: draft.version,
       idempotencyKey,
       // Pasted HTML stays on-device; the Worker accepts plain text only.
-      plainText: draft.plainText
+      plainText: draft.plainText,
+      ...(outputLanguage ? { outputLanguage } : {})
     };
     const result = processor.simplifyStream && hooks
       ? await processor.simplifyStream(request, hooks)

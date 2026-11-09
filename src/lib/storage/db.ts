@@ -1,7 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { ProcessingAttempt, SourceBlock, SourceDraft } from '../import/types';
 
-export interface StoredLesson { id: string; draftId: string; sourceVersion: number; title: string; createdAt: number; lastAccessedAt?: number; pinned?: boolean; sentences: Array<{ text: string; kind: 'heading' | 'statement' | 'list-item' | 'task' | 'quote'; sources: string[] }> }
+export interface StoredLesson { id: string; draftId: string; sourceVersion: number; title: string; createdAt: number; lastAccessedAt?: number; pinned?: boolean; outputLanguage?: 'en'; sentences: Array<{ text: string; kind: 'heading' | 'statement' | 'list-item' | 'task' | 'quote'; sources: string[] }> }
 export interface StoredDocument { id: string; draftId: string; version: number; blocks: SourceBlock[]; wordCount: number; language: string }
 /** Binary audio lives on the device: OPFS when available, otherwise IndexedDB. */
 export interface StoredAudio { id: string; draftId: string; createdAt: number; storage: 'opfs' | 'indexeddb'; blob?: Blob }

@@ -278,3 +278,38 @@ describe('real AI adapter (synthetic content only)',()=>{
   });
 
 });
+
+describe('English output language',()=>{
+  it('accepts only "en" as an alternative to the source language',()=>{
+    assert.deepEqual(validatePayload({...input,outputLanguage:'en'})?.outputLanguage,'en');
+    assert.equal(validatePayload({...input})?.outputLanguage,undefined);
+    for (const bad of ['no','nb','EN','fr','',null,1,['en']]) assert.equal(validatePayload({...input,outputLanguage:bad}),null,String(bad));
+  });
+  it('asks for English in both the system prompt and the user message, and only then',async()=>{
+    const sent: {system:string;user:string}[] = [];
+    const fetcher = async (_url:string, init:RequestInit):Promise<Response> => {
+      const body = JSON.parse(String(init.body));
+      sent.push({system:body.systemInstruction.parts[0].text,user:body.contents[0].parts[0].text});
+      return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(lesson)}]}}]});
+    };
+    await simplifyWithAi(input,configured,fetcher);
+    await simplifyWithAi({...input,outputLanguage:'en'},configured,fetcher);
+    assert.match(sent[0].system,/Write in the same language and written standard as the source/);
+    assert.doesNotMatch(sent[0].user,/in English/);
+    assert.match(sent[1].system,/Write the lesson in simple, clear English/);
+    assert.doesNotMatch(sent[1].system,/Nynorsk stays Nynorsk/);
+    assert.match(sent[1].system,/NOT translated/);
+    assert.match(sent[1].user,/Write the lesson in English/);
+    assert.equal(userMessage(input.plainText),userMessage(input.plainText,undefined));
+  });
+  it('still rejects invented numbers and altered quotations in an English lesson',async()=>{
+    const en: SimplifyPayload = {...input,outputLanguage:'en'};
+    const good = {sentences:[{text:'Most bumblebees can fly far.',kind:'statement',sources:['original']},
+      {text:'Some species fly up to 20 kilometres.',kind:'statement',sources:['original']}]};
+    assert.equal((await simplifyWithAi(en,configured,provider(good).fetcher)).sentences.length,2);
+    const invented = {sentences:[{text:'Some species fly up to 25 kilometres.',kind:'statement',sources:['original']}]};
+    await assert.rejects(simplifyWithAi(en,configured,provider(invented).fetcher),{code:'invalid-output'});
+    const translatedQuote = {sentences:[{text:'Most bumblebees can fly far.',kind:'quote',sources:['original']}]};
+    await assert.rejects(simplifyWithAi(en,configured,provider(translatedQuote).fetcher),{code:'invalid-output'});
+  });
+});
