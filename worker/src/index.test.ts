@@ -29,7 +29,7 @@ describe('stateless Cloudflare Worker API', () => {
   });
 
   it('allows canonical production frontend even when ALLOWED_ORIGINS is unset or stale', async () => {
-    const production = 'https://learnflow-nine-pied.vercel.app';
+    const production = 'https://learnflow.espen-erlandsen.workers.dev';
     const missingOriginConfig = await handleRequest(new Request(api + '/capabilities', {
       headers: { Origin: production }
     }), {});

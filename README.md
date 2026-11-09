@@ -29,6 +29,3 @@ is public and defined in `.env.production`. There are **no Google API secrets in
 See [Cloudflare Workers Static Assets setup](docs/cloudflare-workers-static-deployment.md). The intended
 production domain is `https://learnflow.espen-erlandsen.workers.dev`; the AI Worker stays at
 `https://learnflow-serv.espen-erlandsen.workers.dev`.
-
-Do not retire the old Vercel origin before providing an export/import path for
-locally stored lessons and audio.

@@ -1,6 +1,6 @@
 # ADR-0001: Installable SvelteKit web app, stateless EU functions on Vercel, Gemini Flash via the Gemini API
 
-**Status:** Accepted. The simplification model was chosen on pilot results and is confirmed on the full
+**Status:** Accepted. Note: hosting on Vercel (Decision 3) was superseded by ADR-0002 and Vercel is no longer used; the references to it below are kept as history. The simplification model was chosen on pilot results and is confirmed on the full
 practice split (see Decision 4).
 **Date:** 2026-11-05. **Revised:** 2026-11-06, three times. First the language model moved from Gemini on Vertex AI
 (EU endpoint) to Claude through the Anthropic API with global inference. Then, after the first harness

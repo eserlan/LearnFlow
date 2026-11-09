@@ -5,7 +5,7 @@ import { handleRequest, type Env } from './index.ts';
 
 const text='Planter trenger lys og vann. De vokser best når de får nok av begge deler.';
 const input={ lessonId:'lesson-123:1',text };
-const origin='https://learnflow-nine-pied.vercel.app';
+const origin='https://learnflow.espen-erlandsen.workers.dev';
 const env:Env={GEMINI_API_KEY:'test-key', GEMINI_MODEL:'test-model',
   RATE_LIMITER:{limit:async()=>({success:true})}};
 const wav=new Uint8Array(48);

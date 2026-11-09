@@ -56,8 +56,7 @@ uses `cd worker && npm run deploy`, **never** the repo root deployment
 command.
 
 The API allows the exact frontend origin
-`https://learnflow.espen-erlandsen.workers.dev`, plus legacy Vercel
-and Pages origins during migration. All API endpoints remain on
+`https://learnflow.espen-erlandsen.workers.dev`, plus the Pages origin. All API endpoints remain on
 `learnflow-serv`; the static Worker only serves app files.
 
 If you renamed the API Worker in the dashboard rather than creating a new
@@ -74,9 +73,8 @@ and that its secrets and limiter binding survived.
 3. With **fictional** Norwegian test text, simplify, select **Lag lyd**,
    play the WAV, reload the page and confirm it can play again.
 4. Confirm the PWA manifests and `/service-worker.js` load.
-5. Only when this works consider retiring Vercel. User lessons and audio
-   are tied to the old origin, so migration requires explicit export/import.
-   Track this in GitHub issue #30.
+5. Vercel is no longer used. Lessons and audio saved on the old Vercel origin
+   stay on that origin's browser storage and are not migrated.
 
 References:
 - https://developers.cloudflare.com/workers/static-assets/migration-guides/vercel-to-workers/static-site/

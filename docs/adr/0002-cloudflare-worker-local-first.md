@@ -10,7 +10,7 @@ LearnFlow already has a SvelteKit 5 PWA, Dexie/IndexedDB source drafts, a consen
 
 ## Decision
 
-1. **Frontend:** retain the existing SvelteKit application at the repository root, deployed on Vercel with independent PR preview deployments. Do not force a monorepo migration just for a Worker.
+1. **Frontend:** retain the existing SvelteKit application at the repository root, deployed as Cloudflare Workers Static Assets (originally planned on Vercel; Vercel is no longer used). Do not force a monorepo migration just for a Worker.
 2. **AI API:** provide a separate, stateless Cloudflare Worker. The intended public contract is `POST /api/simplify`, `POST /api/speak`, and `GET /health`. Requests are transient; results are returned to the browser. Worker integration must use the existing consent-protected `SimplificationProcessor` boundary.
 3. **Store all source and generated files on the pupil's device:** source text, source documents, lesson metadata and progress in Dexie/IndexedDB; generated audio in OPFS where supported (with a deliberate fallback). Keep the original source on-device for provenance and retry. Existing expiry and delete features continue to apply. Do not sync or back up files to the server.
 4. **No cloud persistence in the MVP:** no R2, D1, KV, Durable Objects, server-side session database, Cloudflare Workflows, or other persistent stores of pupil content. Do not use a CDN/API cache for private processing results. Do not log source text, simplified responses, generated audio, or student-entered content.
@@ -40,7 +40,7 @@ This ADR **supersedes ADR-0001 Decision 3 (Vercel Node.js server functions) and 
 ## Delivery sequence / gates
 
 1. Scaffold an isolated Worker (no persistence bindings), health endpoint, CORS policy, placeholder AI endpoints and tests.
-2. Confirm actual Vercel project configuration and independent Worker deployment. Set explicit preview/production allowed origins, no wildcard.
+2. Confirm the Static Assets frontend and independent Worker deployment. Set explicit preview/production allowed origins, no wildcard.
 3. Implement request validation, rate limiting and appropriate authentication/abuse controls; document secret management, no-content logging and operational metrics.
 4. Implement the spec 006 consent/privacy gate and provider privacy/DPIA approval **before** passing real student content to the Worker.
 5. Implement source-grounded `/api/simplify` via the existing processor interface, preserving source IDs, verification and fallback; later implement `/api/speak` and client-side OPFS storage.
