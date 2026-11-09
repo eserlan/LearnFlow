@@ -71,6 +71,18 @@ describe('real AI adapter (synthetic content only)',()=>{
       return new Response(null,{status:302,headers:{Location:'https://example.invalid'}});
     }),{code:'unavailable'});
   });
+  it('rejects links and web addresses that were not in the original text, but keeps ones that were',async()=>{
+    const bad=provider({sentences:[{text:'Les mer på https://eksempel.no/gratis i dag.',kind:'statement',sources:['original']}]});
+    await assert.rejects(simplifyWithAi(input,configured,bad.fetcher),{code:'invalid-output',reason:'links'});
+    const bare=provider({sentences:[{text:'Se eksempel.no for mer.',kind:'statement',sources:['original']}]});
+    await assert.rejects(simplifyWithAi(input,configured,bare.fetcher),{code:'invalid-output',reason:'links'});
+    const withLink:SimplifyPayload={...input,plainText:'Les mer på ndla.no/fag. Humler kan fly.'};
+    const ok=provider({sentences:[{text:'Les mer på ndla.no/fag.',kind:'statement',sources:['original']}]});
+    assert.equal((await simplifyWithAi(withLink,configured,ok.fetcher)).sentences[0].text,'Les mer på ndla.no/fag.');
+    // Ordinary text with a full stop between words is not mistaken for a web address.
+    const plain=provider({sentences:[{text:'De fleste humler kan fly langt.',kind:'statement',sources:['original']}]});
+    assert.equal((await simplifyWithAi(input,configured,plain.fetcher)).sentences.length,1);
+  });
   it('rejects numbers that were not in the original text, retrying once, with a safe reason',async()=>{
     const p=provider({sentences:[{text:'Humler flyr 900 kilometer.',kind:'statement',sources:['original']}]});
     await assert.rejects(simplifyWithAi(input,configured,p.fetcher),{code:'invalid-output',reason:'numbers'});

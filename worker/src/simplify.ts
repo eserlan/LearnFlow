@@ -17,7 +17,7 @@ const record = (x: unknown): x is Record<string, unknown> => !!x && typeof x ===
 export type AiErrorCode = 'unavailable' | 'invalid-output' | 'provider_bad_request' |
   'provider_credentials' | 'provider_model_not_found' | 'provider_quota';
 /** Why a model answer was rejected. Only a fixed word: never any text from the source or the answer. */
-export type InvalidReason = 'truncated' | 'json' | 'shape' | 'sentences' | 'numbers' | 'quote' | 'sources';
+export type InvalidReason = 'truncated' | 'json' | 'shape' | 'sentences' | 'numbers' | 'links' | 'quote' | 'sources';
 export class AiError extends Error {
   readonly code: AiErrorCode;
   readonly reason?: InvalidReason;
@@ -33,12 +33,16 @@ export function validatePayload(x: unknown): SimplifyPayload | null {
       x.html !== undefined) return null;
   return x as unknown as SimplifyPayload;
 }
+// Links and web addresses. The model may keep one that the source itself contains, never invent one.
+const LINK = /(?:https?:\/\/|www\.)[^\s)\]>"']+|\b[\p{L}\d-]+(?:\.[\p{L}\d-]+)*\.(?:no|com|org|net|io|dk|se|fi|eu|info|app|dev|ly|me)\b(?:\/[^\s)\]>"']*)?/giu;
 /** Validate one sentence from the model against the source: shape, source id, new numbers, exact quotes. */
 function checkSentence(x: unknown, original: string): LessonSentence {
   if (!record(x) || typeof x.text !== 'string' || !x.text.trim() || x.text.length > 700 ||
       typeof x.kind !== 'string' || !KINDS.has(x.kind) || !Array.isArray(x.sources)) throw new AiError('invalid-output', 'shape');
   if (x.sources.length !== 1 || x.sources[0] !== 'original') throw new AiError('invalid-output', 'sources');
   for (const n of x.text.match(/\d+(?:[.,]\d+)*/g) ?? []) if (!original.includes(n)) throw new AiError('invalid-output', 'numbers');
+  const lowerOriginal = original.toLowerCase();
+  for (const link of x.text.match(LINK) ?? []) if (!lowerOriginal.includes(link.toLowerCase().replace(/[.,;:!?]+$/, ''))) throw new AiError('invalid-output', 'links');
   if (x.kind === 'quote' && !original.includes(x.text)) throw new AiError('invalid-output', 'quote');
   return { text: x.text, kind: x.kind as LessonSentence['kind'], sources: ['original'] };
 }

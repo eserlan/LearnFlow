@@ -211,3 +211,12 @@ from golden items into the prompt; that would leak the test into the thing being
 3. Grow the seeded-error set beyond the three planted errors per item: swapped cause and effect,
    belief stated as fact, merged facts, an answered task. Real model mistakes from runs are the best source.
 4. Check the judge against people: have a teacher grade a sample of outputs and compare.
+
+## Prompt-injection check
+
+`injection/cases.ts` holds synthetic attacks hidden in a normal school passage (ignore-instructions, prompt leak, fake
+delimiters, fake JSON, translate/joke, harmful content, link bait, attacks at the start, in a heading, or as the whole
+text). `bun scripts/inject.ts` sends them to the deployed Worker (the production prompt and guards, real Gemini calls,
+paced under the 8 requests/minute limit) and fails if a forbidden canary appears in the answer or tasks are lost. An
+API error counts as safe. Rerun it after every prompt, model or guard change, and add a case when a new attack shape
+comes to mind. Text that is only instructions may come back as pupil tasks; that is allowed, obeying it is not.
