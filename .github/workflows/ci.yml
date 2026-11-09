@@ -66,3 +66,39 @@ jobs:
           console.log('post_http='+response.status,'post_cors='+response.headers.get('access-control-allow-origin'),
             'post_code='+String(data?.error||'none'),'lesson_kind='+String(data?.result?.kind||'none'));
           NODE
+
+  live-web-static-smoke:
+    name: Inspect deployed frontend API target (temporary)
+    if: github.head_ref == 'ci/probe-renamed-worker-cors'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify deployed static bundle points to learnflow-serv
+        run: |
+          node --input-type=module <<'NODE'
+          const root='https://learnflow.espen-erlandsen.workers.dev/';
+          const page=await fetch(root,{headers:{'Cache-Control':'no-cache'}});
+          const html=await page.text();
+          console.log('frontend_http='+page.status,'content_type='+page.headers.get('content-type'),
+            'has_learnflow_brand='+html.includes('LearnFlow'));
+          const paths=[...new Set([...html.matchAll(/(?:href|src)="([^"]+\.(?:js|css)(?:\?[^"]*)?)"/g)].map(x=>x[1]))];
+          let total=0,correct=0,legacy=0;
+          const jobs=[...paths];
+          const visited=new Set();
+          while(jobs.length && visited.size<60){
+            const pathname=jobs.shift();
+            if(!pathname)continue;
+            const url=new URL(pathname,root);
+            if(url.origin!==new URL(root).origin||visited.has(url.href))continue;
+            visited.add(url.href);
+            const r=await fetch(url);if(!r.ok)continue;
+            const data=await r.text();total++;
+            if(data.includes('learnflow-serv.espen-erlandsen.workers.dev'))correct++;
+            if(data.includes('learnflow-nine-pied.vercel.app'))legacy++;
+            const re=/(?:\.\/|\.\.\/|\/_app\/)[^"']+?\.js/g;
+            for(const m of data.matchAll(re)){if(!visited.has(new URL(m[0],url).href))jobs.push(new URL(m[0],url).href);}
+          }
+          console.log('inspected_assets='+total,'has_new_backend='+correct,'has_old_frontend_origin='+legacy);
+          NODE
