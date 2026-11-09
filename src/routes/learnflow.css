@@ -366,3 +366,40 @@ body { margin: 0; }
 }
 .learnflow-shell .reading-fold[open] { flex-basis: 100%; }
 .learnflow-shell .reading-fold .reading-options { margin-top: .5rem; }
+
+/* First-visit guide, hints, privacy fold and the About page. */
+.learnflow-shell .how { list-style: none; margin: 0 0 1.15rem; padding: 0; display: grid; gap: .6rem; }
+.learnflow-shell .how li {
+  display: flex; align-items: center; gap: .85rem; margin: 0; padding: .8rem 1rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 1rem;
+}
+.learnflow-shell .how .num {
+  flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--accent); color: #fff; font-weight: 700;
+}
+.learnflow-shell[data-theme="dark"] .how .num { color: #10162a; }
+.learnflow-shell .more { margin-top: .35rem; }
+.learnflow-shell .more summary { cursor: pointer; font-size: .83rem; color: var(--muted); font-weight: 600; }
+.learnflow-shell .note.expiry { margin: 0 0 .5rem; }
+.learnflow-shell .hint {
+  margin: .8rem 0 0; padding: .7rem .9rem; font-size: 1rem; line-height: 1.45;
+  background: var(--accent-tint); border: 1px solid var(--accent); border-radius: .85rem;
+}
+.learnflow-shell .hint button { margin: .4rem 0 0; min-height: 2.4rem; display: block; }
+.learnflow-shell button.linklike {
+  display: inline; min-height: 0; margin: 0; padding: 0; border: 0; background: none; color: var(--ink);
+  font: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: .18rem;
+}
+.learnflow-shell button.linklike:hover:not(:disabled) { background: none; color: var(--accent-hover); }
+.learnflow-shell[data-theme="dark"] button.linklike:not(.secondary):not(.theme-toggle) { color: var(--ink); background: none; }
+.learnflow-shell .site-footer { padding: 1rem 0 0; text-align: center; font-size: .9rem; }
+.learnflow-shell .site-footer a, .learnflow-shell .about a { color: var(--muted); }
+.learnflow-shell .about section p { margin: .5rem 0; }
+.learnflow-shell .about section h2 { margin-bottom: .5rem; }
+.learnflow-shell .about section > p { color: var(--ink); }
+@media (max-width: 600px) {
+  .learnflow-shell .how, .learnflow-shell .about > p:first-child {
+    margin-inline: max(1rem, env(safe-area-inset-left)) max(1rem, env(safe-area-inset-right));
+  }
+  .learnflow-shell .about > p:first-child { margin-bottom: 0; }
+}
