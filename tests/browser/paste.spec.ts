@@ -222,3 +222,28 @@ test('language switch is a radio group with arrow-key support', async ({ page })
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('html')).toHaveAttribute('lang', 'nn');
 });
+
+test('on a phone a long lesson title keeps the full row width and the actions wrap below it', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await seedLesson(page);
+  await page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('learnflow'); request.onsuccess = () => resolve(request.result); request.onerror = reject;
+    });
+    const tx = db.transaction('lessons', 'readwrite');
+    const store = tx.objectStore('lessons');
+    const get = store.get('d1:1');
+    get.onsuccess = () => store.put({ ...get.result, title: 'In-Depth Guide: Post-Production in Video Production and more' });
+    await new Promise<void>((resolve) => { tx.oncomplete = () => resolve(); });
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  const row = page.getByRole('button', { name: /Vis leksjon/ });
+  const box = await row.boundingBox();
+  expect(box!.width).toBeGreaterThan(300);
+  const menu = page.locator('summary[aria-label^="Flere valg"]');
+  const menuBox = await menu.boundingBox();
+  expect(menuBox!.y).toBeGreaterThan(box!.y + box!.height - 1);
+  const toggle = await page.getByRole('button', { name: /modus/ }).boundingBox();
+  expect(toggle!.x + toggle!.width).toBeLessThanOrEqual(390);
+  await page.locator('.lesson-list').screenshot({ path: 'test-results/lesson-row-mobile.png' });
+});
