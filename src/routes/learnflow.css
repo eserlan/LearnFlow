@@ -316,6 +316,14 @@ body { margin: 0; }
 .learnflow-shell .row-title { font-weight: 650; overflow-wrap: anywhere; }
 .learnflow-shell .row-meta { font-size: .82rem; font-weight: 450; color: var(--muted); }
 .learnflow-shell .lesson-list button.danger { margin: 0; }
+.learnflow-shell .lesson-list button.pin {
+  flex: none; margin: 0; width: 2.8rem; padding: 0;
+  display: grid; place-items: center; font-size: 1.05rem;
+  opacity: .65;
+}
+.learnflow-shell .lesson-list button.pin[aria-pressed="true"] {
+  background: var(--accent-tint); border-color: var(--accent); opacity: 1;
+}
 .learnflow-shell .reading-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem; font-size: 1rem; line-height: 1.3; }
 .learnflow-shell .reading-bar button { margin: 0; min-height: 2.6rem; padding: .5rem .8rem; font-size: .9rem; }
 .learnflow-shell .reading-options { display: flex; flex-wrap: wrap; gap: .35rem; }
