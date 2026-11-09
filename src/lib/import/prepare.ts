@@ -1,4 +1,5 @@
 import type { ClipboardInput, Language, SourceBlock } from './types';
+import { plainTitle } from '../markdown';
 
 export interface PreparedSource {
 	blocks: SourceBlock[];
@@ -35,7 +36,7 @@ export function prepareSource(input: ClipboardInput): PreparedSource {
 		...(input.html ? { html: input.html } : {}),
 		wordCount: words,
 		language: 'uncertain',
-		title: input.plainText.split(/\r\n|\r|\n/).find((line) => line.trim())?.trim() ?? 'Untitled lesson',
+		title: plainTitle(input.plainText.split(/\r\n|\r|\n/).find((line) => line.trim()) ?? '') || 'Untitled lesson',
 		needsSectionChoice: words > 2000,
 		warnings: words < 30 ? ['This is a short text. There may not be much to simplify.'] : []
 	};

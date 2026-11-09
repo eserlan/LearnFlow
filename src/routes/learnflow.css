@@ -169,7 +169,9 @@ body { margin: 0; }
 .learnflow-shell li strong { font-weight: 650; }
 .learnflow-shell .actions { display: flex; flex-wrap: wrap; gap: .25rem; margin-top: .7rem; }
 .learnflow-shell .actions button { margin: .2rem .25rem .2rem 0; }
-.learnflow-shell .lesson { font-size: 1.125rem; line-height: 1.8; }
+.learnflow-shell .lesson { font-size: var(--lesson-size, 1.125rem); line-height: 1.8; }
+.learnflow-shell .lesson.spacious { line-height: 2.1; letter-spacing: .01em; word-spacing: .06em; }
+.learnflow-shell .lesson.clear-font { font-family: "Atkinson Hyperlegible", Verdana, "Trebuchet MS", "Segoe UI", sans-serif; }
 .learnflow-shell .lesson h2 { font-size: 1.5rem; line-height: 1.3; }
 .learnflow-shell .audio-panel {
   margin: 1rem 0 1.3rem;
@@ -264,14 +266,14 @@ body { margin: 0; }
   animation: lf-spin .8s linear infinite;
 }
 .learnflow-shell .progress { margin: 1rem 0 .25rem; }
-.learnflow-shell .steps { display: flex; gap: .5rem; flex-wrap: wrap; list-style: none; margin: 0 0 .6rem; padding: 0; font-size: .85rem; }
-.learnflow-shell .steps li { padding: .2rem .65rem; border-radius: 999px; background: var(--accent-tint); color: var(--muted); }
+.learnflow-shell .steps { display: flex; gap: .3rem; flex-wrap: wrap; list-style: none; margin: 0 0 .6rem; padding: 0; font-size: .8rem; }
+.learnflow-shell .steps li { padding: .2rem .55rem; border: 0; border-radius: 999px; background: var(--accent-tint); color: var(--muted); }
 .learnflow-shell .steps li.current { background: var(--accent); color: #fff; font-weight: 600; }
 .learnflow-shell .steps li.done { color: var(--accent); }
 .learnflow-shell .steps li.done::before { content: '✓ '; }
 .learnflow-shell .bar { height: 4px; overflow: hidden; border-radius: 4px; background: var(--accent-tint); }
 .learnflow-shell .bar span { display: block; height: 100%; width: 35%; border-radius: 4px; background: var(--accent); animation: lf-slide 1.2s ease-in-out infinite; }
-.learnflow-shell .lesson.live { border-left: 3px dashed var(--accent); padding-left: 1rem; }
+.learnflow-shell .lesson.live { outline: 2px dashed var(--accent); outline-offset: -8px; }
 .learnflow-shell .caret { display: inline-block; width: .5em; height: 1.1em; margin-top: .5rem; background: var(--accent); animation: lf-blink 1s steps(2) infinite; }
 @keyframes lf-spin { to { transform: rotate(360deg); } }
 @keyframes lf-slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
@@ -280,3 +282,87 @@ body { margin: 0; }
   .learnflow-shell .spinner, .learnflow-shell .caret { animation: none; }
   .learnflow-shell .bar span { animation: none; width: 100%; opacity: .5; }
 }
+
+/* Reading view, worksheet tasks, undo toast, lesson list, reading options. */
+.learnflow-shell .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.learnflow-shell .origin-field { margin-top: .9rem; }
+.learnflow-shell .origin-field summary { cursor: pointer; color: var(--muted); font-size: .9rem; font-weight: 600; }
+.learnflow-shell .origin-field input { margin-top: .5rem; }
+.learnflow-shell .word-count.near { color: var(--ink); font-weight: 600; }
+.learnflow-shell .word-count.over { color: var(--danger); font-weight: 700; }
+.learnflow-shell .problem { margin-top: .9rem; padding: .85rem 1rem; border: 1px solid var(--danger); border-radius: .8rem; }
+.learnflow-shell .problem p[role="alert"] { margin: 0 0 .4rem; font-weight: 600; }
+.learnflow-shell .problem button { margin: .2rem 0; }
+.learnflow-shell .problem details { margin-top: .4rem; font-size: .85rem; color: var(--muted); }
+.learnflow-shell .problem summary { cursor: pointer; }
+.learnflow-shell button.danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+.learnflow-shell button.danger:hover:not(:disabled) { background: var(--danger); color: var(--surface); }
+.learnflow-shell[data-theme="dark"] button.danger:not(.theme-toggle) { color: var(--danger); background: transparent; }
+.learnflow-shell .toast {
+  position: sticky; top: .5rem; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  margin: 0 0 1rem; padding: .35rem .5rem .35rem 1rem;
+  background: var(--ink); color: var(--surface); border-radius: .8rem; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+}
+.learnflow-shell .toast button { margin: 0; min-height: 2.4rem; }
+.learnflow-shell .lesson-list li { display: flex; align-items: center; gap: .5rem; padding: .35rem 0; }
+.learnflow-shell .lesson-list button.row {
+  flex: 1; min-width: 0; margin: 0; padding: .7rem .85rem;
+  display: flex; flex-direction: column; align-items: flex-start; gap: .1rem; text-align: left;
+  background: var(--surface-soft); color: var(--ink); border-color: var(--border);
+}
+.learnflow-shell[data-theme="dark"] .lesson-list button.row { color: var(--ink); }
+.learnflow-shell .lesson-list button.row:hover { background: var(--accent-tint); }
+.learnflow-shell .row-title { font-weight: 650; overflow-wrap: anywhere; }
+.learnflow-shell .row-meta { font-size: .82rem; font-weight: 450; color: var(--muted); }
+.learnflow-shell .lesson-list button.danger { margin: 0; }
+.learnflow-shell .reading-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem; font-size: 1rem; line-height: 1.3; }
+.learnflow-shell .reading-bar button { margin: 0; min-height: 2.6rem; padding: .5rem .8rem; font-size: .9rem; }
+.learnflow-shell .reading-options { display: flex; flex-wrap: wrap; gap: .35rem; }
+.learnflow-shell .reading-options button[aria-pressed="true"] { background: var(--accent-tint); border-color: var(--accent); color: var(--ink); }
+.learnflow-shell .reading h2 { margin: 1.2rem 0 .4rem; font-size: calc(var(--lesson-size, 1.125rem) * 1.45); line-height: 1.25; outline: none; }
+.learnflow-shell .lesson h3 { font-size: calc(var(--lesson-size, 1.125rem) * 1.1); }
+.learnflow-shell .lesson .audio-panel {
+  position: sticky; top: .4rem; z-index: 4;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem;
+  margin: .6rem 0 1.2rem; padding: .6rem .8rem; font-size: 1rem; line-height: 1.4;
+  box-shadow: 0 6px 18px rgba(20, 32, 68, .08);
+}
+.learnflow-shell .lesson .audio-panel button { margin: 0; }
+.learnflow-shell .lesson .audio-panel audio { flex: 1 1 14rem; width: auto; margin: 0; }
+.learnflow-shell .lesson .audio-panel .note { flex: 1 1 12rem; margin: 0; font-size: .8rem; }
+.learnflow-shell .lesson .audio-panel [role="alert"], .learnflow-shell .lesson .audio-panel [role="status"] { flex-basis: 100%; }
+.learnflow-shell .lesson ul.items { list-style: disc; padding-left: 1.4rem; margin: .75rem 0; }
+.learnflow-shell .lesson ul.items li { padding: .15rem 0; border: 0; }
+.learnflow-shell .lesson ol.tasks {
+  list-style: none; counter-reset: task; margin: .75rem 0 1.25rem; padding: .35rem 1rem;
+  background: var(--accent-tint); border: 1px solid var(--border); border-radius: 1rem;
+}
+.learnflow-shell .lesson ol.tasks li { counter-increment: task; display: flex; gap: .8rem; padding: .8rem 0; border-bottom: 1px solid var(--border); }
+.learnflow-shell .lesson ol.tasks li:last-child { border-bottom: 0; }
+.learnflow-shell .lesson ol.tasks li::before {
+  content: counter(task); flex: none; display: grid; place-items: center;
+  width: 1.9rem; height: 1.9rem; margin-top: .1rem; border-radius: 50%;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: .9rem;
+}
+.learnflow-shell[data-theme="dark"] .lesson ol.tasks li::before { color: #10162a; }
+.learnflow-shell .lesson .note.caution { margin-top: 1.5rem; }
+.learnflow-shell .md > :first-child { margin-top: 0; }
+.learnflow-shell .md > :last-child { margin-bottom: 0; }
+.learnflow-shell .md h1, .learnflow-shell .md h2, .learnflow-shell .md h3, .learnflow-shell .md h4 { margin: 1.1rem 0 .4rem; font-size: 1.05rem; line-height: 1.3; }
+.learnflow-shell .md p { margin: .5rem 0; }
+.learnflow-shell .md ul, .learnflow-shell .md ol { list-style: revert; padding-left: 1.3rem; margin: .5rem 0; }
+.learnflow-shell .md li { padding: .15rem 0; border: 0; }
+.learnflow-shell .md hr { border: 0; border-top: 1px solid var(--border); margin: 1rem 0; }
+.learnflow-shell .lesson .source-text { white-space: normal; }
+@media (max-width: 480px) {
+  .learnflow-shell .reading-options button { flex: 1 1 auto; }
+  .learnflow-shell .lesson ol.tasks { padding-inline: .75rem; }
+}
+.learnflow-shell .reading-fold { position: relative; }
+.learnflow-shell .reading-fold summary {
+  cursor: pointer; list-style: none; padding: .5rem .8rem; min-height: 2.6rem; display: flex; align-items: center;
+  border: 1px solid var(--border); border-radius: .75rem; background: var(--surface-soft); font-size: .9rem; font-weight: 650;
+}
+.learnflow-shell .reading-fold[open] { flex-basis: 100%; }
+.learnflow-shell .reading-fold .reading-options { margin-top: .5rem; }

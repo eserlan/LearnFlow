@@ -1,8 +1,9 @@
 import type { StoredLesson } from '../storage/db';
 import { WorkerProcessorError } from './worker-processor';
+import { stripMarkdown } from '../markdown';
 
 export function narratedText(lesson: StoredLesson): string {
-  return lesson.sentences.map((sentence) => sentence.text.trim()).filter(Boolean).join('\n');
+  return lesson.sentences.map((sentence) => stripMarkdown(sentence.text).trim()).filter(Boolean).join('\n');
 }
 
 /** Returns a binary WAV only. The key, origin policy and rate limiting live on the Worker. */
