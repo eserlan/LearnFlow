@@ -299,6 +299,8 @@ describe('English output language',()=>{
     assert.match(sent[1].system,/Write the lesson in simple, clear English/);
     assert.doesNotMatch(sent[1].system,/Nynorsk stays Nynorsk/);
     assert.match(sent[1].system,/NOT translated/);
+    assert.match(sent[1].system,/NOT repeated or put in brackets/);
+    assert.doesNotMatch(sent[1].system,/fotosyntese\)/);
     assert.match(sent[1].user,/Write the lesson in English/);
     assert.equal(userMessage(input.plainText),userMessage(input.plainText,undefined));
   });
