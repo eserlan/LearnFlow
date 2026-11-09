@@ -13,7 +13,7 @@
   import { renderInline, renderMarkdown, plainTitle } from '../lib/markdown';
   import { groupSentences, wordCount, type LessonSentence } from '../lib/lesson/layout';
   import { narratedText, speakLesson } from '../lib/lesson/speak';
-  import { getLessonAudio, storeLessonAudio } from '../lib/storage/audio';
+  import { getLessonAudio, storeLessonAudio, listLessonIdsWithAudio } from '../lib/storage/audio';
   import type { SourceBlock, SourceDraft } from '../lib/import/types';
 
   let text = $state('');
@@ -33,6 +33,11 @@
   let selectedLesson = $state<StoredLesson | null>(null);
   let selectedLessonSource = $state('');
   let audioUrl = $state<string | null>(null);
+  // Playing a saved lesson straight from the list, without opening it.
+  let audioIds = $state<Set<string>>(new Set());
+  let listPlaying = $state<{id:string;title:string;url:string}|null>(null);
+  let listPaused = $state(false);
+  let listAudio = $state<HTMLAudioElement | null>(null);
   let audioBusy = $state(false);
   let audioError = $state('');
   let audioStatus = $state('');
@@ -96,12 +101,13 @@
     } catch { /* storage disabled or unreadable */ }
     void (async () => { await purgeExpiredDrafts(); await refresh(); })();
     const timer = setInterval(async () => { await purgeExpiredDrafts(); await refresh(); }, 60_000);
-    return () => { clearInterval(timer); void commitUndo(); if (audioUrl) URL.revokeObjectURL(audioUrl); };
+    return () => { clearInterval(timer); void commitUndo(); stopListPlayback(); if (audioUrl) URL.revokeObjectURL(audioUrl); };
   });
   async function refresh() {
     drafts = (await db.drafts.where('status').anyOf('pending','failed','processing').toArray())
       .sort((a,b) => b.lastActivityAt - a.lastActivityAt);
     lessons = await db.lessons.orderBy('createdAt').reverse().toArray();
+    audioIds = new Set(await listLessonIdsWithAudio());
   }
   function pasted(event:ClipboardEvent) {
     if (!event.clipboardData?.getData('text/plain')) return;
@@ -258,6 +264,31 @@
       await refresh();
     } finally { busy = false; phase = 'idle'; }
   }
+  function stopListPlayback() {
+    listAudio?.pause();
+    if (listPlaying) URL.revokeObjectURL(listPlaying.url);
+    listPlaying = null; listPaused = false;
+    if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+  }
+  /** One tap on the list: play that lesson's saved audio. Starting another lesson stops the first. */
+  async function playFromList(lesson:StoredLesson) {
+    if (listPlaying?.id === lesson.id) {
+      if (listAudio?.paused) void listAudio.play().catch(() => {}); else listAudio?.pause();
+      return;
+    }
+    stopListPlayback();
+    const wav = await getLessonAudio(lesson.id);
+    if (!wav) { error = copy.audioUnavailable; await refresh(); return; }
+    listPlaying = {id:lesson.id,title:title(lesson.title),url:URL.createObjectURL(wav)};
+    await tick();
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({title:listPlaying.title,artist:'LearnFlow'});
+      navigator.mediaSession.setActionHandler('play',() => void listAudio?.play().catch(() => {}));
+      navigator.mediaSession.setActionHandler('pause',() => listAudio?.pause());
+      navigator.mediaSession.setActionHandler('stop',stopListPlayback);
+    }
+    void listAudio?.play().catch(() => { listPaused = true; });
+  }
   async function focusLesson() {
     await tick();
     lessonTitleElement?.scrollIntoView({block:'start'});
@@ -279,6 +310,7 @@
   }
   async function showLesson(lesson:StoredLesson) {
     if (audioBusy) return;
+    stopListPlayback();
     const source=await db.drafts.get(lesson.draftId);
     if (!source || source.version !== lesson.sourceVersion) { error=copy.unavailable; return; }
     clearAudioPlayer();
@@ -306,6 +338,7 @@
         audioUrl=URL.createObjectURL(wav);
         audioStatus=copy.audioReady;
       }
+      audioIds = new Set([...audioIds, lesson.id]);
     } catch (cause) {
       audioError=storing ? copy.audioStorageFailed : readableSimplificationError(cause,false);
       if (!(cause instanceof WorkerProcessorError) && !storing) audioError=copy.audioNotAvailable;
@@ -350,6 +383,7 @@
     if (busy) return;
     await commitUndo();
     if (selectedLesson?.draftId===id) closeLesson();
+    if (listPlaying && lessons.some(l => l.draftId===id && l.id===listPlaying!.id)) stopListPlayback();
     undo = {id,title:label};
     undoTimer = setTimeout(() => void commitUndo(), 7000);
   }
@@ -457,6 +491,12 @@
             <span class="row-title">{title(lesson.title)}</span>
             <span class="row-meta">{new Date(lesson.createdAt).toLocaleDateString(language === 'nn' ? 'nn-NO' : 'nb-NO',{day:'numeric',month:'short'})} · {wordCount(lesson.sentences)} {copy.wordsShort}</span>
           </button>
+          {#if audioIds.has(lesson.id)}
+            {@const active = listPlaying?.id === lesson.id && !listPaused}
+            <button class="play" type="button" aria-pressed={active}
+              aria-label={`${active ? copy.pauseLesson : copy.playLesson}: ${title(lesson.title)}`}
+              onclick={() => void playFromList(lesson)}><span aria-hidden="true">{active ? '⏸' : '▶'}</span></button>
+          {/if}
           <button class="danger" onclick={() => discard(lesson.draftId,lesson.title)}>{copy.discard}</button>
         </li>
       {/each}</ul>
@@ -533,4 +573,12 @@
   {/if}
   <footer class="site-footer"><a href="/om">{copy.aboutLink}</a></footer>
 </div>
+{#if listPlaying}
+  <div class="mini-player" role="region" aria-label={copy.nowPlaying}>
+    <span class="mp-title"><span class="mp-label">{copy.nowPlaying}</span> {listPlaying.title}</span>
+    <audio bind:this={listAudio} src={listPlaying.url} controls
+      onplay={() => listPaused = false} onpause={() => listPaused = true} onended={stopListPlayback}></audio>
+    <button type="button" class="secondary" onclick={stopListPlayback}>{copy.stopPlayback}</button>
+  </div>
+{/if}
 </main>

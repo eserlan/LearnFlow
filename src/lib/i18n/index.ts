@@ -132,6 +132,11 @@ const messages = {
 		aboutDeleteTitle: 'Slette alt',
 		aboutDelete: 'Trykk «Slett» på en leksjon eller tekst, så fjernes den og lyden fra enheten. Uferdige tekster slettes automatisk etter 7 dager. Å tømme nettleserens data fjerner alt.',
 		aboutBack: '← Tilbake til LearnFlow',
+		playLesson: 'Spill av',
+		pauseLesson: 'Pause',
+		stopPlayback: 'Stopp',
+		nowPlaying: 'Spiller nå',
+		audioUnavailable: 'Fant ikke lyden på enheten. Åpne leksjonen og lag lyd på nytt.',
 		description: 'Lim inn og forenkle skoleteksten din.'
 	},
 	nn: {
@@ -265,6 +270,11 @@ const messages = {
 		aboutDeleteTitle: 'Slette alt',
 		aboutDelete: 'Trykk «Slett» på ein leksjon eller tekst, så blir han og lyden fjerna frå eininga. Uferdige tekstar blir sletta automatisk etter 7 dagar. Å tømme data i nettlesaren fjernar alt.',
 		aboutBack: '← Tilbake til LearnFlow',
+		playLesson: 'Spel av',
+		pauseLesson: 'Pause',
+		stopPlayback: 'Stopp',
+		nowPlaying: 'Speler no',
+		audioUnavailable: 'Fann ikkje lyden på eininga. Opne leksjonen og lag lyd på nytt.',
 		description: 'Lim inn og forenkl skuleteksten din.'
 	}
 } as const;

@@ -164,3 +164,41 @@ test('About page explains privacy and follows the chosen language', async ({ pag
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.getByLabel('Språk')).toHaveValue('nn');
 });
+
+test('a lesson with saved audio can be played from the list, one at a time, and stops when opened', async ({ page }) => {
+  await seedLesson(page);
+  // No audio yet: no play button on the row.
+  await expect(page.getByRole('button', { name: /^Spill av: / })).toHaveCount(0);
+  await page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('learnflow'); request.onsuccess = () => resolve(request.result); request.onerror = reject;
+    });
+    // One second of 8 kHz mono 8-bit silence.
+    const samples = 8000, bytes = new Uint8Array(44 + samples).fill(128), view = new DataView(bytes.buffer);
+    const text = (at: number, value: string) => [...value].forEach((c, i) => view.setUint8(at + i, c.charCodeAt(0)));
+    text(0, 'RIFF'); view.setUint32(4, 36 + samples, true); text(8, 'WAVE'); text(12, 'fmt ');
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+    view.setUint32(24, 8000, true); view.setUint32(28, 8000, true); view.setUint16(32, 1, true); view.setUint16(34, 8, true);
+    text(36, 'data'); view.setUint32(40, samples, true);
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('audioAssets', 'readwrite');
+      tx.objectStore('audioAssets').put({ id: 'd1:1', draftId: 'd1', createdAt: Date.now(), storage: 'indexeddb', blob: new Blob([bytes], { type: 'audio/wav' }) });
+      tx.oncomplete = () => resolve(); tx.onerror = reject;
+    });
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  const play = page.getByRole('button', { name: 'Spill av: Video' });
+  await expect(play).toBeVisible();
+  await play.click();
+  await expect(page.getByRole('region', { name: 'Spiller nå' })).toContainText('Video');
+  await expect(page.getByRole('button', { name: 'Pause: Video' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Pause: Video' }).click();
+  await expect(page.getByRole('button', { name: 'Spill av: Video' })).toHaveAttribute('aria-pressed', 'false');
+  await page.getByRole('button', { name: 'Spill av: Video' }).click();
+  await page.getByRole('button', { name: /Vis leksjon: Video/ }).click();
+  await expect(page.getByRole('region', { name: 'Spiller nå' })).toHaveCount(0);
+  await page.getByRole('button', { name: '← Tilbake' }).first().click();
+  await page.getByRole('button', { name: 'Spill av: Video' }).click();
+  await page.getByRole('button', { name: 'Stopp' }).click();
+  await expect(page.getByRole('region', { name: 'Spiller nå' })).toHaveCount(0);
+});
