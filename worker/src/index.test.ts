@@ -81,6 +81,28 @@ describe('stateless Cloudflare Worker API', () => {
     assert.equal(preview.status,403);
   });
 
+  it('allows the new static Worker frontend without allowing arbitrary workers.dev origins', async () => {
+    const production = 'https://learnflow.espen-erlandsen.workers.dev';
+    const health = await handleRequest(new Request(api + '/health', {
+      headers: { Origin: production }
+    }), {});
+    assert.equal(health.status, 200);
+    assert.equal(health.headers.get('Access-Control-Allow-Origin'), production);
+    for (const endpoint of ['/api/simplify','/api/speak']) {
+      const preflight = await handleRequest(new Request(api + endpoint, {
+        method:'OPTIONS', headers: {Origin:production,
+          'Access-Control-Request-Method':'POST',
+          'Access-Control-Request-Headers':'Content-Type'}
+      }), {});
+      assert.equal(preflight.status, 204);
+      assert.equal(preflight.headers.get('Access-Control-Allow-Origin'), production);
+    }
+    const bad = await handleRequest(new Request(api + '/health', {
+      headers: { Origin: 'https://stranger.espen-erlandsen.workers.dev' }
+    }), {});
+    assert.equal(bad.status,403);
+  });
+
   it('handles only valid CORS preflight', async () => {
     const ok = await handleRequest(new Request(api + '/api/simplify', {
       method: 'OPTIONS', headers: { Origin: 'https://preview.example.test', 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'Content-Type' }

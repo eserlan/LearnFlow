@@ -16,6 +16,8 @@ jobs:
       - run: bun run check
       - run: bun run build
       - run: test -f build/index.html && test -f build/manifest.webmanifest && test -f build/service-worker.js && test -f build/_headers
+      - name: Verify Wrangler can deploy the static frontend without auto-configuring SvelteKit
+        run: npx --yes wrangler@4.158.0 deploy --config wrangler.jsonc --dry-run
       - run: bun run test:unit
       - run: bun run test:integration
   worker:

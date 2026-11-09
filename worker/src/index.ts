@@ -27,6 +27,7 @@ const ROUTES = new Set(['/health', '/capabilities', ...API_PATHS]);
 // the migration so users can retrieve their device-local lessons there.
 // Pages project slug: "learnflow-web"; preview domains are NOT auto-allowed.
 const PRODUCTION_ORIGINS = [
+  'https://learnflow.espen-erlandsen.workers.dev',
   'https://learnflow-web.pages.dev',
   'https://learnflow-nine-pied.vercel.app'
 ] as const;

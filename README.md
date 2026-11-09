@@ -2,7 +2,7 @@
 
 LearnFlow helps learners turn long school texts into shorter lessons and spoken audio.
 
-- **Frontend:** static SvelteKit 3 site deployed to Cloudflare Pages.
+- **Frontend:** static SvelteKit 3 site deployed through Cloudflare Workers Static Assets.
 - **AI API:** separate stateless Cloudflare Worker (Gemini simplification and TTS).
 - **Storage:** lesson drafts and generated audio live only in the browser's IndexedDB/OPFS.
 
@@ -26,9 +26,9 @@ is public and defined in `.env.production`. There are **no Google API secrets in
 
 ## Deployment
 
-See [Cloudflare Pages setup](docs/cloudflare-pages-static-deployment.md). The intended
-production domain is `https://learnflow-web.pages.dev`; the AI Worker stays at
-`https://learnflow.espen-erlandsen.workers.dev`.
+See [Cloudflare Workers Static Assets setup](docs/cloudflare-workers-static-deployment.md). The intended
+production domain is `https://learnflow.espen-erlandsen.workers.dev`; the AI Worker stays at
+`https://learnflow-serv.espen-erlandsen.workers.dev`.
 
 Do not retire the old Vercel origin before providing an export/import path for
 locally stored lessons and audio.
