@@ -1,6 +1,6 @@
-# ADR-0001: Installable SvelteKit web app, stateless EU functions on Vercel, Gemini Flash via the Gemini API
+# ADR-0001: Installable SvelteKit web app, stateless API on a Cloudflare Worker, Gemini Flash via the Gemini API
 
-**Status:** Accepted. Note: hosting on Vercel (Decision 3) was superseded by ADR-0002 and Vercel is no longer used; the references to it below are kept as history. The simplification model was chosen on pilot results and is confirmed on the full
+**Status:** Accepted. The hosting choice in Decision 3 was changed by ADR-0002 (Cloudflare Worker for the API, Workers Static Assets for the app). The simplification model was chosen on pilot results and is confirmed on the full
 practice split (see Decision 4).
 **Date:** 2026-11-05. **Revised:** 2026-11-06, three times. First the language model moved from Gemini on Vertex AI
 (EU endpoint) to Claude through the Anthropic API with global inference. Then, after the first harness
@@ -37,9 +37,10 @@ shaped by:
 2. **Local data: Dexie on IndexedDB** for lessons, source and simplified text, progress and settings. **OPFS
    (Origin Private File System)** stores the audio files. The app asks for persistent storage
    (`navigator.storage.persist()`) and encourages pupils to add LearnFlow to the home screen.
-3. **Server: SvelteKit server routes deployed as Vercel Node.js functions, pinned to an EU region** (`arn1`
-   Stockholm, with `fra1` Frankfurt as fallback). Edge Functions are not used. The server is **stateless**: no
-   database, no stored text or audio, and logs contain metadata only, never request or response content.
+3. **Hosting: the app is static files on Cloudflare (Workers Static Assets); the API is a separate Cloudflare
+   Worker** (`learnflow-serv`, see ADR-0002). There are no SvelteKit server routes. The Worker is
+   **stateless**: no database, no stored text or audio, and logs contain metadata only, never request or
+   response content.
    - `POST /api/simplify`: simplification, automatic checks and the check call; streams sections as they are
      ready.
    - `POST /api/speak`: speech for one chapter; returns one continuous audio file plus word timings.
@@ -58,7 +59,7 @@ shaped by:
    - **Processing location:** the Gemini API does not let us choose where it processes requests, so
      processing outside the EEA needs the documented legal basis that Principle II requires (see Action
      Items).
-   - The API key is a Vercel encrypted environment variable, available to server functions only, in a
+   - The API key is a Cloudflare Worker secret (`GEMINI_API_KEY`), available to the Worker only, in a
      dedicated Google Cloud project with a budget alert.
    - Evaluation runs go through the team's own command-line logins (`agy` for Gemini, `claude -p` for the
      Claude judge), so the eval needs no API key. Production calls the API directly; the harness gets a
@@ -134,9 +135,8 @@ and desktop; no install required to try it.
 
 | Option | Assessment |
 |--------|------------|
-| Vercel Edge Functions | Rejected. They run near the user by default, which makes "where is data processed" harder to answer; the runtime is reduced; LLM calls take seconds, so edge latency gains are irrelevant. |
-| **Vercel Node.js functions pinned to `arn1`/`fra1`** | **Chosen.** A clear EU processing location, full Node APIs, native SvelteKit support, preview deployments, and secrets kept on the server. Vercel becomes a data processor. |
-| Google Cloud Run in an EU region | Viable. One cloud with the Gemini API, which makes the DPIA simpler, but more setup and no built-in preview deployments. This is the fallback if Vercel's data protection terms or region limits don't work out. |
+| **Cloudflare Worker for the API, Workers Static Assets for the app** | **Chosen (ADR-0002).** Static files plus a small stateless Worker keep secrets on the server, stream responses, and need no server framework. Workers run near the user, so the processing location is not pinned to the EU; the DPIA has to cover that (see Action Items). Cloudflare becomes a data processor. |
+| Google Cloud Run in an EU region | Viable. One cloud with the Gemini API, which makes the DPIA simpler and pins the location, but more setup. This is the fallback if Cloudflare's data protection terms or lack of region pinning don't work out. |
 
 ### Language model access
 
@@ -173,9 +173,9 @@ and desktop; no install required to try it.
   texts are school material, not pupil data, but a pupil can paste anything, so the transfer is treated as
   personal data. If the DPIA or a school customer requires EU processing, the options are Gemini on Vertex
   AI (which the team does not want) or Claude through Bedrock with EU routing.
-- **Vercel vs Google Cloud Run.** Vercel gives the best SvelteKit developer experience, but adds more
-  processors (Vercel, Google and, for the check, Anthropic) to the DPIA. That is an acceptable cost if
-  Vercel's data processing agreement and EU region pinning hold up.
+- **Cloudflare vs Google Cloud Run.** Cloudflare gives a simple static frontend and stateless Worker, but adds
+  more processors (Cloudflare, Google and, for the check, Anthropic) to the DPIA, and the Worker's location
+  is not pinned to the EU. That is an acceptable cost if Cloudflare's data processing agreement holds up.
 
 ## Consequences
 
@@ -223,7 +223,7 @@ and desktop; no install required to try it.
 6. [ ] Confirm Gemini 3.8 Flash on the full practice split, then add a Gemini API backend to the harness
    and measure the production path (structured output, thinking level, latency). Choose the check model on
    the seeded-error set.
-7. [ ] Confirm Vercel's region pinning for functions on the chosen plan, its data processing agreement and
-   its log retention. Add Vercel, Google, Anthropic (if it does the check) and the TTS provider to the DPIA's
-   list of processors.
+7. [ ] Confirm Cloudflare's data processing agreement and log retention for Workers, and whether regional
+   processing is needed. Add Cloudflare, Google, Anthropic (if it does the check) and the TTS provider to the
+   DPIA's list of processors.
 8. [ ] Run `/speckit-plan` for 001–004 using this ADR.

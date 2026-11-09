@@ -6,11 +6,11 @@
 
 ## Context
 
-LearnFlow already has a SvelteKit 5 PWA, Dexie/IndexedDB source drafts, a consent-checked processing boundary, and a model-quality evaluation suite. ADR-0001 previously selected Vercel Node.js functions for the AI endpoints. The product owner has now chosen Cloudflare Workers for the AI backend while keeping Vercel's convenient web app deployment, **and has explicitly ruled out server-side file storage for the MVP**.
+LearnFlow already has a SvelteKit 5 PWA, Dexie/IndexedDB source drafts, a consent-checked processing boundary, and a model-quality evaluation suite. ADR-0001 previously selected server functions for the AI endpoints. The product owner has now chosen a Cloudflare Worker for the AI backend, with the web app served as Cloudflare Workers Static Assets, **and has explicitly ruled out server-side file storage for the MVP**.
 
 ## Decision
 
-1. **Frontend:** retain the existing SvelteKit application at the repository root, deployed as Cloudflare Workers Static Assets (originally planned on Vercel; Vercel is no longer used). Do not force a monorepo migration just for a Worker.
+1. **Frontend:** retain the existing SvelteKit application at the repository root, deployed as Cloudflare Workers Static Assets. Do not force a monorepo migration just for a Worker.
 2. **AI API:** provide a separate, stateless Cloudflare Worker. The intended public contract is `POST /api/simplify`, `POST /api/speak`, and `GET /health`. Requests are transient; results are returned to the browser. Worker integration must use the existing consent-protected `SimplificationProcessor` boundary.
 3. **Store all source and generated files on the pupil's device:** source text, source documents, lesson metadata and progress in Dexie/IndexedDB; generated audio in OPFS where supported (with a deliberate fallback). Keep the original source on-device for provenance and retry. Existing expiry and delete features continue to apply. Do not sync or back up files to the server.
 4. **No cloud persistence in the MVP:** no R2, D1, KV, Durable Objects, server-side session database, Cloudflare Workflows, or other persistent stores of pupil content. Do not use a CDN/API cache for private processing results. Do not log source text, simplified responses, generated audio, or student-entered content.
@@ -19,7 +19,7 @@ LearnFlow already has a SvelteKit 5 PWA, Dexie/IndexedDB source drafts, a consen
 
 ## Supersession and preserved decisions
 
-This ADR **supersedes ADR-0001 Decision 3 (Vercel Node.js server functions) and its associated server-hosting comparison**. ADR-0001 remains authoritative for SvelteKit, local-first storage, golden evaluation/faithfulness gates, provider choice, and the unresolved TTS experiment. A new architecture review is required before introducing cloud file persistence.
+This ADR **supersedes ADR-0001 Decision 3 (server functions) and its associated server-hosting comparison**. ADR-0001 remains authoritative for SvelteKit, local-first storage, golden evaluation/faithfulness gates, provider choice, and the unresolved TTS experiment. A new architecture review is required before introducing cloud file persistence.
 
 ## Device data and network boundaries
 

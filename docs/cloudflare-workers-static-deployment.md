@@ -73,9 +73,9 @@ and that its secrets and limiter binding survived.
 3. With **fictional** Norwegian test text, simplify, select **Lag lyd**,
    play the WAV, reload the page and confirm it can play again.
 4. Confirm the PWA manifests and `/service-worker.js` load.
-5. Vercel is no longer used. Lessons and audio saved on the old Vercel origin
-   stay on that origin's browser storage and are not migrated.
+5. Lessons and audio are stored in each browser per origin, so they stay on the
+   address where they were created and are not migrated between addresses.
 
 References:
-- https://developers.cloudflare.com/workers/static-assets/migration-guides/vercel-to-workers/static-site/
+- https://developers.cloudflare.com/workers/static-assets/
 - https://developers.cloudflare.com/workers/ci-cd/builds/configuration/
