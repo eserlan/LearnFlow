@@ -1,14 +1,13 @@
-<script lang="ts">
-  import type { InterfaceLanguage } from './i18n';
-
+<script lang="ts" generics="T extends string">
+  /** A small two-or-three-way choice shown as a radio group (used for the interface and output language). */
   let { value = $bindable(), label, options, onchange }: {
-    value: InterfaceLanguage;
+    value: T;
     label: string;
-    options: { value: InterfaceLanguage; text: string }[];
+    options: { value: T; text: string; lang?: string }[];
     onchange?: () => void;
   } = $props();
 
-  function choose(next: InterfaceLanguage) {
+  function choose(next: T) {
     if (next === value) return;
     value = next;
     onchange?.();
@@ -28,7 +27,7 @@
 <div class="segmented" role="radiogroup" aria-label={label} onkeydown={key}>
   {#each options as option (option.value)}
     <button type="button" role="radio" class="segment" aria-checked={value === option.value}
-      tabindex={value === option.value ? 0 : -1} lang={option.value}
+      tabindex={value === option.value ? 0 : -1} lang={option.lang}
       onclick={() => choose(option.value)}>{option.text}</button>
   {/each}
 </div>

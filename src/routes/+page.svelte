@@ -59,6 +59,8 @@
   const MAX_WORDS = 2000;
   const title = (value:string) => plainTitle(value) || value;
   let language = $state<'nb'|'nn'>('nb');
+  // What the lesson is written in: the language of the text, or English. Remembered on this device.
+  let outputLanguage = $state<'same'|'en'>('same');
   let hintSeen = $state(true);   // set from storage on mount, so it never flashes for returning users
   let sourceOpen = $state(false);
   let theme = $state<'light'|'dark'>('light');
@@ -96,6 +98,9 @@
 
   $effect(() => { document.documentElement.lang = language; });
   // Saved on change only: an effect would overwrite the stored choice with the default before it is read.
+  function saveOutputLanguage() {
+    try { localStorage.setItem('learnflow-output',outputLanguage); } catch { /* storage disabled */ }
+  }
   function saveLanguage() {
     try { localStorage.setItem('learnflow-lang',language); } catch { /* storage disabled */ }
   }
@@ -108,6 +113,7 @@
       const lang = localStorage.getItem('learnflow-lang');
       if (lang === 'nn' || lang === 'nb') language = lang;
       hintSeen = localStorage.getItem('learnflow-hint-seen') === '1';
+      if (localStorage.getItem('learnflow-output') === 'en') outputLanguage = 'en';
       const stored = localStorage.getItem('learnflow-theme');
       if (stored) theme = stored === 'dark' ? 'dark' : 'light';
       else if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) theme = 'dark';
@@ -257,6 +263,8 @@
       if (capabilities?.simplify !== true) throw new Error(capabilities?.reason ?? 'not-enabled');
       checkingCapabilities = false;
       status = copy.sending; phase = 'sending';
+      // Fixed for this run, so changing the choice while it works does not mix the request and the saved lesson.
+      const target = outputLanguage === 'en' ? 'en' as const : undefined;
       const response = await simplifyDraft(id,
         {canProcess:async () => true}, createWorkerProcessor(api), {
           onAccepted: () => { phase = 'received'; status = copy.received; },
@@ -268,9 +276,9 @@
             }
           },
           onReset: () => { live = []; phase = 'received'; status = copy.received; }
-        });
+        }, target);
       phase = 'saving';
-      const lesson = await saveVerifiedLesson(id,response);
+      const lesson = await saveVerifiedLesson(id,response,target);
       text = ''; html = undefined; origin = ''; resumeId = null;
       // The streamed draft gives way to the checked lesson, rendered properly from the final result.
       live = [];
@@ -448,7 +456,7 @@
     <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><h1>LearnFlow</h1></div>
     <div class="topbar-controls">
     <LanguageSwitch bind:value={language} label={copy.languageLabel} onchange={saveLanguage}
-      options={[{value:'nb',text:copy.bokmal},{value:'nn',text:copy.nynorsk}]} />
+      options={[{value:'nb',text:copy.bokmal,lang:'nb'},{value:'nn',text:copy.nynorsk,lang:'nn'}]} />
     <button type="button" class="theme-toggle" onclick={toggleTheme} aria-label={theme === 'light' ? copy.darkMode : copy.lightMode} title={theme === 'light' ? copy.darkMode : copy.lightMode}>
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         {#if theme === 'light'}<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
@@ -476,6 +484,11 @@
     </ol>
   {/if}
   <section class="composer" aria-labelledby="paste-title">
+    <div class="output-choice">
+      <span class="output-label" id="output-label">{copy.outputLabel}</span>
+      <LanguageSwitch bind:value={outputLanguage} label={copy.outputLabel} onchange={saveOutputLanguage}
+        options={[{value:'same',text:copy.outputSame},{value:'en',text:copy.outputEnglish,lang:'en'}]} />
+    </div>
     <label for="source">{copy.prompt}</label>
     <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9" placeholder={copy.placeholder} aria-describedby="source-help"></textarea>
     <div class="composer-footer">
@@ -543,7 +556,7 @@
         <li>
           <button class="row" onclick={() => void openLesson(lesson)} aria-label={`${copy.showLesson}: ${title(lesson.title)}`}>
             <span class="row-title">{title(lesson.title)}</span>
-            <span class="row-meta">{new Date(lesson.createdAt).toLocaleDateString(language === 'nn' ? 'nn-NO' : 'nb-NO',{day:'numeric',month:'short'})} · {wordCount(lesson.sentences)} {copy.wordsShort}</span>
+            <span class="row-meta">{new Date(lesson.createdAt).toLocaleDateString(language === 'nn' ? 'nn-NO' : 'nb-NO',{day:'numeric',month:'short'})} · {wordCount(lesson.sentences)} {copy.wordsShort}{lesson.outputLanguage === 'en' ? ' · English' : ''}</span>
           </button>
           {#if audioIds.has(lesson.id)}
             {@const active = listPlaying?.id === lesson.id && !listPaused}
@@ -602,7 +615,7 @@
   {/if}
   {:else}
     <div class="read-progress" aria-hidden="true"><span style:transform={`scaleX(${readProgress})`}></span></div>
-    <article aria-labelledby="lesson-title" class="lesson reading" class:clear-font={clearFont} class:spacious
+    <article aria-labelledby="lesson-title" lang={selectedLesson.outputLanguage === 'en' ? 'en' : undefined} class="lesson reading" class:clear-font={clearFont} class:spacious
       style:--lesson-size={SIZES[textSize]}>
       <div class="reading-bar">
         <button class="secondary back" onclick={closeLesson} disabled={audioBusy}>{copy.back}</button>
@@ -633,6 +646,7 @@
         {#if audioError}<p role="alert">{audioError}</p>{/if}
       </div>
       {@render blocksView(lessonBlocks)}
+      {#if selectedLesson.outputLanguage === 'en'}<p class="note translated" role="note" lang={language}>{copy.translatedNote}</p>{/if}
       <p class="note caution" role="note">{copy.cautionLead}
         <button type="button" class="linklike" onclick={() => { sourceOpen = true; }}>{copy.cautionLink}</button>.</p>
       <details bind:open={sourceOpen}><summary>{copy.showSource}</summary><div class="source-text md">{@html renderMarkdown(selectedLessonSource)}</div></details>

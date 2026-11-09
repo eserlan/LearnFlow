@@ -264,3 +264,34 @@ for (const textScale of ['100%', '130%', '160%']) {
     await page.locator('.topbar').screenshot({ path: `test-results/topbar-${textScale.replace('%', '')}.png` });
   });
 }
+
+test('output language defaults to the text and English is remembered on the device', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const group = page.getByRole('radiogroup', { name: 'Skriv leksjonen på' });
+  await expect(group.getByRole('radio', { name: 'Samme som teksten' })).toHaveAttribute('aria-checked', 'true');
+  await expect(group.getByRole('radio')).toHaveCount(2);
+  await group.getByRole('radio', { name: 'English' }).click();
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.getByRole('radiogroup', { name: 'Skriv leksjonen på' }).getByRole('radio', { name: 'English' })).toHaveAttribute('aria-checked', 'true');
+  await page.getByRole('radio', { name: 'Nynorsk' }).click();
+  await expect(page.getByRole('radiogroup', { name: 'Skriv leksjonen på' }).getByRole('radio', { name: 'Same som teksten' })).toBeVisible();
+});
+
+test('an English lesson is marked as translated and read in English', async ({ page }) => {
+  await seedLesson(page);
+  await page.evaluate(async () => {
+    const db: IDBDatabase = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('learnflow'); request.onsuccess = () => resolve(request.result); request.onerror = reject;
+    });
+    const tx = db.transaction('lessons', 'readwrite');
+    const store = tx.objectStore('lessons');
+    const get = store.get('d1:1');
+    get.onsuccess = () => store.put({ ...get.result, outputLanguage: 'en' });
+    await new Promise<void>((resolve) => { tx.oncomplete = () => resolve(); });
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('.row-meta')).toContainText('English');
+  await page.getByRole('button', { name: /Vis leksjon: Video/ }).click();
+  await expect(page.locator('article.lesson')).toHaveAttribute('lang', 'en');
+  await expect(page.getByText('Denne leksjonen er oversatt til engelsk av AI.')).toBeVisible();
+});
