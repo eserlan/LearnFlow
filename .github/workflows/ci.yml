@@ -35,3 +35,34 @@ jobs:
       - run: npm run check
       - run: npm run test
 
+
+  live-api-origin-smoke:
+    name: Synthetic CORS check on renamed API (temporary)
+    if: github.head_ref == 'ci/probe-renamed-worker-cors'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Probe actual deployed API without pupil data
+        run: |
+          node --input-type=module <<'NODE'
+          const url='https://learnflow-serv.espen-erlandsen.workers.dev';
+          const origin='https://learnflow.espen-erlandsen.workers.dev';
+          const cap=await fetch(url+'/capabilities',{headers:{Origin:origin}});
+          const c=await cap.json().catch(()=>null);
+          console.log('cap_http='+cap.status,'cap_cors='+cap.headers.get('access-control-allow-origin'),
+            'simplify='+c?.simplify,'reason='+c?.reason);
+          const pre=await fetch(url+'/api/simplify',{method:'OPTIONS',headers:{
+            Origin:origin,'Access-Control-Request-Method':'POST',
+            'Access-Control-Request-Headers':'Content-Type'
+          }});
+          console.log('preflight_http='+pre.status,'preflight_cors='+pre.headers.get('access-control-allow-origin'));
+          const payload={draftId:'ci-rename-probe',sourceVersion:1,idempotencyKey:'ci-rename-probe:1',
+            plainText:'Planter trenger lys og vann for å vokse.'};
+          const response=await fetch(url+'/api/simplify',{method:'POST',headers:{Origin:origin,
+            'Content-Type':'application/json'},body:JSON.stringify(payload)});
+          const data=await response.json().catch(()=>null);
+          console.log('post_http='+response.status,'post_cors='+response.headers.get('access-control-allow-origin'),
+            'post_code='+String(data?.error||'none'),'lesson_kind='+String(data?.result?.kind||'none'));
+          NODE
