@@ -29,18 +29,20 @@ test('edited draft survives reload and resume focuses the editor', async ({ page
   const source=page.getByLabel('Lim inn teksten du vil lære');
   await source.fill('Første versjon av teksten.');
   await page.locator('section.composer').getByRole('button',{name:'Forenkle med AI'}).click();
+  await page.locator('summary[aria-label^="Flere valg"]').click();
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toBeFocused();
   await source.fill('Oppdatert versjon av teksten.');
   await page.locator('section.composer').getByRole('button',{name:'Forenkle med AI'}).click();
   await page.reload();
+  await page.locator('summary[aria-label^="Flere valg"]').click();
   await page.getByRole('button',{name:'Rediger tekst'}).click();
   await expect(source).toHaveValue('Oppdatert versjon av teksten.');
 });
 
 test('Nynorsk labels main action correctly', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
-  await page.getByLabel('Språk').selectOption('nn');
+  await page.getByRole('radio', { name: 'Nynorsk' }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'nn');
   await expect(page.getByRole('heading', { name: 'Gjer teksten lettare' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Forenkl med KI' })).toBeVisible();
@@ -56,7 +58,7 @@ test('modern editor keeps the same flow and remembers the chosen theme', async (
   await expect(shell).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(shell).toHaveAttribute('data-theme', 'dark');
-  await page.getByLabel('Språk').selectOption('nn');
+  await page.getByRole('radio', { name: 'Nynorsk' }).click();
   await expect(page.getByRole('button', { name: 'Byt til lys modus' })).toBeVisible();
   await page.getByRole('button', { name: 'Byt til lys modus' }).click();
   await expect(shell).toHaveAttribute('data-theme', 'light');
@@ -112,7 +114,6 @@ test('lesson opens in a reading view with clean title, worksheet tasks and rende
   await page.getByText('Vis originalteksten').click();
   await expect(page.locator('.source-text h3')).toHaveText('1. Faser');
   await expect(page.locator('.source-text li strong')).toHaveText('Forproduksjon:');
-  await page.getByText('Lesevalg').first().click();
   await page.getByRole('button', { name: 'Større tekst' }).click();
   await page.reload();
   await page.getByRole('button', { name: /Vis leksjon: Video/ }).click();
@@ -123,7 +124,8 @@ test('lesson opens in a reading view with clean title, worksheet tasks and rende
 
 test('deleting a lesson can be undone', async ({ page }) => {
   await seedLesson(page);
-  await page.getByRole('button', { name: 'Slett' }).first().click();
+  await page.locator('summary[aria-label="Flere valg: Video"]').click();
+  await page.getByRole('button', { name: 'Slett' }).click();
   await expect(page.getByRole('status')).toContainText('Slettet: Video');
   await expect(page.getByRole('button', { name: /Vis leksjon/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'Angre' }).click();
@@ -154,7 +156,7 @@ test('lesson shows a one-time tip, and the AI caution links to the original', as
 
 test('About page explains privacy and follows the chosen language', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
-  await page.getByLabel('Språk').selectOption('nn');
+  await page.getByRole('radio', { name: 'Nynorsk' }).click();
   await page.getByRole('link', { name: 'Om LearnFlow' }).click();
   await expect(page).toHaveURL(/\/om\/?$/);
   await expect(page.getByRole('heading', { name: 'Kva skjer med teksten din?' })).toBeVisible();
@@ -162,7 +164,7 @@ test('About page explains privacy and follows the chosen language', async ({ pag
   await page.getByRole('link', { name: /Tilbake til LearnFlow/ }).click();
   await expect(page.getByRole('heading', { name: 'Gjer teksten lettare' })).toBeVisible();
   await page.reload({ waitUntil: 'networkidle' });
-  await expect(page.getByLabel('Språk')).toHaveValue('nn');
+  await expect(page.getByRole('radio', { name: 'Nynorsk' })).toHaveAttribute('aria-checked', 'true');
 });
 
 test('a lesson with saved audio can be played from the list, one at a time, and stops when opened', async ({ page }) => {
@@ -201,4 +203,22 @@ test('a lesson with saved audio can be played from the list, one at a time, and 
   await page.getByRole('button', { name: 'Spill av: Video' }).click();
   await page.getByRole('button', { name: 'Stopp' }).click();
   await expect(page.getByRole('region', { name: 'Spiller nå' })).toHaveCount(0);
+});
+
+test('primary action is disabled until there is text, and an example can fill the box', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const action = page.locator('section.composer').getByRole('button', { name: 'Forenkle med AI' });
+  await expect(action).toBeDisabled();
+  await page.getByRole('button', { name: 'Prøv med en eksempeltekst' }).click();
+  await expect(page.getByLabel('Lim inn teksten du vil lære')).not.toHaveValue('');
+  await expect(action).toBeEnabled();
+});
+
+test('language switch is a radio group with arrow-key support', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const group = page.getByRole('radiogroup', { name: 'Språk' });
+  await expect(group.getByRole('radio', { name: 'Bokmål' })).toHaveAttribute('aria-checked', 'true');
+  await group.getByRole('radio', { name: 'Bokmål' }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'nn');
 });

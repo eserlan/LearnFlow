@@ -8,6 +8,7 @@
   import { purgeExpiredLessons, touchLesson, setLessonPinned } from '../lib/storage/lessons';
   import { db, type StoredLesson } from '../lib/storage/db';
   import { getCopy } from '../lib/i18n';
+  import LanguageSwitch from '../lib/LanguageSwitch.svelte';
   import { simplifyDraft } from '../lib/lesson/handoff';
   import { createWorkerProcessor, WorkerProcessorError } from '../lib/lesson/worker-processor';
   import { saveVerifiedLesson } from '../lib/lesson/saved-lesson';
@@ -68,6 +69,22 @@
   const lessonBlocks = $derived(selectedLesson ? groupSentences(selectedLesson.sentences) : []);
   const liveBlocks = $derived(groupSentences(live));
   const SIZES = ['1rem','1.125rem','1.3rem','1.5rem'];
+  let readProgress = $state(0);
+  function trackScroll() {
+    const room = document.documentElement.scrollHeight - window.innerHeight;
+    readProgress = room > 0 ? Math.min(1, Math.max(0, window.scrollY / room)) : 0;
+  }
+  $effect(() => {
+    if (!selectedLesson) { readProgress = 0; return; }
+    trackScroll();
+    window.addEventListener('scroll', trackScroll, { passive: true });
+    window.addEventListener('resize', trackScroll);
+    return () => { window.removeEventListener('scroll', trackScroll); window.removeEventListener('resize', trackScroll); };
+  });
+  function useExample() {
+    text = copy.exampleText; html = undefined; error = ''; status = '';
+    sourceElement?.focus();
+  }
   function savePrefs() {
     try { localStorage.setItem('learnflow-reading',JSON.stringify({textSize,clearFont,spacious})); } catch { /* storage disabled */ }
   }
@@ -429,9 +446,14 @@
 <main class="learnflow-shell" data-theme={theme}>
   <header class="topbar">
     <div class="brand"><span class="brand-mark" aria-hidden="true">L</span><h1>LearnFlow</h1></div>
-    <div class="language-control"><label for="lang">{copy.languageLabel}</label>
-      <select id="lang" bind:value={language} onchange={saveLanguage}><option value="nb">{copy.bokmal}</option><option value="nn">{copy.nynorsk}</option></select></div>
-    <button type="button" class="theme-toggle" onclick={toggleTheme} aria-label={theme === 'light' ? copy.darkMode : copy.lightMode} title={theme === 'light' ? copy.darkMode : copy.lightMode}>{theme === 'light' ? '☾' : '☀'}</button>
+    <LanguageSwitch bind:value={language} label={copy.languageLabel} onchange={saveLanguage}
+      options={[{value:'nb',text:copy.bokmal},{value:'nn',text:copy.nynorsk}]} />
+    <button type="button" class="theme-toggle" onclick={toggleTheme} aria-label={theme === 'light' ? copy.darkMode : copy.lightMode} title={theme === 'light' ? copy.darkMode : copy.lightMode}>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        {#if theme === 'light'}<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>
+        {:else}<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>{/if}
+      </svg>
+    </button>
   </header>
 
   <div class="content">
@@ -453,22 +475,26 @@
   {/if}
   <section class="composer" aria-labelledby="paste-title">
     <label for="source">{copy.prompt}</label>
-    <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9" placeholder={copy.placeholder}></textarea>
+    <textarea id="source" bind:value={text} bind:this={sourceElement} onpaste={pasted} rows="9" placeholder={copy.placeholder} aria-describedby="source-help"></textarea>
+    <div class="composer-footer">
+      <span class="word-count" class:near={inputWordCount > MAX_WORDS * 0.9 && inputWordCount <= MAX_WORDS} class:over={inputWordCount > MAX_WORDS}>
+        {inputWordCount.toLocaleString('nb-NO')} {copy.wordLimit}
+      </span>
+      <button class="primary-action" onclick={prepareAndSave} disabled={busy || inputWordCount === 0} aria-busy={busy}>
+        {#if busy}<span class="spinner" aria-hidden="true"></span>{copy.working}{:else}{copy.start}{/if}
+      </button>
+    </div>
+    <p id="source-help" class="visually-hidden">{copy.inputRequired}</p>
+    {#if inputWordCount === 0 && !busy && !lessons.length}
+      <button type="button" class="secondary example" onclick={useExample}>{copy.tryExample}</button>
+    {/if}
+    <p class="note privacy">{copy.privacyShort}</p>
+    <details class="more"><summary>{copy.privacyMore}</summary><p class="note">{copy.processingNotice}</p></details>
     <details class="origin-field" open={!!origin}>
       <summary>{copy.originOptional}</summary>
       <label for="origin" class="visually-hidden">{copy.origin}</label>
       <input id="origin" bind:value={origin} maxlength="120" placeholder={copy.origin}/>
     </details>
-    <p class="note">{copy.privacyShort}</p>
-    <details class="more"><summary>{copy.privacyMore}</summary><p class="note">{copy.processingNotice}</p></details>
-    <div class="composer-footer">
-      <span class="word-count" class:near={inputWordCount > MAX_WORDS * 0.9 && inputWordCount <= MAX_WORDS} class:over={inputWordCount > MAX_WORDS}>
-        {inputWordCount.toLocaleString('nb-NO')} {copy.wordLimit}
-      </span>
-      <button onclick={prepareAndSave} disabled={busy} aria-busy={busy}>
-        {#if busy}<span class="spinner" aria-hidden="true"></span>{copy.working}{:else}{copy.start}{/if}
-      </button>
-    </div>
     {#if error}
       <div class="problem">
         <p role="alert">{error}</p>
@@ -527,7 +553,12 @@
             aria-label={`${lesson.pinned ? copy.unpinLesson : copy.pinLesson}: ${title(lesson.title)}`}
             title={lesson.pinned ? copy.unpinLesson : copy.pinLesson}
             onclick={() => void togglePin(lesson)}><span aria-hidden="true">📌</span></button>
-          <button class="danger" onclick={() => discard(lesson.draftId,lesson.title)}>{copy.discard}</button>
+          <details class="menu">
+            <summary aria-label={`${copy.moreActions}: ${title(lesson.title)}`}><span aria-hidden="true">⋯</span></summary>
+            <div class="menu-list">
+              <button class="danger" onclick={() => discard(lesson.draftId,lesson.title)}>{copy.discard}</button>
+            </div>
+          </details>
         </li>
       {/each}</ul>
     </section>
@@ -543,9 +574,14 @@
           {#if shouldWarnExpiry(draft.lastActivityAt)} <span>{copy.deleteSoon}</span>{/if}
           <div class="actions">
             <button onclick={() => runSimplification(draft.id)} disabled={busy}>{copy.simplify}</button>
-            <button class="secondary" onclick={() => editDraft(draft)} disabled={busy}>{copy.edit}</button>
-            <button class="secondary" onclick={() => showOriginal(draft)}>{copy.original}</button>
-            <button class="danger" onclick={() => discard(draft.id,draft.title)} disabled={busy}>{copy.discard}</button>
+            <details class="menu">
+              <summary aria-label={`${copy.moreActions}: ${title(draft.title)}`}><span aria-hidden="true">⋯</span></summary>
+              <div class="menu-list">
+                <button class="secondary" onclick={() => editDraft(draft)} disabled={busy}>{copy.edit}</button>
+                <button class="secondary" onclick={() => showOriginal(draft)}>{copy.original}</button>
+                <button class="danger" onclick={() => discard(draft.id,draft.title)} disabled={busy}>{copy.discard}</button>
+              </div>
+            </details>
           </div>
         </li>
       {/each}</ul>
@@ -563,18 +599,18 @@
     </section>
   {/if}
   {:else}
+    <div class="read-progress" aria-hidden="true"><span style:transform={`scaleX(${readProgress})`}></span></div>
     <article aria-labelledby="lesson-title" class="lesson reading" class:clear-font={clearFont} class:spacious
       style:--lesson-size={SIZES[textSize]}>
       <div class="reading-bar">
         <button class="secondary back" onclick={closeLesson} disabled={audioBusy}>{copy.back}</button>
-        <details class="reading-fold"><summary>{copy.readingOptions}</summary>
         <div class="reading-options" role="group" aria-label={copy.readingOptions}>
+          <span class="reading-label" aria-hidden="true">{copy.readingOptions}</span>
           <button type="button" class="secondary" onclick={() => changeSize(-1)} disabled={textSize===0} aria-label={copy.smaller}>A−</button>
           <button type="button" class="secondary" onclick={() => changeSize(1)} disabled={textSize===3} aria-label={copy.larger}>A+</button>
           <button type="button" class="secondary" aria-pressed={clearFont} onclick={() => { clearFont=!clearFont; savePrefs(); }}>{copy.clearFont}</button>
           <button type="button" class="secondary" aria-pressed={spacious} onclick={() => { spacious=!spacious; savePrefs(); }}>{copy.spacious}</button>
         </div>
-        </details>
       </div>
       <h2 id="lesson-title" tabindex="-1" bind:this={lessonTitleElement}>{title(selectedLesson.title)}</h2>
       {#if !hintSeen}
